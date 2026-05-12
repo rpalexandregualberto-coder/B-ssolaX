@@ -1,0 +1,7 @@
+# Backups de dados (localStorage exports)
+backups/
+
+# Arquivos de sistema
+Thumbs.db
+.DS_Store
+desktop.ini

@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Ação — Alexandre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #09090b;
+  --surface: #111113;
+  --card: #17171a;
+  --border: #222226;
+  --border-light: #2c2c32;
+  --accent: #e8ff47;
+  --accent-dim: rgba(232,255,71,0.08);
+  --accent-border: rgba(232,255,71,0.2);
+  --red: #ff4d4d;
+  --red-dim: rgba(255,77,77,0.08);
+  --blue: #4d94ff;
+  --blue-dim: rgba(77,148,255,0.08);
+  --green: #4dff91;
+  --green-dim: rgba(77,255,145,0.08);
+  --orange: #ff9a3c;
+  --orange-dim: rgba(255,154,60,0.08);
+  --purple: #b47dff;
+  --text: #e8e8ea;
+  --text-muted: #5a5a62;
+  --text-dim: #8a8a95;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Instrument Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* GRAIN OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 220px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  padding: 24px 0;
+}
+
+.logo {
+  padding: 0 20px 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+}
+
+.logo-mark svg { width: 18px; height: 18px; }
+
+.logo h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.logo p {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.nav-section {
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+
+.nav-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  padding: 0 8px;
+  margin-bottom: 4px;
+  margin-top: 12px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  transition: all 0.15s;
+  text-decoration: none;
+  position: relative;
+}
+
+.nav-item:hover { background: var(--card); color: var(--text); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+
+.nav-item .icon { font-size: 0.85rem; width: 16px; text-align: center; flex-shrink: 0; }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 99px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 20px 0;
+  border-top: 1px solid var(--border);
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--accent), #b2ff00);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: #000;
+  flex-shrink: 0;
+}
+
+.user-info p { font-size: 0.78rem; font-weight: 600; }
+.user-info span { font-size: 0.65rem; color: var(--text-muted); }
+
+/* MAIN */
+.main {
+  margin-left: 220px;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(9,9,11,0.8);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-left h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.topbar-left p { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deadline-chip {
+  background: rgba(255,77,77,0.1);
+  border: 1px solid rgba(255,77,77,0.25);
+  color: var(--red);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 99px;
+  letter-spacing: 0.04em;
+}
+
+.progress-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.progress-pill strong { color: var(--accent); font-weight: 700; }
+
+/* CONTENT */
+.content { padding: 28px 32px 60px; }
+
+/* VIEWS */
+.view { display: none; }
+.view.active { display: block; }
+
+/* METRIC CARDS */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.metric-card.mc-yellow::after { background: var(--accent); }
+.metric-card.mc-red::after { background: var(--red); }
+.metric-card.mc-blue::after { background: var(--blue); }
+.metric-card.mc-green::after { background: var(--green); }
+
+.metric-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.metric-card.mc-yellow .metric-value { color: var(--accent); }
+.metric-card.mc-red .metric-value { color: var(--red); }
+.metric-card.mc-blue .metric-value { color: var(--blue); }
+.metric-card.mc-green .metric-value { color: var(--green); }
+
+.metric-sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 4px; }
+
+/* SECTION HEADER */
+.sec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  margin-top: 24px;
+}
+
+.sec-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+
+.sec-title .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+
+.sec-count {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+/* TASK ROWS */
+.task-list { display: flex; flex-direction: column; gap: 4px; }
+
+.task-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  animation: fadeIn 0.3s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.task-row:hover { border-color: var(--border-light); background: #1c1c20; }
+
+.task-row.done {
+  background: #111311;
+  border-color: #1e2a1e;
+  opacity: 0.6;
+}
+
+.task-row.done:hover { opacity: 0.8; }
+
+/* CHECKBOX */
+.cb {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-light);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  transition: all 0.15s;
+  color: transparent;
+}
+
+.task-row.done .cb {
+  background: #3a6a3a;
+  border-color: #3a6a3a;
+  color: #fff;
+}
+
+.task-name {
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: var(--text);
+  transition: color 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-row.done .task-name {
+  color: #4a6a4a;
+  text-decoration: line-through;
+  text-decoration-color: #2a4a2a;
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* STATUS BADGES */
+.badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.badge-not-started { background: #1e1e22; color: var(--text-muted); border: 1px solid var(--border); }
+.badge-process { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(77,148,255,0.2); }
+.badge-overdue { background: rgba(180,125,255,0.1); color: var(--purple); border: 1px solid rgba(180,125,255,0.2); }
+.badge-done { background: var(--green-dim); color: var(--green); border: 1px solid rgba(77,255,145,0.2); }
+.badge-amanha { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+.badge-urgente { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,77,77,0.2); }
+.badge-segunda { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(77,148,255,0.2); }
+
+.category-icon {
+  font-size: 0.85rem;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* BOARD VIEW */
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.board-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.board-col-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.col-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.board-col-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.col-cnt {
+  margin-left: auto;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  background: var(--border);
+  padding: 1px 7px;
+  border-radius: 99px;
+}
+
+.board-col-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+
+.board-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.board-card:hover { border-color: var(--border-light); transform: translateY(-1px); }
+
+.board-card-title {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.board-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* CALENDAR VIEW */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-day-label {
+  text-align: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 8px 0;
+}
+
+.cal-day {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  min-height: 80px;
+  padding: 8px;
+  font-size: 0.7rem;
+  position: relative;
+}
+
+.cal-day.other-month { opacity: 0.35; }
+.cal-day.today { border-color: var(--accent); }
+.cal-day.today .day-num { color: var(--accent); font-weight: 800; }
+
+.day-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-bottom: 4px;
+  color: var(--text-dim);
+}
+
+.cal-event {
+  font-size: 0.58rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.cal-event.ev-yellow { background: var(--accent-dim); color: var(--accent); border-left: 2px solid var(--accent); }
+.cal-event.ev-red { background: var(--red-dim); color: var(--red); border-left: 2px solid var(--red); }
+.cal-event.ev-blue { background: var(--blue-dim); color: var(--blue); border-left: 2px solid var(--blue); }
+.cal-event.ev-green { background: var(--green-dim); color: var(--green); border-left: 2px solid var(--green); }
+
+/* POS VENDA */
+.pos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.pos-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.pos-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.pos-table tr:last-child td { border-bottom: none; }
+.pos-table tr:hover td { background: var(--card); }
+
+/* ADD TASK FORM */
+.add-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  background: var(--card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  align-items: center;
+  transition: border-color 0.15s;
+}
+
+.add-bar:focus-within { border-color: var(--accent); }
+
+.add-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.87rem;
+  color: var(--text);
+}
+
+.add-bar input::placeholder { color: var(--text-muted); }
+
+.add-bar select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  outline: none;
+  cursor: pointer;
+}
+
+.btn-add {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  letter-spacing: 0.05em;
+  transition: opacity 0.15s;
+}
+
+.btn-add:hover { opacity: 0.85; }
+
+/* QUICK NOTES */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.note-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.note-card h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  color: var(--text-dim);
+}
+
+.note-card textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 80px;
+}
+
+.note-card textarea::placeholder { color: var(--text-muted); }
+
+/* PROGRESS BAR */
+.global-progress {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.gp-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.gp-bar-outer {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.gp-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #b2ff00);
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.gp-pct {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* Animations for tabs */
+.view { animation: tabIn 0.2s ease; }
+@keyframes tabIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 99px; }
+
+/* RESPONSIVE - hide sidebar on mobile */
+@media (max-width: 768px) {
+  .sidebar { width: 64px; }
+  .logo h2, .logo p, .nav-label, .nav-item span, .user-info { display: none; }
+  .main { margin-left: 64px; }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .board { grid-template-columns: 1fr; }
+  .notes-grid { grid-template-columns: 1fr; }
+  .content { padding: 16px; }
+  .topbar { padding: 14px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 18 18" fill="none">
+        <rect x="1" y="1" width="7" height="7" rx="2" fill="#000"/>
+        <rect x="10" y="1" width="7" height="7" rx="2" fill="#000"/>
+        <rect x="1" y="10" width="7" height="7" rx="2" fill="#000"/>
+        <rect x="10" y="10" width="7" height="7" rx="2" fill="#000" opacity="0.4"/>
+      </svg>
+    </div>
+    <h2>Central de Ação</h2>
+    <p>Workspace Alexandre</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Principal</div>
+    <a class="nav-item active" onclick="switchView('dashboard', this)">
+      <span class="icon">⚡</span><span>Dashboard</span>
+    </a>
+    <a class="nav-item" onclick="switchView('board', this)">
+      <span class="icon">🗂</span><span>Kanban Board</span>
+      <span class="nav-badge" id="badge-process">0</span>
+    </a>
+    <a class="nav-item" onclick="switchView('lista', this)">
+      <span class="icon">✅</span><span>Todas as Tarefas</span>
+    </a>
+    <a class="nav-item" onclick="switchView('calendar', this)">
+      <span class="icon">📅</span><span>Calendário</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Projetos</div>
+    <a class="nav-item" onclick="switchView('exacta', this)">
+      <span class="icon">🏢</span><span>Exacta</span>
+    </a>
+    <a class="nav-item" onclick="switchView('posvenda', this)">
+      <span class="icon">🤝</span><span>Pós-Venda</span>
+    </a>
+    <a class="nav-item" onclick="switchView('conteudo', this)">
+      <span class="icon">📲</span><span>Conteúdo</span>
+    </a>
+    <a class="nav-item" onclick="switchView('financeiro', this)">
+      <span class="icon">💰</span><span>Financeiro</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Ferramentas</div>
+    <a class="nav-item" onclick="switchView('notas', this)">
+      <span class="icon">📝</span><span>Notas Rápidas</span>
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">AL</div>
+      <div class="user-info">
+        <p>Alexandre</p>
+        <span>Gestor · SSA/BA</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 id="view-title">Dashboard</h1>
+      <p id="view-sub">Visão geral · Abril 2025</p>
+    </div>
+    <div class="topbar-right">
+      <span class="deadline-chip">⏳ <span id="days-left">9</span> dias restantes</span>
+      <div class="progress-pill">
+        <strong id="pct-display">0%</strong> concluído
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ============ DASHBOARD ============ -->
+    <div class="view active" id="view-dashboard">
+
+      <div class="global-progress">
+        <span class="gp-label">Progresso Geral Abril</span>
+        <div class="gp-bar-outer"><div class="gp-bar-inner" id="gp-bar" style="width:0%"></div></div>
+        <span class="gp-pct" id="gp-pct-text">0%</span>
+      </div>
+
+      <div class="metrics">
+        <div class="metric-card mc-yellow">
+          <div class="metric-label">Total de Tarefas</div>
+          <div class="metric-value" id="m-total">15</div>
+          <div class="metric-sub">Final de abril</div>
+        </div>
+        <div class="metric-card mc-green">
+          <div class="metric-label">Concluídas</div>
+          <div class="metric-value" id="m-done">0</div>
+          <div class="metric-sub">Tarefas finalizadas</div>
+        </div>
+        <div class="metric-card mc-blue">
+          <div class="metric-label">Em andamento</div>
+          <div class="metric-value" id="m-prog">0</div>
+          <div class="metric-sub">Marcadas como processo</div>
+        </div>
+        <div class="metric-card mc-red">
+          <div class="metric-label">Pendentes</div>
+          <div class="metric-value" id="m-pend">15</div>
+          <div class="metric-sub">Ainda não iniciadas</div>
+        </div>
+      </div>
+
+      <!-- ADD TASK -->
+      <div class="add-bar">
+        <span style="font-size:1rem; color:var(--text-muted)">+</span>
+        <input type="text" id="new-task-input" placeholder="Adicionar nova tarefa..." onkeydown="handleAddKey(event)">
+        <select id="new-task-cat">
+          <option value="🔥 Urgente">🔥 Urgente</option>
+          <option value="📲 Conteúdo">📲 Conteúdo</option>
+          <option value="🏢 Exacta">🏢 Exacta</option>
+          <option value="💰 Financeiro">💰 Financeiro</option>
+          <option value="🤝 Pós-Venda">🤝 Pós-Venda</option>
+          <option value="📋 Outros">📋 Outros</option>
+        </select>
+        <button class="btn-add" onclick="addTask()">+ Adicionar</button>
+      </div>
+
+      <!-- HOJE / AMANHÃ -->
+      <div class="sec-header">
+        <div class="sec-title"><span class="dot" style="background:var(--accent)"></span> Amanhã cedo — Prioridade Máxima</div>
+      </div>
+      <div class="task-list" id="section-amanha"></div>
+
+      <!-- URGENTE -->
+      <div class="sec-header">
+        <div class="sec-title"><span class="dot" style="background:var(--red)"></span> Urgente — Matar logo</div>
+      </div>
+      <div class="task-list" id="section-urgente"></div>
+
+      <!-- SEGUNDA -->
+      <div class="sec-header">
+        <div class="sec-title"><span class="dot" style="background:var(--blue)"></span> A partir de Segunda-feira</div>
+      </div>
+      <div class="task-list" id="section-segunda"></div>
+
+      <!-- CONTEÚDO -->
+      <div class="sec-header">
+        <div class="sec-title"><span class="dot" style="background:var(--purple)"></span> Conteúdo & Redes Sociais</div>
+      </div>
+      <div class="task-list" id="section-conteudo-home"></div>
+
+      <!-- FINANCEIRO -->
+      <div class="sec-header">
+        <div class="sec-title"><span class="dot" style="background:var(--orange)"></span> Financeiro & Viagem</div>
+      </div>
+      <div class="task-list" id="section-financeiro-home"></div>
+
+      <!-- OUTROS -->
+      <div class="sec-header">
+        <div class="sec-title"><span class="dot" style="background:var(--text-muted)"></span> Exacta & Outros</div>
+      </div>
+      <div class="task-list" id="section-outros-home"></div>
+
+    </div>
+
+    <!-- ============ KANBAN BOARD ============ -->
+    <div class="view" id="view-board">
+      <div class="board" id="kanban-board">
+        <!-- generated by JS -->
+      </div>
+    </div>
+
+    <!-- ============ LISTA ============ -->
+    <div class="view" id="view-lista">
+      <div class="add-bar">
+        <span style="font-size:1rem; color:var(--text-muted)">+</span>
+        <input type="text" id="new-task-input2" placeholder="Adicionar nova tarefa..." onkeydown="handleAddKey2(event)">
+        <select id="new-task-cat2">
+          <option value="🔥 Urgente">🔥 Urgente</option>
+          <option value="📲 Conteúdo">📲 Conteúdo</option>
+          <option value="🏢 Exacta">🏢 Exacta</option>
+          <option value="💰 Financeiro">💰 Financeiro</option>
+          <option value="🤝 Pós-Venda">🤝 Pós-Venda</option>
+          <option value="📋 Outros">📋 Outros</option>
+        </select>
+        <button class="btn-add" onclick="addTask2()">+ Adicionar</button>
+      </div>
+      <div class="task-list" id="section-all"></div>
+    </div>
+
+    <!-- ============ CALENDAR ============ -->
+    <div class="view" id="view-calendar">
+      <div class="cal-grid" id="cal-grid">
+        <!-- generated by JS -->
+      </div>
+    </div>
+
+    <!-- ============ EXACTA ============ -->
+    <div class="view" id="view-exacta">
+      <div class="metrics" style="grid-template-columns: repeat(3,1fr)">
+        <div class="metric-card mc-yellow">
+          <div class="metric-label">Projeto</div>
+          <div class="metric-value" style="font-size:1.4rem">Exacta</div>
+          <div class="metric-sub">Empresa principal</div>
+        </div>
+        <div class="metric-card mc-blue">
+          <div class="metric-label">Status</div>
+          <div class="metric-value" style="font-size:1.4rem">Ativo</div>
+          <div class="metric-sub">Em operação</div>
+        </div>
+        <div class="metric-card mc-green">
+          <div class="metric-label">Tarefas Exacta</div>
+          <div class="metric-value" id="exacta-task-count">2</div>
+          <div class="metric-sub">Este mês</div>
+        </div>
+      </div>
+      <div class="sec-header"><div class="sec-title"><span class="dot" style="background:var(--accent)"></span> Tarefas da Exacta</div></div>
+      <div class="task-list" id="section-exacta-tasks"></div>
+
+      <div class="sec-header" style="margin-top:24px"><div class="sec-title"><span class="dot" style="background:var(--blue)"></span> Guia de Vendas — Pontos Principais</div></div>
+      <div class="notes-grid">
+        <div class="note-card">
+          <h4>🎯 Primeiro Contato</h4>
+          <textarea placeholder="Abordagem inicial, qualificação...">Qualificar lead → Estado, Tipo de Veículo, Valor Entrada, Valor do Veículo. Usar neurociência das vendas para criar rapport.</textarea>
+        </div>
+        <div class="note-card">
+          <h4>🔥 Fechamento</h4>
+          <textarea placeholder="Técnicas de fechamento...">Usar gatilhos estratégicos. Escassez, urgência, prova social. Cada gatilho deve ser aplicado de forma planejada.</textarea>
+        </div>
+        <div class="note-card">
+          <h4>🤝 Pós-Venda</h4>
+          <textarea placeholder="Acompanhamento...">App Real Invest, Grupo WhatsApp, CRM. Verificar status do app (Ativo/Inativo). Identificar nova oportunidade de negócio.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PÓS-VENDA ============ -->
+    <div class="view" id="view-posvenda">
+      <div class="sec-header"><div class="sec-title"><span class="dot" style="background:var(--green)"></span> Planilha Pós-Venda Geral</div></div>
+      <div style="overflow-x:auto; background:var(--card); border:1px solid var(--border); border-radius:var(--radius)">
+        <table class="pos-table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Produto</th>
+              <th>Status App</th>
+              <th>Canal</th>
+              <th>Nova Opp?</th>
+              <th>Responsável</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="pos-venda-body">
+            <tr>
+              <td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px; font-size:0.8rem">
+                Adicione clientes no pós-venda →
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top: 12px">
+        <div class="add-bar">
+          <input type="text" id="pv-cliente" placeholder="Nome do cliente...">
+          <select id="pv-produto">
+            <option>Consórcio Auto</option>
+            <option>Consórcio Imóvel</option>
+            <option>Financiamento Veicular</option>
+            <option>Refinanciamento</option>
+          </select>
+          <select id="pv-status">
+            <option>Ativo</option>
+            <option>Inativo</option>
+            <option>Não Instalado</option>
+          </select>
+          <button class="btn-add" onclick="addPosVenda()">+ Adicionar</button>
+        </div>
+      </div>
+
+      <div class="sec-header" style="margin-top:20px"><div class="sec-title"><span class="dot" style="background:var(--blue)"></span> Tarefas de Pós-Venda</div></div>
+      <div class="task-list" id="section-posvenda-tasks"></div>
+    </div>
+
+    <!-- ============ CONTEÚDO ============ -->
+    <div class="view" id="view-conteudo">
+      <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
+        <div class="metric-card mc-purple" style="--mc-color:var(--purple)">
+          <div class="metric-label">Posts Instagram</div>
+          <div class="metric-value" style="color:var(--purple)">3</div>
+          <div class="metric-sub">Meta do mês</div>
+        </div>
+        <div class="metric-card mc-yellow">
+          <div class="metric-label">Vídeos</div>
+          <div class="metric-value">3</div>
+          <div class="metric-sub">Para criar e postar</div>
+        </div>
+        <div class="metric-card mc-blue">
+          <div class="metric-label">Agendamentos</div>
+          <div class="metric-value">—</div>
+          <div class="metric-sub">Programar postagens</div>
+        </div>
+      </div>
+      <div class="sec-header"><div class="sec-title"><span class="dot" style="background:var(--purple)"></span> Tarefas de Conteúdo</div></div>
+      <div class="task-list" id="section-conteudo-tasks"></div>
+
+      <div class="sec-header" style="margin-top:20px"><div class="sec-title"><span class="dot" style="background:var(--accent)"></span> Roteiro de Vídeos</div></div>
+      <div class="notes-grid">
+        <div class="note-card"><h4>🎬 Vídeo 1</h4><textarea placeholder="Tema, roteiro, chamada para ação...">Tema do vídeo 1...</textarea></div>
+        <div class="note-card"><h4>🎬 Vídeo 2</h4><textarea placeholder="Tema, roteiro, chamada para ação...">Tema do vídeo 2...</textarea></div>
+        <div class="note-card"><h4>🎬 Vídeo 3</h4><textarea placeholder="Tema, roteiro, chamada para ação...">Tema do vídeo 3...</textarea></div>
+      </div>
+    </div>
+
+    <!-- ============ FINANCEIRO ============ -->
+    <div class="view" id="view-financeiro">
+      <div class="sec-header"><div class="sec-title"><span class="dot" style="background:var(--orange)"></span> Financeiro & Viagem</div></div>
+      <div class="task-list" id="section-financeiro-tasks"></div>
+      <div class="sec-header" style="margin-top:20px"><div class="sec-title"><span class="dot" style="background:var(--accent)"></span> Anotações Financeiras</div></div>
+      <div class="notes-grid">
+        <div class="note-card"><h4>💳 Passagens</h4><textarea placeholder="Destino, datas, valores...">Pesquisar: destino, melhores datas, comparar companhias, usar milhas?</textarea></div>
+        <div class="note-card"><h4>📊 Financeiro Pessoal</h4><textarea placeholder="Receitas, despesas, metas...">Alinhar entradas vs saídas. Reserva de emergência?</textarea></div>
+        <div class="note-card"><h4>📋 Lista Material Vingança</h4><textarea placeholder="Lista de materiais...">Adicione os itens da lista aqui...</textarea></div>
+      </div>
+    </div>
+
+    <!-- ============ NOTAS ============ -->
+    <div class="view" id="view-notas">
+      <div class="sec-header"><div class="sec-title"><span class="dot" style="background:var(--accent)"></span> Notas Rápidas</div></div>
+      <div class="notes-grid">
+        <div class="note-card"><h4>🧠 Pautas Reunião Segunda</h4><textarea placeholder="O que discutir na reunião?">Definir pautas da reunião rápida de segunda-feira...</textarea></div>
+        <div class="note-card"><h4>🚗 HB20 — Anúncio</h4><textarea placeholder="Detalhes do veículo, preço...">Informações para o anúncio do HB20...</textarea></div>
+        <div class="note-card"><h4>🔗 Troca Fácil LP</h4><textarea placeholder="Pendências da landing page...">Itens pendentes da landing page do Troca Fácil...</textarea></div>
+        <div class="note-card"><h4>💬 Mateus</h4><textarea placeholder="O que resolver com Mateus?">Pontos para resolver com Mateus amanhã cedo...</textarea></div>
+        <div class="note-card"><h4>📌 Negociação</h4><textarea placeholder="Estratégia de negociação...">A partir de segunda. Pontos chave para negociar...</textarea></div>
+        <div class="note-card"><h4>📝 Geral</h4><textarea placeholder="Anotações diversas...">Espaço livre para anotações...</textarea></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+// ==================== DATA ====================
+const TASKS = [
+  // AMANHÃ
+  { id:1, name:"Concluir com Mateus", section:"amanha", badge:"badge-amanha", badgeLabel:"Amanhã", icon:"🌅", status:"not-started", category:"📋 Outros" },
+  // URGENTE
+  { id:2, name:"Concluir Landing Page do Troca Fácil", section:"urgente", badge:"badge-urgente", badgeLabel:"Urgente", icon:"🔥", status:"not-started", category:"🔥 Urgente" },
+  { id:3, name:"Postar HB20", section:"urgente", badge:"badge-urgente", badgeLabel:"Urgente", icon:"🔥", status:"not-started", category:"🔥 Urgente" },
+  { id:4, name:"Anunciar Exacta", section:"urgente", badge:"badge-urgente", badgeLabel:"Urgente", icon:"🔥", status:"not-started", category:"🏢 Exacta" },
+  // SEGUNDA
+  { id:5, name:"Negociar — a partir de segunda-feira", section:"segunda", badge:"badge-segunda", badgeLabel:"Segunda", icon:"📅", status:"not-started", category:"📋 Outros" },
+  { id:6, name:"Reunião rápida — definir pautas", section:"segunda", badge:"badge-segunda", badgeLabel:"Segunda", icon:"📅", status:"not-started", category:"📋 Outros" },
+  // CONTEÚDO
+  { id:7, name:"Postar nas redes sociais — 3 posts Instagram", section:"conteudo", badge:"badge-not-started", badgeLabel:"Não iniciado", icon:"📲", status:"not-started", category:"📲 Conteúdo" },
+  { id:8, name:"Programar postagens", section:"conteudo", badge:"badge-not-started", badgeLabel:"Não iniciado", icon:"📲", status:"not-started", category:"📲 Conteúdo" },
+  { id:9, name:"Criar 3 vídeos para postar", section:"conteudo", badge:"badge-not-started", badgeLabel:"Não iniciado", icon:"📲", status:"not-started", category:"📲 Conteúdo" },
+  // FINANCEIRO
+  { id:10, name:"Comprar passagens", section:"financeiro", badge:"badge-not-started", badgeLabel:"Não iniciado", icon:"💰", status:"not-started", category:"💰 Financeiro" },
+  { id:11, name:"Organizar compra das passagens", section:"financeiro", badge:"badge-not-started", badgeLabel:"Não iniciado", icon:"💰", status:"not-started", category:"💰 Financeiro" },
+  { id:12, name:"Alinhar financeiro pessoal", section:"financeiro", badge:"badge-not-started", badgeLabel:"Não iniciado", icon:"💰", status:"not-started", category:"💰 Financeiro" },
+  // OUTROS
+  { id:13, name:"Tarefas da Exacta", section:"outros", badge:"badge-not-started", badgeLabel:"Não iniciado", icon:"🏢", status:"not-started", category:"🏢 Exacta" },
+  { id:14, name:"Listar todos os pós-venda", section:"outros", badge:"badge-not-started", badgeLabel:"Não iniciado", icon:"🤝", status:"not-started", category:"🤝 Pós-Venda" },
+  { id:15, name:"Lista do material de vingança", section:"outros", badge:"badge-not-started", badgeLabel:"Não iniciado", icon:"📋", status:"not-started", category:"📋 Outros" },
+];
+
+let nextId = 16;
+const doneSet = new Set();
+const processSet = new Set();
+
+function getStatus(id) {
+  if (doneSet.has(id)) return "done";
+  if (processSet.has(id)) return "process";
+  return "not-started";
+}
+
+function cycleStatus(id) {
+  const cur = getStatus(id);
+  if (cur === "not-started") { processSet.add(id); }
+  else if (cur === "process") { processSet.delete(id); doneSet.add(id); }
+  else { doneSet.delete(id); }
+  renderAll();
+}
+
+// ==================== RENDER TASK ROW ====================
+function renderTaskRow(task) {
+  const status = getStatus(task.id);
+  const isDone = status === "done";
+  const isProcess = status === "process";
+
+  let badgeClass = task.badge;
+  let badgeLabel = task.badgeLabel;
+  if (isProcess) { badgeClass = "badge-process"; badgeLabel = "Process"; }
+  if (isDone) { badgeClass = "badge-done"; badgeLabel = "Completed"; }
+
+  const div = document.createElement("div");
+  div.className = `task-row${isDone ? " done" : ""}`;
+  div.onclick = () => cycleStatus(task.id);
+  div.innerHTML = `
+    <div class="cb">${isDone ? "✓" : ""}</div>
+    <div class="task-name">${task.icon} ${task.name}</div>
+    <div class="task-meta">
+      <span class="badge ${badgeClass}">${badgeLabel}</span>
+      <span style="font-size:0.65rem;color:var(--text-muted)">${task.category}</span>
+    </div>
+  `;
+  return div;
+}
+
+// ==================== RENDER SECTIONS ====================
+function renderSections() {
+  const sections = {
+    amanha: "section-amanha",
+    urgente: "section-urgente",
+    segunda: "section-segunda",
+    conteudo: "section-conteudo-home",
+    financeiro: "section-financeiro-home",
+    outros: "section-outros-home",
+    all: "section-all",
+  };
+
+  Object.keys(sections).forEach(sec => {
+    const el = document.getElementById(sections[sec]);
+    if (!el) return;
+    el.innerHTML = "";
+    const tasks = sec === "all" ? TASKS : TASKS.filter(t => t.section === sec);
+    tasks.forEach(t => el.appendChild(renderTaskRow(t)));
+  });
+
+  // Exacta tasks
+  const exactaEl = document.getElementById("section-exacta-tasks");
+  if (exactaEl) {
+    exactaEl.innerHTML = "";
+    TASKS.filter(t => t.category === "🏢 Exacta").forEach(t => exactaEl.appendChild(renderTaskRow(t)));
+  }
+
+  // Pós-venda tasks
+  const pvEl = document.getElementById("section-posvenda-tasks");
+  if (pvEl) {
+    pvEl.innerHTML = "";
+    TASKS.filter(t => t.category === "🤝 Pós-Venda").forEach(t => pvEl.appendChild(renderTaskRow(t)));
+  }
+
+  // Conteúdo tasks
+  const ctEl = document.getElementById("section-conteudo-tasks");
+  if (ctEl) {
+    ctEl.innerHTML = "";
+    TASKS.filter(t => t.category === "📲 Conteúdo").forEach(t => ctEl.appendChild(renderTaskRow(t)));
+  }
+
+  // Financeiro tasks
+  const ftEl = document.getElementById("section-financeiro-tasks");
+  if (ftEl) {
+    ftEl.innerHTML = "";
+    TASKS.filter(t => t.category === "💰 Financeiro").forEach(t => ftEl.appendChild(renderTaskRow(t)));
+  }
+}
+
+// ==================== KANBAN ====================
+const COLS = [
+  { key: "not-started", label: "Não Iniciado", color: "#5a5a62", cls: "badge-not-started" },
+  { key: "process",     label: "Em Processo",  color: "var(--blue)", cls: "badge-process" },
+  { key: "overdue",     label: "Atrasado",     color: "var(--purple)", cls: "badge-overdue" },
+  { key: "done",        label: "Concluído",    color: "var(--green)", cls: "badge-done" },
+];
+
+function renderKanban() {
+  const board = document.getElementById("kanban-board");
+  if (!board) return;
+  board.innerHTML = "";
+  COLS.forEach(col => {
+    const tasks = TASKS.filter(t => {
+      const s = getStatus(t.id);
+      return s === col.key;
+    });
+    const colEl = document.createElement("div");
+    colEl.className = "board-col";
+    colEl.innerHTML = `
+      <div class="board-col-header">
+        <div class="col-dot" style="background:${col.color}"></div>
+        <span class="board-col-title" style="color:${col.color}">${col.label}</span>
+        <span class="col-cnt">${tasks.length}</span>
+      </div>
+      <div class="board-col-body" id="col-${col.key}"></div>
+    `;
+    board.appendChild(colEl);
+    const body = colEl.querySelector(`#col-${col.key}`);
+    tasks.forEach(t => {
+      const card = document.createElement("div");
+      card.className = "board-card";
+      card.onclick = () => cycleStatus(t.id);
+      card.innerHTML = `
+        <div class="board-card-title">${t.icon} ${t.name}</div>
+        <div class="board-card-footer">
+          <span class="badge ${t.badge}" style="font-size:0.58rem">${t.badgeLabel}</span>
+          <span style="font-size:0.62rem; color:var(--text-muted)">${t.category}</span>
+        </div>
+      `;
+      body.appendChild(card);
+    });
+  });
+}
+
+// ==================== METRICS ====================
+function updateMetrics() {
+  const total = TASKS.length;
+  const done = doneSet.size;
+  const proc = processSet.size;
+  const pend = total - done - proc;
+  const pct = Math.round((done / total) * 100);
+
+  document.getElementById("m-total").textContent = total;
+  document.getElementById("m-done").textContent = done;
+  document.getElementById("m-prog").textContent = proc;
+  document.getElementById("m-pend").textContent = pend;
+  document.getElementById("gp-bar").style.width = pct + "%";
+  document.getElementById("gp-pct-text").textContent = pct + "%";
+  document.getElementById("pct-display").textContent = pct + "%";
+
+  const badge = document.getElementById("badge-process");
+  badge.textContent = proc;
+  badge.style.display = proc > 0 ? "" : "none";
+}
+
+// ==================== CALENDAR ====================
+function renderCalendar() {
+  const grid = document.getElementById("cal-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  const days = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+  days.forEach(d => {
+    const lbl = document.createElement("div");
+    lbl.className = "cal-day-label";
+    lbl.textContent = d;
+    grid.appendChild(lbl);
+  });
+
+  // April 2025 — starts on Tuesday (day index 2)
+  const events = {
+    22: [{label:"Mateus", cls:"ev-yellow"}],
+    26: [{label:"Negociação", cls:"ev-blue"},{label:"Reunião Rápida", cls:"ev-blue"}],
+    27: [{label:"Postar HB20", cls:"ev-red"}],
+    28: [{label:"3 Posts IG", cls:"ev-yellow"}],
+    30: [{label:"Deadline Abril", cls:"ev-red"},{label:"Passagens", cls:"ev-green"}],
+  };
+
+  // March trailing days
+  const march = [27,28,29,30,31];
+  march.forEach(d => {
+    const cell = document.createElement("div");
+    cell.className = "cal-day other-month";
+    cell.innerHTML = `<div class="day-num">${d}</div>`;
+    grid.appendChild(cell);
+  });
+
+  for (let d = 1; d <= 30; d++) {
+    const cell = document.createElement("div");
+    const isToday = d === 21;
+    cell.className = `cal-day${isToday ? " today" : ""}`;
+    cell.innerHTML = `<div class="day-num">${d}</div>`;
+    if (events[d]) {
+      events[d].forEach(ev => {
+        const evEl = document.createElement("div");
+        evEl.className = `cal-event ${ev.cls}`;
+        evEl.textContent = ev.label;
+        cell.appendChild(evEl);
+      });
+    }
+    grid.appendChild(cell);
+  }
+
+  // May trailing
+  for (let d = 1; d <= 3; d++) {
+    const cell = document.createElement("div");
+    cell.className = "cal-day other-month";
+    cell.innerHTML = `<div class="day-num">${d}</div>`;
+    grid.appendChild(cell);
+  }
+}
+
+// ==================== ADD TASK ====================
+function addTask() {
+  const input = document.getElementById("new-task-input");
+  const catEl = document.getElementById("new-task-cat");
+  const name = input.value.trim();
+  if (!name) return;
+  const cat = catEl.value;
+  const icons = {"🔥 Urgente":"🔥","📲 Conteúdo":"📲","🏢 Exacta":"🏢","💰 Financeiro":"💰","🤝 Pós-Venda":"🤝","📋 Outros":"📋"};
+  TASKS.push({ id: nextId++, name, section:"outros", badge:"badge-not-started", badgeLabel:"Não iniciado", icon: icons[cat]||"📌", status:"not-started", category: cat });
+  input.value = "";
+  renderAll();
+}
+
+function handleAddKey(e) { if (e.key === "Enter") addTask(); }
+
+function addTask2() {
+  const input = document.getElementById("new-task-input2");
+  const catEl = document.getElementById("new-task-cat2");
+  const name = input.value.trim();
+  if (!name) return;
+  const cat = catEl.value;
+  const icons = {"🔥 Urgente":"🔥","📲 Conteúdo":"📲","🏢 Exacta":"🏢","💰 Financeiro":"💰","🤝 Pós-Venda":"🤝","📋 Outros":"📋"};
+  TASKS.push({ id: nextId++, name, section:"outros", badge:"badge-not-started", badgeLabel:"Não iniciado", icon: icons[cat]||"📌", status:"not-started", category: cat });
+  input.value = "";
+  renderAll();
+}
+
+function handleAddKey2(e) { if (e.key === "Enter") addTask2(); }
+
+// ==================== PÓS-VENDA ====================
+let posVendaRows = [];
+
+function addPosVenda() {
+  const cliente = document.getElementById("pv-cliente").value.trim();
+  if (!cliente) return;
+  const produto = document.getElementById("pv-produto").value;
+  const status = document.getElementById("pv-status").value;
+  posVendaRows.push({cliente, produto, status, canal:"WhatsApp", opp:"Em Análise", resp:"Alexandre"});
+  document.getElementById("pv-cliente").value = "";
+  renderPosVenda();
+}
+
+function renderPosVenda() {
+  const tbody = document.getElementById("pos-venda-body");
+  if (!tbody) return;
+  if (posVendaRows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;font-size:0.8rem">Adicione clientes no pós-venda →</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = posVendaRows.map((r,i) => `
+    <tr>
+      <td style="font-weight:600">${r.cliente}</td>
+      <td><span class="badge badge-not-started">${r.produto}</span></td>
+      <td><span class="badge ${r.status==="Ativo"?"badge-done":r.status==="Inativo"?"badge-urgente":"badge-not-started"}">${r.status}</span></td>
+      <td>${r.canal}</td>
+      <td><span class="badge badge-process">${r.opp}</span></td>
+      <td>${r.resp}</td>
+      <td><span class="badge badge-process">Em Processo</span></td>
+    </tr>
+  `).join("");
+}
+
+// ==================== VIEW SWITCH ====================
+const viewTitles = {
+  dashboard: ["Dashboard", "Visão geral · Abril 2025"],
+  board: ["Kanban Board", "Task & Supervise"],
+  lista: ["Todas as Tarefas", "Lista completa"],
+  calendar: ["Calendário", "Abril 2025"],
+  exacta: ["Exacta", "Projeto e tarefas"],
+  posvenda: ["Pós-Venda", "Planilha de acompanhamento"],
+  conteudo: ["Conteúdo", "Redes sociais e vídeos"],
+  financeiro: ["Financeiro & Viagem", "Passagens e financeiro pessoal"],
+  notas: ["Notas Rápidas", "Anotações e pautas"],
+};
+
+function switchView(name, el) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("view-" + name).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  if (el) el.classList.add("active");
+  const [title, sub] = viewTitles[name] || ["", ""];
+  document.getElementById("view-title").textContent = title;
+  document.getElementById("view-sub").textContent = sub;
+  if (name === "board") renderKanban();
+  if (name === "calendar") renderCalendar();
+}
+
+// ==================== RENDER ALL ====================
+function renderAll() {
+  renderSections();
+  renderKanban();
+  updateMetrics();
+  renderPosVenda();
+}
+
+// ==================== DAYS LEFT ====================
+function updateDaysLeft() {
+  const today = new Date();
+  const endOfApril = new Date(2025, 3, 30);
+  const diff = Math.max(0, Math.ceil((endOfApril - today) / (1000 * 60 * 60 * 24)));
+  document.getElementById("days-left").textContent = diff;
+}
+
+// ==================== INIT ====================
+updateDaysLeft();
+renderCalendar();
+renderAll();
+</script>
+</body>
+</html>
