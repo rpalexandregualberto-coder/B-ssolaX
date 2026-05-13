@@ -3,6 +3,11 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
+  const proxySecret = process.env.PROXY_SECRET;
+  if (!proxySecret || event.headers["x-proxy-secret"] !== proxySecret) {
+    return { statusCode: 403, body: JSON.stringify({ error: { message: "Acesso não autorizado." } }) };
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return {
