@@ -4366,15 +4366,6 @@ function toggleMeetingCard(id){
 // ══════════════════════════════════════
 async function analyzeMeeting(id){
   const m=meetings.find(x=>x.id===id); if(!m)return;
-  if(!userApiKey){
-    showKeyError("Salve sua API Key primeiro (campo acima).");
-    // scroll banner into view
-    const banner = document.getElementById("apikey-banner");
-    if(banner) banner.scrollIntoView({behavior:"smooth", block:"center"});
-    if(resultEl) resultEl.innerHTML = "";
-    if(btn){ btn.classList.remove("loading"); btn.textContent = "✨ Analisar com IA"; }
-    return;
-  }
   const btn=document.getElementById(`btn-ai-${id}`);
   if(btn){ btn.classList.add("loading"); btn.textContent="✨ Analisando..."; }
   const resultEl=document.getElementById(`ai-result-${id}`);
@@ -4412,14 +4403,9 @@ ${m.transcript}
 Responda APENAS com o JSON. Nada mais.`;
 
   try{
-    const resp=await fetch("https://api.anthropic.com/v1/messages",{
+    const resp=await fetch("/.netlify/functions/ai-proxy",{
       method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "anthropic-version":"2023-06-01",
-        "anthropic-dangerous-direct-browser-access":"true",
-        "x-api-key": userApiKey
-      },
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         model:"claude-haiku-4-5-20251001",
         max_tokens:4096,
@@ -4861,15 +4847,9 @@ DADOS DA SEMANA:
 Responda APENAS com o JSON.`;
 
   try{
-    if(!userApiKey){ alert("Configure sua API Key da Anthropic em Configuracoes."); throw new Error("API key nao configurada"); }
-    const resp = await fetch("https://api.anthropic.com/v1/messages",{
+    const resp = await fetch("/.netlify/functions/ai-proxy",{
       method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "anthropic-version":"2023-06-01",
-        "anthropic-dangerous-direct-browser-access":"true",
-        "x-api-key": userApiKey
-      },
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         model:"claude-haiku-4-5-20251001",
         max_tokens:4096,
@@ -5882,14 +5862,9 @@ ${text.slice(0,5000)}
 Responda APENAS com o JSON.`;
 
   try{
-    const resp=await fetch("https://api.anthropic.com/v1/messages",{
+    const resp=await fetch("/.netlify/functions/ai-proxy",{
       method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "anthropic-version":"2023-06-01",
-        "anthropic-dangerous-direct-browser-access":"true",
-        "x-api-key": userApiKey
-      },
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:8192,messages:[{role:"user",content:prompt}]})
     });
     const data=await resp.json();
