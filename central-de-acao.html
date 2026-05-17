@@ -6624,18 +6624,18 @@ function addLigacao(){
     notas:"",
   });
   ["lig-nome","lig-tel","lig-assunto"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
-  renderLigacoes();
+  renderAll();
 }
 
 function marcarLigado(id){
   const l=LIGACOES.find(x=>x.id===id);
   if(l){l.done=!l.done;l.ultimaAtualizacao=new Date().toISOString();}
-  renderLigacoes();
+  renderAll();
 }
 
 function removerLigacao(id){
   LIGACOES=LIGACOES.filter(x=>x.id!==id);
-  renderLigacoes();
+  renderAll();
 }
 
 function renderLigacoes(){
@@ -7206,7 +7206,8 @@ function handleRecurrence(taskId){
     // reset status handled by doneSet not being in it
   };
   TASKS.push(newTask);
-  taskRecurrence[newTask.id] = rec; // inherit recurrence
+  // NÃO herda recorrência — só a tarefa original fica em taskRecurrence
+  // para evitar duplicação exponencial
 }
 
 // Hook into cycleStatus — when task goes done, check recurrence
@@ -7628,6 +7629,7 @@ function renderPanelFiles(id){
 function removeFile(taskId, idx){
   if(taskFiles[taskId]) taskFiles[taskId].splice(idx,1);
   renderPanelFiles(taskId);
+  try{ saveData(); }catch(e){}
 }
 
 // Drag & drop + ESC
@@ -8067,13 +8069,15 @@ function checkRecurrenceAndCreate(){
       delete newTask.project_id; // ou mantem? mantem.
       newTask.project_id = original.project_id;
       TASKS.push(newTask);
-      // herda recorrencia
-      taskRecurrence[newTask.id] = recurType;
+      // NÃO herda recorrência — evita duplicação exponencial
       created++;
     }
   });
   localStorage.setItem("central_acao_recurrence_last", todayStr);
-  if(created>0) console.log(`✅ Recorrencia: ${created} tarefa(s) criada(s) automaticamente pra hoje`);
+  if(created>0){
+    try{ saveData(); }catch(e){}
+    console.log(`✅ Recorrencia: ${created} tarefa(s) criada(s) automaticamente pra hoje`);
+  }
 }
 
 function focoToggle(id){
