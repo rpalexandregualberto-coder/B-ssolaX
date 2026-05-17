@@ -4259,6 +4259,7 @@ function addPV(){
   pvRows.push({cli,prod:document.getElementById("pv-prod").value,canal:document.getElementById("pv-canal").value,appSt:document.getElementById("pv-appst").value,opp:"Em Análise"});
   document.getElementById("pv-cli").value="";
   renderPV();
+  try{ saveData(); }catch(e){}
 }
 function renderPV(){
   const tbody=document.getElementById("pv-body"); if(!tbody)return;
@@ -5162,7 +5163,7 @@ function pctLimiteCartao(cartaoId){
 // Quanto foi gasto numa categoria no mes corrente (finYear/finMonth)
 function gastoCategoriaMes(categoria){
   return FIN_TRANSACTIONS
-    .filter(t=>t.categoria===categoria)
+    .filter(t=>t.categoria===categoria && t.tipo==="despesa")
     .filter(t=>{
       if(!t.data) return false;
       const d = new Date(t.data+'T12:00:00');
@@ -5283,6 +5284,7 @@ function getFixas(){
     } else {
       FIN_FIXAS_BY_MONTH[key] = [];
     }
+    try{ saveData(); }catch(e){}
   }
   return FIN_FIXAS_BY_MONTH[key];
 }
