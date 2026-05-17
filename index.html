@@ -4412,7 +4412,7 @@ ${m.transcript}
 Responda APENAS com o JSON. Nada mais.`;
 
   try{
-    const resp=await fetch("/.netlify/functions/ai-proxy",{
+    const resp=await fetch("/api/ai-proxy",{
       method:"POST",
       headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
       body:JSON.stringify({
@@ -4857,7 +4857,7 @@ DADOS DA SEMANA:
 Responda APENAS com o JSON.`;
 
   try{
-    const resp = await fetch("/.netlify/functions/ai-proxy",{
+    const resp = await fetch("/api/ai-proxy",{
       method:"POST",
       headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
       body:JSON.stringify({
@@ -5873,7 +5873,7 @@ ${text.slice(0,5000)}
 Responda APENAS com o JSON.`;
 
   try{
-    const resp=await fetch("/.netlify/functions/ai-proxy",{
+    const resp=await fetch("/api/ai-proxy",{
       method:"POST",
       headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
       body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:8192,messages:[{role:"user",content:prompt}]})
