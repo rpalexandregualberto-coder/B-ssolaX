@@ -2564,9 +2564,6 @@ label.form-label{
     </div>
 
     <!-- AVISO discreto se NAO tiver chave salva -->
-    <div id="apikey-warning-reunioes" style="display:none;background:rgba(255,170,60,.08);border:1px solid rgba(255,170,60,.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.78rem;color:var(--orange)">
-      ⚠️ Análise por IA desabilitada. <a href="#" onclick="gotoView('config',null);return false;" style="color:var(--accent);text-decoration:underline">Configure sua API Key em Configurações →</a>
-    </div>
 
     <div style="display:flex;gap:9px;margin-bottom:20px">
       <button class="btn btn-primary" onclick="toggleNewMeeting()">+ Nova Reunião</button>
@@ -3272,27 +3269,17 @@ label.form-label{
   <div class="view" id="view-config">
     <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--accent)"></span>Configurações</div></div>
 
-    <div style="background:linear-gradient(135deg,rgba(226,255,90,.07),rgba(180,125,255,.07));border:1px solid rgba(226,255,90,.2);border-radius:14px;padding:20px 22px;margin-bottom:18px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-        <div style="font-size:1.4rem">🔑</div>
-        <div style="font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.08em">API Key Anthropic</div>
-        <span id="apikey-state-badge" style="margin-left:auto;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--card);color:var(--muted);border:1px solid var(--border)">não configurada</span>
+    <div style="background:linear-gradient(135deg,rgba(61,255,160,.07),rgba(91,159,255,.07));border:1px solid rgba(61,255,160,.2);border-radius:14px;padding:20px 22px;margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="font-size:1.4rem">🤖</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em">Inteligência Artificial</div>
+        <span style="margin-left:auto;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(61,255,160,.12);color:var(--green);border:1px solid rgba(61,255,160,.3)">✓ Ativa</span>
       </div>
-      <div style="font-size:.78rem;color:var(--muted);margin-bottom:14px">Necessária pros recursos de IA. Crie em <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--blue);text-decoration:none">console.anthropic.com →</a></div>
-      <div id="apikey-empty-state" style="display:none">
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <input id="apikey-input" type="password" placeholder="sk-ant-api03-..." style="flex:1;min-width:240px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-family:'Instrument Sans',sans-serif;font-size:.82rem;color:#eeeef0;outline:none">
-          <button class="btn btn-primary" onclick="saveApiKey()" style="padding:9px 18px;font-size:.78rem">Salvar Chave</button>
-        </div>
-        <div id="apikey-status" style="margin-top:8px;font-size:.72rem;color:var(--muted)"></div>
-      </div>
-      <div id="apikey-saved-state" style="display:none">
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:rgba(61,255,160,.06);border:1px solid rgba(61,255,160,.2);border-radius:10px;padding:11px 14px">
-          <span style="color:var(--green);font-weight:800">✓</span>
-          <span style="font-size:.8rem;color:var(--text);flex:1">Chave configurada e ativa.</span>
-          <span id="apikey-masked" style="font-family:monospace;font-size:.72rem;color:var(--muted);background:var(--card);padding:3px 8px;border-radius:5px;border:1px solid var(--border)">sk-ant-•••</span>
-          <button onclick="apikeyShowEdit()" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.7rem">✏️ Trocar</button>
-          <button onclick="apikeyRemove()" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.7rem">🗑 Remover</button>
+      <div style="display:flex;align-items:center;gap:12px;background:rgba(61,255,160,.06);border:1px solid rgba(61,255,160,.15);border-radius:10px;padding:12px 16px">
+        <span style="color:var(--green);font-size:1.1rem">✓</span>
+        <div>
+          <div style="font-size:.82rem;color:var(--text);font-weight:600">IA configurada e pronta para uso</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:2px">A integração com a Anthropic está ativa no servidor. Nenhuma configuração necessária.</div>
         </div>
       </div>
     </div>
@@ -4490,7 +4477,7 @@ const viewMeta={
   conquistas:["🏆 Conquistas & XP","Evolução, arquétipo e badges"],
   relatorio:["📈 Relatório Semanal","Análise com Inteligência Artificial"],
   notas:["📝 Notas Rápidas","Pautas, anotações e referências"],
-  config:["⚙️ Configurações","API Key, backup e preferências"],
+  config:["⚙️ Configurações","Backup, perfil e preferências"],
   conteudo:["📲 Conteúdo","Redes sociais e vídeos"],
 };
 function gotoView(name,el){
