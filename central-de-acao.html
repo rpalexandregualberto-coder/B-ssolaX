@@ -2622,7 +2622,10 @@ label.form-label{
           <div class="recorder-top">
             <button class="rec-btn idle" id="rec-btn" onclick="toggleRecording()" title="Gravar / Parar">🎙</button>
             <div class="rec-info">
-              <div class="rec-status idle" id="rec-status">Pronto para gravar</div>
+              <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">
+                <div class="rec-status idle" id="rec-status">Pronto para gravar</div>
+                <span id="rec-engine-badge" style="display:none"></span>
+              </div>
               <div class="rec-timer" id="rec-timer">00:00</div>
               <div class="rec-wave" id="rec-wave">
                 <div class="rec-bar" id="rb0" style="height:4px"></div>
@@ -4683,7 +4686,7 @@ function loadApiKey(){
 }
 
 // ══════════════════════════════════════
-//  RECORDER — Web Speech API
+//  RECORDER — AssemblyAI + Web Speech API (fallback)
 // ══════════════════════════════════════
 let recognition = null;
 let recState = "idle"; // idle | recording | paused
@@ -4691,6 +4694,13 @@ let recSeconds = 0;
 let recInterval = null;
 let finalTranscript = "";
 let waveInterval = null;
+
+// AssemblyAI real-time
+let assemblyWS = null;
+let assemblyAudioCtx = null;
+let assemblyProcessor = null;
+let assemblyMicStream = null;
+let assemblyMode = false; // true quando AssemblyAI está ativo
 
 // Variáveis para detecção de pausa entre falantes
 let _lastSpeechTime = 0;
@@ -4802,39 +4812,163 @@ function toggleRecording() {
   else stopRecording();
 }
 
-function startRecording() {
-  recognition = initRecognition();
-  if (!recognition) return;
+// ─────────────────────────────────────────────────
+//  ASSEMBLYAI REAL-TIME STREAMING
+// ─────────────────────────────────────────────────
+async function startAssemblyRecording() {
+  try {
+    // 1. Busca token temporário no nosso proxy
+    const tokenResp = await fetch("/api/assembly-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-proxy-secret": PROXY_SECRET }
+    });
+    if (!tokenResp.ok) return false;
+    const { token } = await tokenResp.json();
+    if (!token) return false;
+
+    // 2. Acessa o microfone
+    assemblyMicStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+
+    // 3. Configura AudioContext a 16kHz (padrão AssemblyAI)
+    assemblyAudioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+    const source = assemblyAudioCtx.createMediaStreamSource(assemblyMicStream);
+
+    // ScriptProcessorNode captura PCM16 em chunks de 4096 amostras (~256ms)
+    assemblyProcessor = assemblyAudioCtx.createScriptProcessor(4096, 1, 1);
+    source.connect(assemblyProcessor);
+    assemblyProcessor.connect(assemblyAudioCtx.destination);
+
+    // 4. Abre WebSocket com AssemblyAI
+    assemblyWS = new WebSocket(
+      `wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=${token}&language_code=pt`
+    );
+
+    assemblyWS.onopen = () => {
+      assemblyMode = true;
+      assemblyProcessor.onaudioprocess = (e) => {
+        if (!assemblyWS || assemblyWS.readyState !== WebSocket.OPEN) return;
+        const f32 = e.inputBuffer.getChannelData(0);
+        // Converte float32 → Int16 PCM
+        const int16 = new Int16Array(f32.length);
+        for (let i = 0; i < f32.length; i++) {
+          int16[i] = Math.max(-32768, Math.min(32767, f32[i] * 32768));
+        }
+        assemblyWS.send(int16.buffer);
+      };
+    };
+
+    assemblyWS.onmessage = (msg) => {
+      const data = JSON.parse(msg.data);
+      const ta = document.getElementById("nm-transcript");
+      const now = Date.now();
+      const pauseDetected = _lastSpeechTime > 0 && (now - _lastSpeechTime) > PAUSE_THRESHOLD_MS;
+
+      if (data.message_type === "FinalTranscript" && data.text?.trim()) {
+        _lastSpeechTime = now;
+        if (pauseDetected && finalTranscript.length > 0) {
+          finalTranscript += `\n--- [pausa] ---\n`;
+        }
+        finalTranscript += data.text.trim() + " ";
+        if (ta) { ta.value = finalTranscript; ta.scrollTop = ta.scrollHeight; }
+      } else if (data.message_type === "PartialTranscript" && data.text) {
+        _lastSpeechTime = now;
+        if (ta) { ta.value = finalTranscript + `[${data.text}]`; ta.scrollTop = ta.scrollHeight; }
+      } else if (data.message_type === "SessionBegins") {
+        setRecEngineBadge("assemblyai");
+      }
+    };
+
+    assemblyWS.onerror = (err) => {
+      console.warn("AssemblyAI WS error:", err);
+    };
+
+    assemblyWS.onclose = (ev) => {
+      // Reconecta automaticamente se ainda está gravando e não foi fechamento intencional
+      if (recState === "recording" && ev.code !== 1000) {
+        setTimeout(() => startAssemblyRecording(), 800);
+      }
+    };
+
+    return true; // sucesso — AssemblyAI ativo
+  } catch (err) {
+    console.warn("AssemblyAI indisponível, usando Web Speech API:", err.message);
+    stopAssemblyCleanup();
+    return false;
+  }
+}
+
+function stopAssemblyCleanup() {
+  if (assemblyProcessor) { try { assemblyProcessor.disconnect(); } catch(e){} assemblyProcessor = null; }
+  if (assemblyAudioCtx)  { try { assemblyAudioCtx.close(); }       catch(e){} assemblyAudioCtx = null; }
+  if (assemblyMicStream) { assemblyMicStream.getTracks().forEach(t => t.stop()); assemblyMicStream = null; }
+  if (assemblyWS)        { try { assemblyWS.close(1000); }          catch(e){} assemblyWS = null; }
+  assemblyMode = false;
+}
+
+function setRecEngineBadge(engine) {
+  const badge = document.getElementById("rec-engine-badge");
+  if (!badge) return;
+  if (engine === "assemblyai") {
+    badge.textContent = "⚡ AssemblyAI";
+    badge.style.cssText = "display:inline-block;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(200,241,53,.12);color:var(--accent);border:1px solid var(--accent-border);margin-left:8px";
+  } else if (engine === "webspeech") {
+    badge.textContent = "🎙 Web Speech";
+    badge.style.cssText = "display:inline-block;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(91,159,255,.1);color:#5b9fff;border:1px solid rgba(91,159,255,.25);margin-left:8px";
+  } else {
+    badge.style.display = "none";
+  }
+}
+
+// ─────────────────────────────────────────────────
+//  FLUXO PRINCIPAL DE GRAVAÇÃO
+// ─────────────────────────────────────────────────
+async function startRecording() {
+  // Prepara transcript
   finalTranscript = document.getElementById("nm-transcript")?.value || "";
-  // strip any leftover interim brackets
   finalTranscript = finalTranscript.replace(/\[.*?\]/g, "").trim();
   if (finalTranscript) finalTranscript += " ";
-  // reset variáveis de detecção de pausa
-  _lastSpeechTime = 0;
-  _segmentBuffer = "";
-  _segmentCount = 0;
+  _lastSpeechTime = 0; _segmentBuffer = ""; _segmentCount = 0;
 
-  try { recognition.start(); } catch(e) { return; }
   recState = "recording";
   recSeconds = 0;
   setRecUI("recording");
   recInterval = setInterval(() => { recSeconds++; updateTimer(); }, 1000);
   startWave();
+
+  // Tenta AssemblyAI primeiro
+  const assemblyOk = await startAssemblyRecording();
+
+  if (!assemblyOk) {
+    // Fallback: Web Speech API
+    recognition = initRecognition();
+    if (!recognition) { stopRecording(); return; }
+    try { recognition.start(); } catch(e) { stopRecording(); return; }
+    setRecEngineBadge("webspeech");
+  }
 }
 
 function stopRecording() {
+  // Para AssemblyAI
+  stopAssemblyCleanup();
+  // Para Web Speech
   if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+
   recState = "idle";
   clearInterval(recInterval); recInterval = null;
   stopWave();
   setRecUI("idle");
-  // Clean up interim text
+  setRecEngineBadge(null);
+
   const ta = document.getElementById("nm-transcript");
   if (ta) ta.value = finalTranscript.trim();
 }
 
 function pauseRecording() {
   if (recState !== "recording") return;
+  // Pausa AssemblyAI suspendendo o AudioContext
+  if (assemblyMode && assemblyAudioCtx) {
+    try { assemblyAudioCtx.suspend(); } catch(e) {}
+  }
   if (recognition) { try { recognition.stop(); } catch(e) {} }
   recState = "paused";
   clearInterval(recInterval); recInterval = null;
@@ -4844,9 +4978,15 @@ function pauseRecording() {
 
 function resumeRecording() {
   if (recState !== "paused") return;
-  recognition = initRecognition();
-  if (!recognition) return;
-  try { recognition.start(); } catch(e) { return; }
+  // Retoma AssemblyAI
+  if (assemblyMode && assemblyAudioCtx) {
+    try { assemblyAudioCtx.resume(); } catch(e) {}
+  } else if (!assemblyMode) {
+    // Web Speech — precisa de nova instância
+    recognition = initRecognition();
+    if (!recognition) return;
+    try { recognition.start(); } catch(e) { return; }
+  }
   recState = "recording";
   recInterval = setInterval(() => { recSeconds++; updateTimer(); }, 1000);
   setRecUI("recording");
