@@ -596,6 +596,17 @@ input[type="date"]{color-scheme:dark}
 .meeting-chevron{font-size:.7rem;color:var(--muted);transition:transform .2s}
 .meeting-card.open .meeting-chevron{transform:rotate(90deg)}
 .meeting-body{border-top:1px solid var(--border);padding:20px 22px}
+.meeting-archived{opacity:.75}
+.meeting-actions{display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap}
+.meeting-action-btn{
+  font-size:.72rem;font-weight:600;padding:5px 14px;border-radius:20px;
+  border:1px solid var(--border);background:transparent;cursor:pointer;
+  transition:all .15s;color:var(--muted);
+}
+.meeting-action-btn:hover{background:var(--surface)}
+.meeting-action-btn.archive:hover{color:#ffaa3c;border-color:rgba(255,170,60,.4);background:rgba(255,170,60,.08)}
+.meeting-action-btn.unarchive:hover{color:#5b9fff;border-color:rgba(91,159,255,.4);background:rgba(91,159,255,.08)}
+.meeting-action-btn.delete:hover{color:var(--red);border-color:rgba(255,77,109,.4);background:rgba(255,77,109,.08)}
 
 /* ══════════════════════════════════════
    TEAMS
@@ -4348,33 +4359,105 @@ function clearForm(){
   ["nm-title","nm-date","nm-pic","nm-agenda","nm-transcript"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
 }
 
+function buildMeetingCard(m, isArchived=false){
+  const card=document.createElement("div");
+  card.className="meeting-card" + (isArchived?" meeting-archived":"");
+  card.id=`mc-${m.id}`;
+  const dateStr=m.date?new Date(m.date+"T12:00:00").toLocaleDateString("pt-BR"):"—";
+  card.innerHTML=`
+    <div class="meeting-head" onclick="toggleMeetingCard(${m.id})">
+      <div class="meeting-icon">${isArchived?"📦":"🎙"}</div>
+      <div class="meeting-info">
+        <div class="meeting-title">${escHtml(m.title)}</div>
+        <div class="meeting-meta">${dateStr} · ${escHtml(m.team||"")} · ${escHtml(m.pic||"—")}</div>
+      </div>
+      <div class="meeting-badges">
+        ${isArchived?'<span class="badge" style="background:rgba(255,170,60,.12);color:#ffaa3c;border:1px solid rgba(255,170,60,.25)">Arquivada</span>':
+          m.analyzed?'<span class="badge b-done">IA analisada ✓</span>':'<span class="badge b-ns">Pendente análise</span>'}
+      </div>
+      <div class="meeting-chevron">▶</div>
+    </div>
+    <div class="meeting-body">
+      ${m.agenda?`<div style="margin-bottom:12px"><label class="form-label">Pautas / Agenda</label><div style="font-size:.82rem;line-height:1.65;color:var(--text);white-space:pre-wrap;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.agenda)}</div></div>`:''}
+      ${m.transcript?`<div style="margin-bottom:14px"><label class="form-label">Transcrição</label><div style="font-size:.78rem;line-height:1.65;color:var(--dim);white-space:pre-wrap;max-height:160px;overflow-y:auto;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.transcript)}</div></div>`:''}
+      ${!isArchived&&!m.analyzed?`<button class="btn btn-ai" id="btn-ai-${m.id}" onclick="analyzeMeeting(${m.id})">✨ Analisar com IA</button>`:''}
+      <div id="ai-result-${m.id}">${m.analyzed&&m.aiData?renderAIResult(m.aiData,m.id):''}</div>
+      <div class="meeting-actions">
+        ${isArchived
+          ? `<button class="meeting-action-btn unarchive" onclick="unarchiveMeeting(${m.id})">📤 Desarquivar</button>`
+          : `<button class="meeting-action-btn archive" onclick="archiveMeeting(${m.id})">📦 Arquivar</button>`
+        }
+        <button class="meeting-action-btn delete" onclick="deleteMeeting(${m.id})">🗑 Apagar</button>
+      </div>
+    </div>`;
+  return card;
+}
+
 function renderMeetings(){
   const list=document.getElementById("meeting-list"); if(!list)return;
-  if(!meetings.length){ list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted);font-size:.82rem">Nenhuma reunião registrada ainda. Clique em <strong style="color:var(--accent)">+ Nova Reunião</strong> para começar.</div>`; return; }
+
+  const ativas  = meetings.filter(m=>!m.archived);
+  const arquiv  = meetings.filter(m=> m.archived);
+
+  if(!meetings.length){
+    list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted);font-size:.82rem">Nenhuma reunião registrada ainda. Clique em <strong style="color:var(--accent)">+ Nova Reunião</strong> para começar.</div>`;
+    return;
+  }
+
   list.innerHTML="";
-  meetings.forEach(m=>{
-    const card=document.createElement("div"); card.className="meeting-card"; card.id=`mc-${m.id}`;
-    const dateStr=m.date?new Date(m.date+"T12:00:00").toLocaleDateString("pt-BR"):"—";
-    card.innerHTML=`
-      <div class="meeting-head" onclick="toggleMeetingCard(${m.id})">
-        <div class="meeting-icon">🎙</div>
-        <div class="meeting-info">
-          <div class="meeting-title">${m.title}</div>
-          <div class="meeting-meta">${dateStr} · ${m.team} · ${m.pic||"—"}</div>
-        </div>
-        <div class="meeting-badges">
-          ${m.analyzed?'<span class="badge b-done">IA analisada ✓</span>':'<span class="badge b-ns">Pendente análise</span>'}
-        </div>
-        <div class="meeting-chevron">▶</div>
+
+  // Reuniões ativas
+  if(!ativas.length){
+    const empty=document.createElement("div");
+    empty.style.cssText="text-align:center;padding:30px;color:var(--muted);font-size:.82rem";
+    empty.textContent="Nenhuma reunião ativa. As arquivadas estão abaixo.";
+    list.appendChild(empty);
+  } else {
+    ativas.forEach(m=>list.appendChild(buildMeetingCard(m,false)));
+  }
+
+  // Seção de arquivadas
+  if(arquiv.length){
+    const section=document.createElement("div");
+    section.style.cssText="margin-top:24px";
+    section.innerHTML=`
+      <div class="archived-toggle" onclick="this.parentElement.classList.toggle('open')" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);user-select:none">
+        <span style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">📦 Reuniões Arquivadas</span>
+        <span style="font-size:.7rem;padding:2px 8px;border-radius:20px;background:rgba(255,170,60,.12);color:#ffaa3c;border:1px solid rgba(255,170,60,.2)">${arquiv.length}</span>
+        <span style="margin-left:auto;color:var(--dim);font-size:.75rem" class="arch-chevron">▶</span>
       </div>
-      <div class="meeting-body">
-        ${m.agenda?`<div style="margin-bottom:12px"><label class="form-label">Pautas / Agenda</label><div style="font-size:.82rem;line-height:1.65;color:var(--text);white-space:pre-wrap;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.agenda)}</div></div>`:''}
-        ${m.transcript?`<div style="margin-bottom:14px"><label class="form-label">Transcrição</label><div style="font-size:.78rem;line-height:1.65;color:var(--dim);white-space:pre-wrap;max-height:160px;overflow-y:auto;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.transcript)}</div></div>`:''}
-        ${!m.analyzed?`<button class="btn btn-ai" id="btn-ai-${m.id}" onclick="analyzeMeeting(${m.id})">✨ Analisar com IA</button>`:''}
-        <div id="ai-result-${m.id}">${m.analyzed&&m.aiData?renderAIResult(m.aiData,m.id):''}</div>
-      </div>`;
-    list.appendChild(card);
-  });
+      <div class="archived-list" style="display:none;margin-top:8px;display:flex;flex-direction:column;gap:8px"></div>`;
+
+    // Começa fechado
+    const archList=section.querySelector(".archived-list");
+    archList.style.display="none";
+    section.querySelector(".archived-toggle").onclick=function(){
+      const open=this.parentElement.classList.toggle("open");
+      archList.style.display=open?"flex":"none";
+      this.querySelector(".arch-chevron").textContent=open?"▼":"▶";
+    };
+    arquiv.forEach(m=>archList.appendChild(buildMeetingCard(m,true)));
+    list.appendChild(section);
+  }
+}
+
+function archiveMeeting(id){
+  const m=meetings.find(x=>x.id===id); if(!m)return;
+  m.archived=true;
+  saveData(); renderMeetings();
+}
+
+function unarchiveMeeting(id){
+  const m=meetings.find(x=>x.id===id); if(!m)return;
+  m.archived=false;
+  saveData(); renderMeetings();
+}
+
+function deleteMeeting(id){
+  if(!confirm("Apagar esta reunião permanentemente?\nEssa ação não pode ser desfeita.")) return;
+  const idx=meetings.findIndex(x=>x.id===id); if(idx<0)return;
+  meetings.splice(idx,1);
+  saveData(); renderMeetings();
 }
 
 function toggleMeetingCard(id){
