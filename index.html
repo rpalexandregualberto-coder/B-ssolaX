@@ -659,6 +659,15 @@ input[type="date"]{color-scheme:dark}
   border-radius:9px;padding:12px 14px;
 }
 .ai-add-hint{font-size:.65rem;color:var(--dim);margin-top:7px;font-style:italic}
+.ai-item.speaker-item{background:rgba(91,159,255,.07);color:var(--text);cursor:default}
+.ai-dialog-box{
+  display:flex;flex-direction:column;gap:8px;
+  background:rgba(255,255,255,.02);border-radius:10px;
+  padding:10px 12px;border:1px solid var(--border);
+}
+.ai-dialog-line{display:flex;flex-direction:column;gap:2px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.03)}
+.ai-dialog-speaker{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.ai-dialog-text{font-size:.81rem;line-height:1.6;color:var(--text)}
 
 /* ══════════════════════════════════════
    FORMS
@@ -4393,20 +4402,38 @@ Analise a seguinte reunião e retorne APENAS um JSON válido (sem markdown, sem 
 
 {
   "resumo": "string — resumo executivo da reunião em 2-3 frases",
+  "participantes_identificados": [
+    {
+      "id": "Falante 1",
+      "perfil": "breve descrição do perfil/papel percebido na conversa (ex: tomador de decisão, cliente, técnico)",
+      "nome_provavel": "nome se mencionado na transcrição, ou null"
+    }
+  ],
+  "dialogo_reconstruido": [
+    { "falante": "Falante 1", "fala": "trecho resumido do que disse" }
+  ],
   "alertas": ["lista de pontos críticos/riscos/urgências identificados (máx 4)"],
   "tarefas": ["lista de tarefas geradas pela reunião, com responsável se mencionado (máx 6)"],
   "plano_de_acao": ["lista de próximos passos concretos em ordem de prioridade (máx 5)"]
 }
 
+INSTRUÇÕES PARA IDENTIFICAÇÃO DE FALANTES:
+- A transcrição é texto corrido capturado por microfone (sem etiquetas de quem falou)
+- Linhas separadas por "--- [pausa] ---" indicam provável troca de falante ou pausa longa
+- Identifique os falantes pela análise do conteúdo: mudanças de assunto, perguntas vs respostas, tom (autoritário/técnico/consultivo), uso de primeira pessoa ("eu quero", "meu cliente")
+- Se nomes forem mencionados na fala, use-os como identificadores
+- Se há apenas 1 falante claro, indique isso no resumo
+- No "dialogo_reconstruido", agrupe falas consecutivas do mesmo falante
+
 REUNIÃO: ${m.title}
 DATA: ${m.date}
 EQUIPE/CONTEXTO: ${m.team}
-PARTICIPANTES: ${m.pic}
+PARTICIPANTES LISTADOS: ${m.pic}
 
 PAUTAS:
 ${m.agenda}
 
-TRANSCRIÇÃO/NOTAS:
+TRANSCRIÇÃO BRUTA:
 ${m.transcript}
 
 Responda APENAS com o JSON. Nada mais.`;
@@ -4456,15 +4483,50 @@ Responda APENAS com o JSON. Nada mais.`;
   updateMetrics();
 }
 
+// Cores para diferenciar falantes visualmente
+const SPEAKER_COLORS = ["#5b9fff","#3dffa0","#ffaa3c","#c8f135","#ff6fd8","#ff4d6d"];
+
 function renderAIResult(data,meetingId){
   if(!data)return"";
+
+  // Falantes identificados
+  const participantes = data.participantes_identificados || [];
+  const speakerMap = {};
+  participantes.forEach((p,i)=>{ speakerMap[p.id] = SPEAKER_COLORS[i % SPEAKER_COLORS.length]; });
+
+  const participantesHtml = participantes.length > 0
+    ? participantes.map((p,i)=>{
+        const cor = SPEAKER_COLORS[i % SPEAKER_COLORS.length];
+        const nome = p.nome_provavel ? ` — <strong>${escHtml(p.nome_provavel)}</strong>` : "";
+        return `<div class="ai-item speaker-item" style="border-left:3px solid ${cor};padding-left:10px">
+          <span style="color:${cor};font-weight:700">${escHtml(p.id)}</span>${nome}
+          <span style="color:var(--dim);font-size:.72rem;margin-left:6px">· ${escHtml(p.perfil||"")}</span>
+        </div>`;
+      }).join("")
+    : "";
+
+  // Diálogo reconstruído
+  const dialogo = data.dialogo_reconstruido || [];
+  const dialogoHtml = dialogo.length > 1
+    ? dialogo.map(d=>{
+        const cor = speakerMap[d.falante] || "var(--dim)";
+        return `<div class="ai-dialog-line">
+          <span class="ai-dialog-speaker" style="color:${cor}">${escHtml(d.falante)}:</span>
+          <span class="ai-dialog-text">${escHtml(d.fala)}</span>
+        </div>`;
+      }).join("")
+    : "";
+
   const alertsHtml=(data.alertas||[]).map(a=>`<div class="ai-item alert-item">🚨 ${a}</div>`).join("");
   const tasksHtml=(data.tarefas||[]).map((t,i)=>`<div class="ai-item task-item" id="ai-task-${meetingId}-${i}" onclick="addAITask(this,'${t.replace(/'/g,"\\'")}')">✅ ${t} <span style="font-size:.6rem;color:var(--dim);margin-left:6px">(clique para adicionar)</span></div>`).join("");
   const planHtml=(data.plano_de_acao||[]).map((p,i)=>`<div class="ai-item plan-item">📌 ${i+1}. ${p}</div>`).join("");
+
   return `<div class="ai-box">
     <div class="ai-box-head"><div class="ai-box-title">✨ Análise da IA</div></div>
     <div class="ai-box-body">
       ${data.resumo?`<div class="ai-section"><div class="ai-section-title summary">📋 Resumo Executivo</div><div class="ai-summary">${data.resumo}</div></div>`:""}
+      ${participantesHtml?`<div class="ai-section"><div class="ai-section-title" style="color:#5b9fff">🗣️ Falantes Identificados</div>${participantesHtml}</div>`:""}
+      ${dialogoHtml?`<div class="ai-section"><div class="ai-section-title" style="color:#c8f135">💬 Diálogo Reconstruído</div><div class="ai-dialog-box">${dialogoHtml}</div></div>`:""}
       ${alertsHtml?`<div class="ai-section"><div class="ai-section-title alerts">🚨 Alertas & Pontos Críticos</div>${alertsHtml}</div>`:""}
       ${tasksHtml?`<div class="ai-section"><div class="ai-section-title tasks">✅ Tarefas Geradas</div>${tasksHtml}<div class="ai-add-hint">Clique em uma tarefa para adicioná-la ao seu quadro</div></div>`:""}
       ${planHtml?`<div class="ai-section"><div class="ai-section-title plan">📌 Plano de Ação</div>${planHtml}</div>`:""}
@@ -4630,6 +4692,12 @@ let recInterval = null;
 let finalTranscript = "";
 let waveInterval = null;
 
+// Variáveis para detecção de pausa entre falantes
+let _lastSpeechTime = 0;
+let _segmentBuffer = "";
+let _segmentCount = 0;
+const PAUSE_THRESHOLD_MS = 1800; // pausa > 1.8s = provável troca de falante
+
 function initRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -4640,37 +4708,89 @@ function initRecognition() {
   rec.lang = "pt-BR";
   rec.continuous = true;
   rec.interimResults = true;
-  rec.maxAlternatives = 1;
+  rec.maxAlternatives = 3; // captura até 3 alternativas para escolher a mais provável
+
+  rec.onsoundstart = () => {
+    // Som detectado — registra o momento para calcular pausas
+    _lastSpeechTime = Date.now();
+  };
 
   rec.onresult = (e) => {
     let interim = "";
+    const now = Date.now();
+    const pauseDetected = _lastSpeechTime > 0 && (now - _lastSpeechTime) > PAUSE_THRESHOLD_MS;
+
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript;
+      // Usa a alternativa com maior confidence se disponível
+      let bestText = e.results[i][0].transcript;
+      let bestConf = e.results[i][0].confidence || 0;
+      for (let j = 1; j < e.results[i].length; j++) {
+        if ((e.results[i][j].confidence || 0) > bestConf) {
+          bestConf = e.results[i][j].confidence;
+          bestText = e.results[i][j].transcript;
+        }
+      }
+
       if (e.results[i].isFinal) {
-        finalTranscript += t + " ";
+        _lastSpeechTime = now;
+        const trimmed = bestText.trim();
+        if (!trimmed) continue;
+
+        // Se houve pausa longa antes deste segmento, marca possível troca de falante
+        if (pauseDetected && finalTranscript.length > 0) {
+          _segmentCount++;
+          finalTranscript += `\n--- [pausa] ---\n`;
+        }
+        finalTranscript += trimmed + " ";
+        _lastSpeechTime = now;
       } else {
-        interim = t;
+        interim = bestText;
       }
     }
+
     const ta = document.getElementById("nm-transcript");
-    if (ta) ta.value = finalTranscript + (interim ? `[${interim}]` : "");
+    if (ta) {
+      ta.value = finalTranscript + (interim ? `[${interim}]` : "");
+      // Auto-scroll para o final
+      ta.scrollTop = ta.scrollHeight;
+    }
   };
 
   rec.onerror = (e) => {
     if (e.error === "not-allowed") {
       alert("Permissão de microfone negada.\nClique em 'Permitir' quando o navegador pedir acesso ao microfone.");
       stopRecording();
-    } else if (e.error === "no-speech") {
-      // silent — just keep going
+    } else if (e.error === "no-speech" || e.error === "audio-capture") {
+      // Silêncio ou microfone momentâneo — reinicia automaticamente
+      if (recState === "recording") {
+        setTimeout(() => {
+          if (recState === "recording") {
+            try { rec.start(); } catch(err) {}
+          }
+        }, 150);
+      }
+    } else if (e.error === "network") {
+      // Erro de rede no reconhecimento — tenta novamente
+      if (recState === "recording") {
+        setTimeout(() => {
+          if (recState === "recording") {
+            try { rec.start(); } catch(err) {}
+          }
+        }, 500);
+      }
     } else {
       console.warn("Speech error:", e.error);
     }
   };
 
   rec.onend = () => {
-    // Auto-restart if still in recording state (continuous mode drops sometimes)
+    // Auto-restart imediato se ainda está gravando (modo contínuo cai às vezes)
     if (recState === "recording") {
-      try { rec.start(); } catch(err) {}
+      setTimeout(() => {
+        if (recState === "recording") {
+          try { rec.start(); } catch(err) {}
+        }
+      }, 100);
     }
   };
 
@@ -4689,6 +4809,10 @@ function startRecording() {
   // strip any leftover interim brackets
   finalTranscript = finalTranscript.replace(/\[.*?\]/g, "").trim();
   if (finalTranscript) finalTranscript += " ";
+  // reset variáveis de detecção de pausa
+  _lastSpeechTime = 0;
+  _segmentBuffer = "";
+  _segmentCount = 0;
 
   try { recognition.start(); } catch(e) { return; }
   recState = "recording";
