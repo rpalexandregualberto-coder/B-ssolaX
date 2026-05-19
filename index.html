@@ -12,10 +12,10 @@
   /* ── LIGHT MODE (padrão) — baseado na referência visual ── */
   --bg:#f0ebe5;
   --surface:rgba(255,255,255,0.95);
-  --card:rgba(255,255,255,0.88);
+  --card:rgba(255,255,255,0.90);
   --card-hover:rgba(255,255,255,0.98);
-  --border:rgba(0,0,0,0.06);
-  --border-light:rgba(0,0,0,0.11);
+  --border:rgba(0,0,0,0.00);
+  --border-light:rgba(0,0,0,0.06);
   --accent:#e8835a;
   --accent-dim:rgba(232,131,90,0.10);
   --accent-border:rgba(232,131,90,0.28);
@@ -27,18 +27,20 @@
   --yellow-dim:rgba(232,131,90,.10);--yellow-b:rgba(232,131,90,.25);
   --text:#1c1c2e;--muted:rgba(28,28,46,0.42);--dim:rgba(28,28,46,0.58);
   --r:16px;--r-sm:12px;--r-lg:22px;--r-xl:28px;
-  --card-blur:blur(24px);
-  --card-shadow:0 2px 20px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-  --card-shadow-hover:0 8px 36px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
-  --bg-mesh:radial-gradient(at 88% 5%,  rgba(240,120,80,0.75) 0px, transparent 48%),
-            radial-gradient(at 100% 45%, rgba(225,95,60,0.55)  0px, transparent 45%),
-            radial-gradient(at 75% 90%,  rgba(255,155,100,0.45) 0px, transparent 48%),
-            radial-gradient(at 12% 20%,  rgba(100,155,230,0.58) 0px, transparent 50%),
-            radial-gradient(at 0%  65%,  rgba(80,140,220,0.42)  0px, transparent 50%);
+  --card-blur:blur(28px);
+  --card-shadow:0 4px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04), 0 0 0 1px rgba(255,255,255,0.65) inset;
+  --card-shadow-hover:0 12px 40px rgba(0,0,0,0.13), 0 3px 10px rgba(0,0,0,0.06), 0 0 0 1px rgba(255,255,255,0.80) inset;
+  --bg-mesh:
+    radial-gradient(ellipse at 92% 2%,  rgba(245,110,65,0.65)  0px, transparent 44%),
+    radial-gradient(ellipse at 105% 50%,rgba(220,85,50,0.45)   0px, transparent 40%),
+    radial-gradient(ellipse at 78% 95%, rgba(255,145,85,0.38)  0px, transparent 44%),
+    radial-gradient(ellipse at 8%  12%, rgba(90,140,230,0.55)  0px, transparent 48%),
+    radial-gradient(ellipse at -5% 70%, rgba(65,125,215,0.40)  0px, transparent 48%),
+    radial-gradient(ellipse at 45% 45%, rgba(248,244,240,1.0)  0px, transparent 65%);
   --sidebar-bg:rgba(255,255,255,0.88);
   --sidebar-shadow:4px 0 24px rgba(0,0,0,0.07);
-  --topbar-bg:rgba(255,255,255,0.88);
-  --topbar-shadow:0 2px 16px rgba(0,0,0,0.06);
+  --topbar-bg:rgba(255,255,255,0.85);
+  --topbar-shadow:0 1px 0 rgba(0,0,0,0.06), 0 4px 20px rgba(0,0,0,0.04);
 }
 
 [data-theme="dark"]{
@@ -59,13 +61,15 @@
   --purple:#c07aff;--purple-dim:rgba(192,122,255,.10);--purple-border:rgba(192,122,255,.25);
   --yellow-dim:rgba(232,131,90,.10);--yellow-b:rgba(232,131,90,.25);
   --text:#ede8fb;--muted:rgba(255,255,255,0.32);--dim:rgba(255,255,255,0.52);
-  --card-blur:blur(20px);
-  --card-shadow:0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset;
-  --card-shadow-hover:0 16px 48px rgba(0,0,0,0.50), 0 1px 0 rgba(255,255,255,0.08) inset;
-  --bg-mesh:radial-gradient(at 85% 5%,  rgba(232,131,90,0.22) 0px, transparent 50%),
-            radial-gradient(at 15% 15%, rgba(110,70,200,0.38) 0px, transparent 55%),
-            radial-gradient(at 85% 20%, rgba(45,65,160,0.32)  0px, transparent 55%),
-            radial-gradient(at 5%  80%, rgba(75,35,155,0.26)  0px, transparent 55%);
+  --card-blur:blur(24px);
+  --card-shadow:0 8px 32px rgba(0,0,0,0.40), 0 1px 0 rgba(255,255,255,0.07) inset, 0 0 0 1px rgba(255,255,255,0.05) inset;
+  --card-shadow-hover:0 18px 52px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.10) inset;
+  --bg-mesh:
+    radial-gradient(ellipse at 88% 3%,  rgba(232,131,90,0.28)  0px, transparent 48%),
+    radial-gradient(ellipse at 12% 12%, rgba(130,80,220,0.42)  0px, transparent 52%),
+    radial-gradient(ellipse at 88% 22%, rgba(50,75,175,0.35)   0px, transparent 52%),
+    radial-gradient(ellipse at 4%  82%, rgba(90,40,170,0.30)   0px, transparent 52%),
+    radial-gradient(ellipse at 55% 55%, rgba(22,17,42,1.0)     0px, transparent 60%);
   --sidebar-bg:rgba(18,14,36,0.85);
   --sidebar-shadow:4px 0 32px rgba(0,0,0,0.45);
   --topbar-bg:rgba(18,14,36,0.82);
@@ -85,123 +89,114 @@ body{
 }
 
 /* ══════════════════════════════════════
-   SIDEBAR
+   SIDEBAR — estreita, ícone-only, sempre escura
 ══════════════════════════════════════ */
 .sidebar{
   position:fixed;left:0;top:0;bottom:0;
-  width:252px;
-  background:var(--sidebar-bg);
-  backdrop-filter:var(--card-blur);
-  -webkit-backdrop-filter:var(--card-blur);
-  border-right:1px solid var(--border);
+  width:68px;
+  background:#1a1625;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-right:1px solid rgba(255,255,255,0.06);
   display:flex;flex-direction:column;
+  align-items:center;
   z-index:200;
-  box-shadow:var(--sidebar-shadow);
+  box-shadow:4px 0 32px rgba(0,0,0,0.18);
 }
-.main{margin-left:252px;min-height:100vh;position:relative;background:var(--bg-mesh);background-color:var(--bg)}
+.main{margin-left:68px;min-height:100vh;position:relative}
 
-/* ─── Avatar profile no topo ─── */
-.sidebar-profile{
-  padding:22px 20px 18px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:13px;
-}
-.avatar{
-  width:42px;height:42px;
-  background:linear-gradient(135deg,#e8835a,#c05a30);
-  border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Outfit',sans-serif;font-weight:900;font-size:.82rem;
-  color:#fff;flex-shrink:0;
-  box-shadow:0 4px 18px rgba(232,131,90,.35);
-}
-.profile-info{flex:1;min-width:0}
-.profile-name{
-  font-family:'Outfit',sans-serif;
-  font-size:.88rem;font-weight:800;
-  color:var(--text);white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis;
-}
-.profile-role{
-  font-size:.65rem;color:var(--muted);
-  margin-top:1px;white-space:nowrap;
-}
-.profile-status{
-  display:flex;align-items:center;gap:5px;
-  margin-top:3px;
-}
-.profile-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 6px var(--green);
-}
-.profile-status-text{font-size:.6rem;color:var(--green);font-weight:600}
-
-/* ─── App title below avatar ─── */
+/* ─── Logo no topo ─── */
 .logo-wrap{
-  padding:14px 20px 13px;
-  border-bottom:1px solid var(--border);
-}
-.logo-brand{
-  display:flex;align-items:center;gap:11px;
+  padding:16px 0 12px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  width:100%;display:flex;justify-content:center;flex-shrink:0;
 }
 .logo-compass{
-  width:38px;height:38px;flex-shrink:0;
+  width:40px;height:40px;flex-shrink:0;
   background:linear-gradient(135deg,#e8835a 0%,#c05a30 100%);
-  border-radius:12px;
+  border-radius:14px;
   display:flex;align-items:center;justify-content:center;
-  font-size:1.15rem;
-  box-shadow:0 4px 18px rgba(232,131,90,.38);
+  font-size:1.2rem;
+  box-shadow:0 4px 18px rgba(232,131,90,.40);
+  cursor:pointer;
+  transition:transform .18s, box-shadow .18s;
 }
-.logo-name{
-  font-family:'Outfit',sans-serif;
-  font-size:1.08rem;font-weight:900;
-  color:var(--text);letter-spacing:-.025em;line-height:1;
+.logo-compass:hover{transform:scale(1.08);box-shadow:0 6px 22px rgba(232,131,90,.55)}
+/* Ocultar textos não usados */
+.logo-brand,.logo-name,.logo-tagline,.logo-x,.logo-mark,.logo-title,.logo-sub{display:none}
+
+/* ─── Avatar e footer ─── */
+.sidebar-footer-wrap{
+  padding:12px 0 16px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;
 }
-.logo-x{color:var(--accent);text-shadow:0 0 18px rgba(232,131,90,.45)}
-.logo-tagline{
-  font-size:.6rem;color:var(--muted);
-  margin-top:3px;letter-spacing:.03em;font-weight:500;
+.avatar{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,#e8835a,#c05a30);
+  border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:.8rem;
+  color:#fff;flex-shrink:0;
+  box-shadow:0 3px 12px rgba(232,131,90,.35);
+  cursor:pointer;
+  transition:transform .18s, box-shadow .18s;
 }
-.logo-mark{display:none}
-.logo-title{display:none}
-.logo-sub{display:none}
+.avatar:hover{transform:scale(1.08);box-shadow:0 5px 18px rgba(232,131,90,.50)}
+.sidebar-profile,.profile-info,.profile-status,.sidebar-xp,.sidebar-footer{display:none}
+.xp-level-row,.xp-bar-wrap,.xp-info-row,.xp-archetype,.xp-streak,.user-row,.user-name,.user-role{display:none}
 
 /* ─── Nav ─── */
-.nav-wrap{flex:1;overflow-y:auto;padding:6px 12px 0;scrollbar-width:none}
+.nav-wrap{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:none;width:100%;display:flex;flex-direction:column;align-items:center;gap:3px}
 .nav-wrap::-webkit-scrollbar{display:none}
-.nav-group-label{
-  font-size:.56rem;text-transform:uppercase;
-  letter-spacing:.16em;color:var(--muted);
-  padding:14px 8px 4px;font-weight:800;
-  opacity:.6;
-}
+.nav-group-label{display:none}
+.nav-divider{width:28px;height:1px;background:rgba(255,255,255,0.07);margin:5px 0;flex-shrink:0}
 .nav-btn{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 12px;border-radius:10px;
-  cursor:pointer;font-size:.8rem;font-weight:500;
-  color:var(--dim);transition:all .18s;
+  display:flex;align-items:center;justify-content:center;
+  width:44px;height:44px;border-radius:14px;
+  cursor:pointer;font-size:1.05rem;
+  color:rgba(255,255,255,0.38);transition:all .18s;
   border:none;background:none;
-  width:100%;text-align:left;
-  margin-bottom:2px;
+  position:relative;
 }
-.nav-btn:hover{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);color:var(--text)}
+.nav-btn:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75)}
 .nav-btn.active{
-  background:linear-gradient(90deg,var(--accent-border),var(--accent-dim));
-  color:var(--accent);font-weight:700;
-  border-left:3px solid var(--accent);
-  padding-left:9px;
-  box-shadow:inset 0 0 20px var(--accent-dim), 0 4px 14px rgba(232,131,90,.15);
+  background:rgba(232,131,90,0.18);
+  color:#e8835a;
+  box-shadow:0 0 0 1px rgba(232,131,90,0.30);
 }
-.nav-icon{font-size:.88rem;width:20px;text-align:center;flex-shrink:0}
+/* Tooltip no hover */
+.nav-btn::after{
+  content:attr(title);
+  position:absolute;left:56px;top:50%;transform:translateY(-50%);
+  background:#1a1625;color:#fff;
+  font-size:.72rem;font-weight:600;font-family:'Inter',sans-serif;
+  padding:5px 10px;border-radius:8px;
+  white-space:nowrap;pointer-events:none;
+  opacity:0;transition:opacity .15s;
+  border:1px solid rgba(255,255,255,0.10);
+  box-shadow:0 4px 16px rgba(0,0,0,0.3);
+  z-index:9999;
+}
+.nav-btn:hover::after{opacity:1}
+.nav-icon{font-size:1.05rem;line-height:1}
 .nav-badge{
-  margin-left:auto;font-size:.57rem;font-weight:800;
-  padding:2px 7px;border-radius:99px;min-width:20px;text-align:center;
+  position:absolute;top:6px;right:6px;
+  font-size:.48rem;font-weight:800;
+  padding:1px 4px;border-radius:99px;min-width:14px;text-align:center;line-height:1.4;
 }
-.nb-red{background:var(--red);color:#fff}
-.nb-blue{background:var(--blue);color:#fff}
+.nb-red{background:#e05470;color:#fff}
+.nb-blue{background:#5b8fee;color:#fff}
 
-/* ─── Footer removido (avatar agora é no topo) ─── */
+/* Sidebar XP — compacto */
+.sidebar-xp{padding:10px 0;border-top:1px solid rgba(255,255,255,0.06);width:100%;display:flex;justify-content:center}
+.xp-level-row{display:none}
+.xp-bar-wrap{display:none}
+.xp-info-row{display:none}
+.xp-archetype{display:none}
+.xp-streak{display:none}
+
+/* ─── Footer ─── */
 .sidebar-footer{display:none}
 .user-row{display:none}
 .user-name{display:none}
@@ -213,20 +208,21 @@ body{
 
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:16px 36px;
-  border-bottom:1px solid var(--border);
+  padding:16px 44px;
+  border-bottom:1px solid var(--border-light);
   background:var(--topbar-bg);
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
+  backdrop-filter:blur(32px);
+  -webkit-backdrop-filter:blur(32px);
   position:sticky;top:0;z-index:100;
   box-shadow:var(--topbar-shadow);
 }
 .topbar-h{
   font-family:'Outfit',sans-serif;
-  font-size:1.1rem;font-weight:800;
-  letter-spacing:-.02em;
+  font-size:1.05rem;font-weight:800;
+  letter-spacing:-.025em;
+  color:var(--text);
 }
-.topbar-sub{font-size:.7rem;color:var(--muted);margin-top:3px;letter-spacing:.01em}
+.topbar-sub{font-size:.7rem;color:var(--muted);margin-top:1px;letter-spacing:.01em}
 .topbar-right{display:flex;align-items:center;gap:10px}
 .chip{
   display:flex;align-items:center;gap:5px;
@@ -236,7 +232,7 @@ body{
 .chip-red{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
 .chip-yellow{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-border)}
 
-.content{padding:32px 38px 80px;max-width:1400px}
+.content{padding:36px 44px 100px;max-width:1440px}
 .view{display:none;animation:vIn .22s ease}
 .view.active{display:block}
 @keyframes vIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -275,18 +271,18 @@ body{
 /* ══════════════════════════════════════
    METRICS CARDS
 ══════════════════════════════════════ */
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
 .met{
   background:var(--card);
   backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);
   border:1px solid var(--border);
-  border-radius:22px;
-  padding:24px 24px 20px;
+  border-radius:24px;
+  padding:26px 26px 22px;
   position:relative;overflow:hidden;
-  transition:all .25s cubic-bezier(.4,0,.2,1);
+  transition:all .28s cubic-bezier(.4,0,.2,1);
   box-shadow:var(--card-shadow);
 }
-.met:hover{border-color:var(--border-light);transform:translateY(-3px);box-shadow:var(--card-shadow-hover)}
+.met:hover{border-color:var(--border-light);transform:translateY(-4px);box-shadow:var(--card-shadow-hover)}
 .met::after{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
   border-radius:var(--r-lg) var(--r-lg) 0 0;
@@ -1147,9 +1143,9 @@ label.form-label{
 ══════════════════════════════════════ */
 .bento-top{
   display:grid;
-  grid-template-columns:1fr 160px 160px 160px;
+  grid-template-columns:1fr 168px 168px 168px;
   grid-template-rows:auto auto;
-  gap:14px;
+  gap:16px;
   margin-bottom:0;
 }
 /* Hero spans 1 col, 2 rows */
@@ -1158,8 +1154,8 @@ label.form-label{
   background:var(--card);
   backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);
   border:1px solid var(--border);
-  border-radius:24px;
-  padding:28px 30px;
+  border-radius:28px;
+  padding:32px 34px;
   box-shadow:var(--card-shadow);
   display:flex;
   align-items:center;
@@ -1167,12 +1163,23 @@ label.form-label{
   gap:20px;
   position:relative;
   overflow:hidden;
+  transition:transform .25s, box-shadow .25s;
 }
+.bento-hero:hover{transform:translateY(-2px);box-shadow:var(--card-shadow-hover)}
 .bento-hero::before{
   content:'';
   position:absolute;
   top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--accent),transparent);
+  background:linear-gradient(90deg,var(--accent),rgba(232,131,90,0.3),transparent);
+  border-radius:28px 28px 0 0;
+}
+.bento-hero::after{
+  content:'';
+  position:absolute;
+  bottom:-40px;right:-40px;
+  width:160px;height:160px;
+  background:radial-gradient(circle,rgba(232,131,90,0.10) 0%,transparent 70%);
+  pointer-events:none;
 }
 .bento-hero-greeting,
 .foco-greeting-title,
@@ -1212,14 +1219,14 @@ label.form-label{
   background:var(--card);
   backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);
   border:1px solid var(--border);
-  border-radius:22px;
-  padding:20px 20px 16px;
+  border-radius:24px;
+  padding:22px 20px 18px;
   box-shadow:var(--card-shadow);
   display:flex;flex-direction:column;
   position:relative;overflow:hidden;
   transition:transform .22s,border-color .22s,box-shadow .22s;
 }
-.bento-stat:hover{transform:translateY(-3px);border-color:var(--border-light);box-shadow:var(--card-shadow-hover)}
+.bento-stat:hover{transform:translateY(-4px);border-color:var(--border-light);box-shadow:var(--card-shadow-hover)}
 .bento-stat-green::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--green)}
 .bento-stat-blue::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--blue)}
 .bento-stat-red::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--red)}
@@ -2353,68 +2360,44 @@ label.form-label{
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-  <!-- AVATAR NO TOPO -->
-  <div class="sidebar-profile">
-    <div class="avatar" id="profile-avatar">U</div>
-    <div class="profile-info">
-      <div class="profile-name" id="profile-name">Usuário</div>
-      <div class="profile-role" id="profile-sub">—</div>
-      <div class="profile-status">
-        <div class="profile-dot"></div>
-        <span class="profile-status-text">Online</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- XP BAR -->
-  <div class="sidebar-xp" onclick="gotoView('conquistas',document.querySelector('[onclick*=\"conquistas\"]'))" title="Ver conquistas e XP">
-    <div class="xp-level-row">
-      <span class="xp-level-badge" id="xp-level-badge">Nv 1</span>
-      <span class="xp-archetype" id="xp-archetype">Iniciante</span>
-    </div>
-    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
-    <div class="xp-info-row">
-      <span id="xp-current-label">0 / 500 XP</span>
-      <div class="xp-streak"><span>🔥</span><span id="xp-streak-count">0 dias</span></div>
-    </div>
-  </div>
-
+  <!-- LOGO NO TOPO -->
   <div class="logo-wrap">
-    <div class="logo-brand">
-      <div class="logo-compass">🧭</div>
-      <div>
-        <div class="logo-name">Bússola<span class="logo-x">X</span></div>
-        <div class="logo-tagline">Central inteligente do seu dia</div>
-      </div>
-    </div>
+    <div class="logo-compass" onclick="gotoView('dashboard',document.querySelector('.nav-btn.active'))">🧭</div>
   </div>
 
+  <!-- NAVEGAÇÃO -->
   <div class="nav-wrap">
-    <div class="nav-group-label">Principal</div>
-    <button class="nav-btn" onclick="gotoView('foco',this)"><span class="nav-icon">🎯</span><span>Modo Foco</span><span class="nav-badge" style="background:var(--accent);color:#000" id="cnt-foco">0</span></button>
-    <button class="nav-btn active" onclick="gotoView('dashboard',this)"><span class="nav-icon">⚡</span><span>Dashboard</span></button>
-    <button class="nav-btn" onclick="gotoView('tarefas',this)"><span class="nav-icon">✅</span><span>Todas as Tarefas</span></button>
-    <button class="nav-btn" onclick="gotoView('calendar',this)"><span class="nav-icon">📅</span><span>Calendário</span></button>
-    <button class="nav-btn" onclick="gotoView('agenda',this)"><span class="nav-icon">⏰</span><span>Agenda do Dia</span></button>
+    <button class="nav-btn active" title="Dashboard" onclick="gotoView('dashboard',this)"><span class="nav-icon">⚡</span></button>
+    <button class="nav-btn" title="Modo Foco" onclick="gotoView('foco',this)"><span class="nav-icon">🎯</span><span class="nav-badge" style="background:var(--accent);color:#fff" id="cnt-foco">0</span></button>
+    <button class="nav-btn" title="Agenda do Dia" onclick="gotoView('agenda',this)"><span class="nav-icon">⏰</span></button>
+    <button class="nav-btn" title="Tarefas" onclick="gotoView('tarefas',this)"><span class="nav-icon">✅</span></button>
+    <button class="nav-btn" title="Calendário" onclick="gotoView('calendar',this)"><span class="nav-icon">📅</span></button>
+    <div class="nav-divider"></div>
+    <button class="nav-btn" title="Reuniões + IA" onclick="gotoView('reunioes',this)"><span class="nav-icon">🎙</span><span class="nav-badge nb-red" id="cnt-meetings">0</span></button>
+    <button class="nav-btn" title="Ligações" onclick="gotoView('ligacoes',this)"><span class="nav-icon">📞</span><span class="nav-badge nb-red" id="cnt-ligacoes" style="display:none">0</span></button>
+    <button class="nav-btn" title="Projetos" onclick="gotoView('projetos',this)"><span class="nav-icon">📁</span><span class="nav-badge nb-blue" id="cnt-projetos">0</span></button>
+    <button class="nav-btn" title="Conteúdo" onclick="gotoView('conteudo',this)"><span class="nav-icon">📲</span></button>
+    <div class="nav-divider"></div>
+    <button class="nav-btn" title="Financeiro" onclick="gotoView('financeiro',this)"><span class="nav-icon">💰</span></button>
+    <button class="nav-btn" title="Metas" onclick="gotoView('metas',this)"><span class="nav-icon">🎯</span><span class="nav-badge" id="cnt-metas" style="background:var(--accent);color:#fff;display:none">0</span></button>
+    <button class="nav-btn" title="Templates" onclick="gotoView('templates',this)"><span class="nav-icon">📋</span></button>
+    <button class="nav-btn" title="Conquistas & XP" onclick="gotoView('conquistas',this)"><span class="nav-icon">🏆</span></button>
+    <button class="nav-btn" title="Relatório IA" onclick="gotoView('relatorio',this)"><span class="nav-icon">📈</span></button>
+    <button class="nav-btn" title="Notas Rápidas" onclick="gotoView('notas',this)"><span class="nav-icon">📝</span></button>
+  </div>
 
-    <div class="nav-group-label">Reuniões</div>
-    <button class="nav-btn" onclick="gotoView('reunioes',this)"><span class="nav-icon">🎙</span><span>Reuniões + IA</span><span class="nav-badge nb-red" id="cnt-meetings">0</span></button>
-
-    <div class="nav-group-label">Equipes</div>
-    <button class="nav-btn" onclick="gotoView('ligacoes',this)"><span class="nav-icon">📞</span><span>Ligações Pendentes</span><span class="nav-badge nb-red" id="cnt-ligacoes" style="display:none">0</span></button>
-
-    <div class="nav-group-label">Projetos</div>
-    <button class="nav-btn" onclick="gotoView('projetos',this)"><span class="nav-icon">📁</span><span>Projetos</span><span class="nav-badge nb-blue" id="cnt-projetos">0</span></button>
-    <button class="nav-btn" onclick="gotoView('conteudo',this)"><span class="nav-icon">📲</span><span>Conteúdo</span></button>
-    <button class="nav-btn" onclick="gotoView('financeiro',this)"><span class="nav-icon">💰</span><span>Financeiro Pessoal</span></button>
-
-    <div class="nav-group-label">Ferramentas</div>
-    <button class="nav-btn" onclick="gotoView('metas',this)"><span class="nav-icon">🎯</span><span>Metas</span><span class="nav-badge" id="cnt-metas" style="background:var(--accent);color:#000;display:none">0</span></button>
-    <button class="nav-btn" onclick="gotoView('templates',this)"><span class="nav-icon">📋</span><span>Templates</span></button>
-    <button class="nav-btn" onclick="gotoView('conquistas',this)"><span class="nav-icon">🏆</span><span>Conquistas & XP</span></button>
-    <button class="nav-btn" onclick="gotoView('relatorio',this)"><span class="nav-icon">📈</span><span>Relatório Semanal IA</span></button>
-    <button class="nav-btn" onclick="gotoView('notas',this)"><span class="nav-icon">📝</span><span>Notas Rápidas</span></button>
-    <button class="nav-btn" onclick="gotoView('config',this)" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px"><span class="nav-icon">⚙️</span><span>Configurações</span></button>
+  <!-- RODAPÉ: Avatar + Configs -->
+  <div class="sidebar-footer-wrap">
+    <button class="nav-btn" title="Configurações" onclick="gotoView('config',this)"><span class="nav-icon">⚙️</span></button>
+    <div class="avatar" id="profile-avatar" title="Perfil" onclick="gotoView('config',document.querySelector('[title=Configurações]'))">U</div>
+    <!-- Hidden XP/Profile (preservado pra JS) -->
+    <div style="display:none">
+      <div class="xp-level-row"><span class="xp-level-badge" id="xp-level-badge">Nv 1</span><span class="xp-archetype" id="xp-archetype">Iniciante</span></div>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
+      <div class="xp-info-row"><span id="xp-current-label">0 / 500 XP</span><div class="xp-streak"><span>🔥</span><span id="xp-streak-count">0 dias</span></div></div>
+      <div id="profile-name">Usuário</div>
+      <div id="profile-sub">—</div>
+    </div>
   </div>
 
 </aside>
