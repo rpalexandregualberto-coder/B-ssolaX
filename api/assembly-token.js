@@ -14,14 +14,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch("https://api.assemblyai.com/v2/realtime/token", {
-      method: "POST",
-      headers: {
-        "authorization": apiKey,
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({ expires_in: 3600 })
-    });
+    // v3 — token válido por 60s para abrir o WebSocket (máx 600s)
+    const response = await fetch(
+      "https://streaming.assemblyai.com/v3/token?expires_in_seconds=60",
+      {
+        method: "GET",
+        headers: { "authorization": apiKey }
+      }
+    );
 
     const data = await response.json();
     return res.status(response.status).json(data);

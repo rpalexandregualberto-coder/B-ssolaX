@@ -4900,7 +4900,7 @@ function toggleRecording() {
 // ─────────────────────────────────────────────────
 async function startAssemblyRecording() {
   try {
-    // 1. Busca token temporário no nosso proxy
+    // 1. Busca token temporário no nosso proxy (v3)
     const tokenResp = await fetch("/api/assembly-token", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-proxy-secret": PROXY_SECRET }
@@ -4912,26 +4912,31 @@ async function startAssemblyRecording() {
     // 2. Acessa o microfone
     assemblyMicStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
 
-    // 3. Configura AudioContext a 16kHz (padrão AssemblyAI)
+    // 3. Configura AudioContext a 16kHz (exigido pelo AssemblyAI)
     assemblyAudioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
     const source = assemblyAudioCtx.createMediaStreamSource(assemblyMicStream);
 
-    // ScriptProcessorNode captura PCM16 em chunks de 4096 amostras (~256ms)
+    // ScriptProcessorNode — chunks de 4096 amostras a 16kHz = ~256ms (dentro do limite 50–1000ms)
     assemblyProcessor = assemblyAudioCtx.createScriptProcessor(4096, 1, 1);
     source.connect(assemblyProcessor);
     assemblyProcessor.connect(assemblyAudioCtx.destination);
 
-    // 4. Abre WebSocket com AssemblyAI
+    // 4. Abre WebSocket v3 com:
+    //    - speech_model=u3-rt-pro (modelo mais preciso)
+    //    - speaker_labels=true (identifica falantes automaticamente)
+    //    - prompt para Português Brasileiro (language_code é ignorado no u3-rt-pro)
+    //    - continuous_partials para atualizar texto durante falas longas
+    const promptPT = encodeURIComponent("Transcribe Brazilian Portuguese. Transcribe verbatim with standard punctuation.");
     assemblyWS = new WebSocket(
-      `wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=${token}&language_code=pt`
+      `wss://streaming.assemblyai.com/v3/ws?sample_rate=16000&speech_model=u3-rt-pro&speaker_labels=true&continuous_partials=true&prompt=${promptPT}&token=${token}`
     );
 
     assemblyWS.onopen = () => {
       assemblyMode = true;
+      // Envia áudio em chunks PCM16
       assemblyProcessor.onaudioprocess = (e) => {
         if (!assemblyWS || assemblyWS.readyState !== WebSocket.OPEN) return;
         const f32 = e.inputBuffer.getChannelData(0);
-        // Converte float32 → Int16 PCM
         const int16 = new Int16Array(f32.length);
         for (let i = 0; i < f32.length; i++) {
           int16[i] = Math.max(-32768, Math.min(32767, f32[i] * 32768));
@@ -4944,20 +4949,38 @@ async function startAssemblyRecording() {
       const data = JSON.parse(msg.data);
       const ta = document.getElementById("nm-transcript");
       const now = Date.now();
-      const pauseDetected = _lastSpeechTime > 0 && (now - _lastSpeechTime) > PAUSE_THRESHOLD_MS;
 
-      if (data.message_type === "FinalTranscript" && data.text?.trim()) {
-        _lastSpeechTime = now;
-        if (pauseDetected && finalTranscript.length > 0) {
-          finalTranscript += `\n--- [pausa] ---\n`;
-        }
-        finalTranscript += data.text.trim() + " ";
-        if (ta) { ta.value = finalTranscript; ta.scrollTop = ta.scrollHeight; }
-      } else if (data.message_type === "PartialTranscript" && data.text) {
-        _lastSpeechTime = now;
-        if (ta) { ta.value = finalTranscript + `[${data.text}]`; ta.scrollTop = ta.scrollHeight; }
-      } else if (data.message_type === "SessionBegins") {
+      if (data.type === "Begin") {
+        // Sessão iniciada — mostra badge
         setRecEngineBadge("assemblyai");
+
+      } else if (data.type === "Turn") {
+        const text = data.transcript?.trim();
+        if (!text) return;
+
+        // Detecta troca de falante pelo speaker_label
+        const speaker = data.speaker_label || null;
+
+        if (data.end_of_turn) {
+          // Turno finalizado — salva no transcript permanente
+          _lastSpeechTime = now;
+          const pauseDetected = _lastSpeechTime > 0 && (now - _lastSpeechTime) > PAUSE_THRESHOLD_MS;
+          if (pauseDetected && finalTranscript.length > 0) {
+            finalTranscript += `\n--- [pausa] ---\n`;
+          }
+          // Se há speaker label, formata como "Falante A: texto"
+          const prefix = speaker ? `[${speaker}] ` : "";
+          finalTranscript += prefix + text + " ";
+          if (ta) { ta.value = finalTranscript; ta.scrollTop = ta.scrollHeight; }
+        } else {
+          // Partial — mostra em tempo real sem salvar
+          const prefix = speaker ? `[${speaker}] ` : "";
+          if (ta) { ta.value = finalTranscript + `[${prefix}${text}]`; ta.scrollTop = ta.scrollHeight; }
+        }
+
+      } else if (data.type === "Termination") {
+        // Sessão encerrada normalmente
+        console.log("AssemblyAI: sessão encerrada.", data);
       }
     };
 
@@ -4966,13 +4989,14 @@ async function startAssemblyRecording() {
     };
 
     assemblyWS.onclose = (ev) => {
-      // Reconecta automaticamente se ainda está gravando e não foi fechamento intencional
-      if (recState === "recording" && ev.code !== 1000) {
+      // Só reconecta em erros inesperados (não em fechamento intencional código 1000)
+      if (recState === "recording" && ev.code !== 1000 && ev.code !== 3008) {
+        console.warn(`AssemblyAI WS fechou (${ev.code}), reconectando...`);
         setTimeout(() => startAssemblyRecording(), 800);
       }
     };
 
-    return true; // sucesso — AssemblyAI ativo
+    return true;
   } catch (err) {
     console.warn("AssemblyAI indisponível, usando Web Speech API:", err.message);
     stopAssemblyCleanup();
@@ -4981,10 +5005,17 @@ async function startAssemblyRecording() {
 }
 
 function stopAssemblyCleanup() {
+  // OBRIGATÓRIO: envia Terminate antes de fechar — evita cobrança contínua
+  if (assemblyWS && assemblyWS.readyState === WebSocket.OPEN) {
+    try { assemblyWS.send(JSON.stringify({ type: "Terminate" })); } catch(e) {}
+    // Fecha após pequeno delay para o servidor processar o Terminate
+    setTimeout(() => { try { assemblyWS.close(1000); } catch(e){} assemblyWS = null; }, 300);
+  } else {
+    if (assemblyWS) { try { assemblyWS.close(1000); } catch(e){} assemblyWS = null; }
+  }
   if (assemblyProcessor) { try { assemblyProcessor.disconnect(); } catch(e){} assemblyProcessor = null; }
   if (assemblyAudioCtx)  { try { assemblyAudioCtx.close(); }       catch(e){} assemblyAudioCtx = null; }
   if (assemblyMicStream) { assemblyMicStream.getTracks().forEach(t => t.stop()); assemblyMicStream = null; }
-  if (assemblyWS)        { try { assemblyWS.close(1000); }          catch(e){} assemblyWS = null; }
   assemblyMode = false;
 }
 
