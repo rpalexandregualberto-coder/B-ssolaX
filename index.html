@@ -2433,7 +2433,7 @@ label.form-label{
       <div id="save-indicator" style="font-size:.68rem;color:var(--green);opacity:0;transition:opacity .4s;white-space:nowrap;display:flex;align-items:center;gap:4px">
         ✓ Salvo
       </div>
-      <button onclick="toggleTheme()" id="theme-toggle-btn" title="Alternar Dark/Light Mode" style="background:none;border:1px solid var(--border);border-radius:99px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.95rem;transition:all .2s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">🌙</button>
+      <button onclick="toggleTheme()" id="theme-toggle-btn" title="Alternar Dark/Light Mode" style="background:none;border:1px solid var(--border);border-radius:99px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.95rem;transition:all .2s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">☀️</button>
       <button onclick="exportBackup()" title="Baixar backup de todos os dados (JSON)" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.72rem;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">⬇ Exportar</button>
       <label title="Restaurar dados de um backup JSON" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.72rem;transition:all .15s;display:inline-flex;align-items:center;gap:4px" onmouseover="this.style.color='var(--blue)';this.style.borderColor='var(--blue)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">
         ⬆ Importar
@@ -9010,7 +9010,7 @@ function setTheme(theme){
 }
 
 function loadTheme(){
-  let theme = "dark";
+  let theme = "light";
   try{
     const stored = localStorage.getItem("central_acao_theme");
     if(stored === "light" || stored === "dark") theme = stored;
