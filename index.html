@@ -2498,6 +2498,58 @@ textarea.form-input{border-radius:16px;resize:vertical}
   .content{padding:16px}
   .topbar{padding:14px 16px}
 }
+
+/* ══ DASHBOARD RÁPIDO ══ */
+.dash-hoje-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-dim);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:.72rem;font-weight:700;color:var(--accent);margin-top:8px}
+.dash-quote-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 22px;margin-top:14px;display:flex;align-items:flex-start;gap:14px;box-shadow:var(--card-shadow)}
+.dash-quote-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+.dash-quote-text{font-size:.82rem;color:var(--text);line-height:1.72;font-style:italic;flex:1}
+.dash-quote-ref{font-size:.68rem;color:var(--muted);margin-top:5px;font-style:normal;font-weight:700}
+.dash-mais-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 22px;box-shadow:var(--card-shadow)}
+.dash-mais-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:800;margin-bottom:6px}
+.dash-mais-val{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--green)}
+.dash-mais-sub{font-size:.7rem;color:var(--dim);margin-top:3px}
+
+/* ══ META FINANCEIRA ══ */
+.fin-meta-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 22px;margin-bottom:14px;box-shadow:var(--card-shadow)}
+.fin-meta-bar-track{height:10px;background:var(--border);border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.fin-meta-bar-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+/* ══ ORDENS DO DIA ══ */
+.ordens-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 22px;margin-bottom:18px;box-shadow:var(--card-shadow)}
+.ordens-title{font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);margin-bottom:14px}
+.ordem-item{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.ordem-item:last-child{border-bottom:none}
+.ordem-time{font-size:.72rem;font-weight:700;color:var(--muted);min-width:44px;text-align:right}
+.ordem-icon{font-size:1rem;flex-shrink:0}
+.ordem-info{flex:1;min-width:0}
+.ordem-nome{font-size:.82rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ordem-tag{font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:6px;flex-shrink:0}
+.ordem-tag-urg{background:var(--red-dim);color:var(--red)}
+.ordem-tag-meet{background:var(--purple-dim,rgba(156,111,224,.15));color:var(--purple)}
+.ordem-tag-done{background:var(--green-dim);color:var(--green);text-decoration:line-through}
+
+/* ══ TRACKER DE HÁBITOS ══ */
+.hab-hero{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:22px;padding:22px 26px;margin-bottom:14px;box-shadow:var(--card-shadow);display:flex;align-items:center;gap:24px}
+.hab-hero-stat{text-align:center}
+.hab-hero-num{font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;line-height:1}
+.hab-hero-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-top:4px}
+.hab-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:16px 20px;margin-bottom:12px;box-shadow:var(--card-shadow);display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s}
+.hab-card:hover{border-color:var(--accent);box-shadow:var(--card-shadow-hover)}
+.hab-card.done-today{border-color:var(--green-border);background:var(--green-dim)}
+.hab-icon{font-size:1.4rem;flex-shrink:0}
+.hab-info{flex:1;min-width:0}
+.hab-name{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.hab-streak{font-size:.68rem;color:var(--muted);font-weight:600}
+.hab-week{display:flex;gap:5px;margin-top:8px}
+.hab-day{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;border:1px solid var(--border);flex-shrink:0}
+.hab-day.done{background:var(--green);color:#fff;border-color:var(--green)}
+.hab-day.today-empty{border-color:var(--accent);color:var(--accent)}
+.hab-day.future{opacity:.35}
+.hab-check-btn{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;flex-shrink:0}
+.hab-check-btn.done{border-color:var(--green);background:var(--green);color:#fff}
+.hab-form-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--accent);border-radius:18px;padding:20px 22px;margin-bottom:18px;box-shadow:var(--card-shadow)}
+.hab-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:.82rem}
 </style>
 </head>
 <body>
@@ -2569,6 +2621,10 @@ textarea.form-input{border-radius:16px;resize:vertical}
     </button>
     <button class="nav-btn" title="Notas" onclick="gotoView('notas',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+    </button>
+    <button class="nav-btn" title="Hábitos" onclick="gotoView('habitos',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
+      <span class="nav-badge" id="cnt-habitos" style="background:var(--green);color:#fff;display:none">0</span>
     </button>
   </div>
 
@@ -2676,6 +2732,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="bento-hero-left">
           <div class="bento-hero-greeting" id="dash-greeting">Bom dia 👊</div>
           <div class="bento-hero-date" id="dash-date">Carregando...</div>
+          <div class="dash-hoje-badge" id="dash-hoje-badge" style="display:none">📅 Hoje: <strong id="dash-hoje-val">0/0</strong></div>
           <div class="bento-progress-wrap">
             <div class="bento-progress-label">Progresso de Abril</div>
             <div class="bento-progress-track">
@@ -2739,6 +2796,22 @@ textarea.form-input{border-radius:16px;resize:vertical}
       </div>
 
     </div><!-- /bento-top -->
+
+    <!-- FRASE DO DIA + MAIS FEITO -->
+    <div style="display:grid;grid-template-columns:1fr auto;gap:14px;margin-top:14px">
+      <div class="dash-quote-card">
+        <div class="dash-quote-icon" id="dash-q-icon">✝️</div>
+        <div>
+          <div class="dash-quote-text" id="dash-q-text">Carregando frase...</div>
+          <div class="dash-quote-ref" id="dash-q-ref">—</div>
+        </div>
+      </div>
+      <div class="dash-mais-card" style="min-width:160px">
+        <div class="dash-mais-label">🏅 Mais Concluído</div>
+        <div class="dash-mais-val" id="dash-mais-val">—</div>
+        <div class="dash-mais-sub" id="dash-mais-sub">este mês</div>
+      </div>
+    </div>
 
     <!-- CARDS RÁPIDOS: Patrimônio + Meu Sonho -->
     <div style="display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-top:14px">
@@ -3033,6 +3106,17 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <button class="btn btn-primary" onclick="toggleAgendaForm()">+ Compromisso</button>
     </div>
 
+    <!-- ORDENS DO DIA -->
+    <div class="ordens-card" id="ordens-do-dia-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="ordens-title">⚡ Ordens do Dia</div>
+        <div style="font-size:.68rem;color:var(--muted)" id="ordens-resumo">tarefas + reuniões de hoje</div>
+      </div>
+      <div id="ordens-list">
+        <div style="font-size:.8rem;color:var(--muted);text-align:center;padding:16px">Nenhuma tarefa ou reunião pra hoje.</div>
+      </div>
+    </div>
+
     <!-- Form novo compromisso -->
     <div id="agenda-form" style="display:none;background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:22px;padding:20px 24px;margin-bottom:20px">
       <div style="font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:800;color:var(--dim);margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em">✦ Novo Compromisso</div>
@@ -3248,6 +3332,27 @@ textarea.form-input{border-radius:16px;resize:vertical}
         </div>
       </div>
 
+    </div>
+
+    <!-- META FINANCEIRA MENSAL + TOP CATEGORIA -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <!-- Meta Financeira -->
+      <div class="fin-meta-card" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div style="font-family:'Outfit',sans-serif;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">🎯 Meta de Gastos Mensal</div>
+          <button onclick="editMetaGastos()" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px 10px;font-size:.62rem;cursor:pointer;color:var(--dim);font-family:'Outfit',sans-serif;font-weight:700">✎ Editar</button>
+        </div>
+        <div id="fin-meta-content">
+          <div style="font-size:.78rem;color:var(--muted);margin-top:8px">Clique em <strong>Editar</strong> para definir sua meta mensal de gastos.</div>
+        </div>
+      </div>
+      <!-- Top Categoria -->
+      <div class="fin-meta-card" style="margin-bottom:0">
+        <div style="font-family:'Outfit',sans-serif;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px">📊 Top Categorias</div>
+        <div id="fin-top-cat">
+          <div style="font-size:.78rem;color:var(--muted)">Lance despesas para ver o ranking.</div>
+        </div>
+      </div>
     </div>
 
     <!-- KPIs Semanais -->
@@ -3974,6 +4079,68 @@ textarea.form-input{border-radius:16px;resize:vertical}
 
 </div><!-- /view-foco -->
 
+<!-- ═══════════════ HÁBITOS ═══════════════ -->
+<div class="view" id="view-habitos">
+
+  <!-- HERO -->
+  <div class="hab-hero">
+    <div style="flex:1">
+      <div style="font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:900;color:var(--text)">🔁 Tracker de Hábitos</div>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:3px">Consistência gera resultados</div>
+    </div>
+    <div class="hab-hero-stat" style="text-align:center;padding:0 16px;border-right:1px solid var(--border)">
+      <div class="hab-hero-num" id="hab-hoje-num" style="color:var(--green)">0</div>
+      <div class="hab-hero-lbl">hoje</div>
+    </div>
+    <div class="hab-hero-stat" style="text-align:center;padding:0 16px;border-right:1px solid var(--border)">
+      <div class="hab-hero-num" id="hab-total-num" style="color:var(--accent)">0</div>
+      <div class="hab-hero-lbl">hábitos</div>
+    </div>
+    <div class="hab-hero-stat" style="text-align:center;padding:0 16px">
+      <div class="hab-hero-num" id="hab-streak-num" style="color:var(--orange,#f5a623)">0</div>
+      <div class="hab-hero-lbl">🔥 sequência</div>
+    </div>
+    <button class="btn btn-primary" style="margin-left:16px" onclick="toggleHabForm()">+ Novo Hábito</button>
+  </div>
+
+  <!-- FORM -->
+  <div class="hab-form-card" id="hab-form" style="display:none">
+    <div style="font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:var(--accent);margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em">✦ Novo Hábito</div>
+    <div class="form-grid">
+      <div class="form-row"><label class="form-label">Nome</label><input class="form-input" id="hab-inp-nome" placeholder="Ex: Beber 2L de água..."></div>
+      <div class="form-row"><label class="form-label">Ícone</label><input class="form-input" id="hab-inp-icon" placeholder="💧" style="max-width:70px"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label class="form-label">Categoria</label>
+        <select class="form-input" id="hab-inp-cat">
+          <option value="saude">💪 Saúde</option>
+          <option value="trabalho">💼 Trabalho</option>
+          <option value="estudo">📚 Estudo</option>
+          <option value="financas">💰 Finanças</option>
+          <option value="espiritualidade">✝️ Espiritualidade</option>
+          <option value="pessoal">🌟 Pessoal</option>
+        </select>
+      </div>
+      <div class="form-row"><label class="form-label">Frequência</label>
+        <select class="form-input" id="hab-inp-freq">
+          <option value="diario">Diário</option>
+          <option value="semanal">Semanal</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="addHabito()">Salvar Hábito</button>
+      <button class="btn btn-ghost" onclick="toggleHabForm()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- LISTA -->
+  <div id="hab-list">
+    <div class="hab-empty">Nenhum hábito cadastrado ainda.<br>Clique em <strong>+ Novo Hábito</strong> para começar.</div>
+  </div>
+
+</div><!-- /view-habitos -->
+
   </div><!-- /content -->
 </main>
 
@@ -4656,6 +4823,56 @@ function updateMetrics(){
   setText("m-analyzed", meetings.filter(m=>m.analyzed).length);
   setText("m-aitasks", aiTasksGenerated);
   setText("cnt-meetings", meetings.length);
+
+  // Tarefas de hoje
+  const today = new Date().toISOString().split("T")[0];
+  const todayTasks = TASKS.filter(t => t.date === today);
+  const todayDone  = todayTasks.filter(t => doneSet.has(t.id)).length;
+  const todayTotal = todayTasks.length;
+  const badgeEl = document.getElementById("dash-hoje-badge");
+  const badgeValEl = document.getElementById("dash-hoje-val");
+  if(badgeEl && badgeValEl){
+    if(todayTotal > 0){
+      badgeEl.style.display = "inline-flex";
+      badgeValEl.textContent = todayDone+"/"+todayTotal;
+      badgeEl.style.borderColor = todayDone === todayTotal ? "var(--green)" : "var(--border)";
+      badgeEl.style.color = todayDone === todayTotal ? "var(--green)" : "var(--accent)";
+    } else {
+      badgeEl.style.display = "none";
+    }
+  }
+
+  // Quote do dia (index pelo dia do ano)
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  const q = QUOTES[dayOfYear % QUOTES.length];
+  const qIcon = document.getElementById("dash-q-icon");
+  const qText = document.getElementById("dash-q-text");
+  const qRef  = document.getElementById("dash-q-ref");
+  if(qIcon && q){ qIcon.textContent = q.icon; qText.textContent = q.text; qRef.textContent = q.ref; }
+
+  // Mais Feito (categoria com mais tarefas concluídas este mês)
+  const thisMonthStr = new Date().toISOString().slice(0,7);
+  const doneCats = {};
+  TASKS.forEach(t => {
+    if(!doneSet.has(t.id)) return;
+    const cat = t.category || t.section || "Geral";
+    doneCats[cat] = (doneCats[cat]||0) + 1;
+  });
+  const topCat = Object.entries(doneCats).sort((a,b)=>b[1]-a[1])[0];
+  const maisValEl = document.getElementById("dash-mais-val");
+  const maisSubEl = document.getElementById("dash-mais-sub");
+  if(maisValEl){
+    if(topCat){ maisValEl.textContent = topCat[0]; if(maisSubEl) maisSubEl.textContent = topCat[1]+" tarefa"+(topCat[1]>1?"s":"")+" concluída"+(topCat[1]>1?"s":""); }
+    else { maisValEl.textContent = "—"; if(maisSubEl) maisSubEl.textContent = "conclua tarefas pra ver"; }
+  }
+
+  // Badge hábitos pendentes hoje
+  const habBadge = document.getElementById("cnt-habitos");
+  if(habBadge && HABITS.length){
+    const pendH = HABITS.filter(h=>!HABITS_DONE[h.id+"_"+today]).length;
+    habBadge.textContent = pendH;
+    habBadge.style.display = pendH > 0 ? "" : "none";
+  }
 }
 
 // ══════════════════════════════════════
@@ -5359,6 +5576,7 @@ const viewMeta={
   conquistas:["🏆 Conquistas & XP","Evolução, arquétipo e badges"],
   relatorio:["📈 Relatório Semanal","Análise com Inteligência Artificial"],
   notas:["📝 Notas Rápidas","Pautas, anotações e referências"],
+  habitos:["🔁 Tracker de Hábitos","Consistência diária com XP e streaks"],
   config:["⚙️ Configurações","Backup, perfil e preferências"],
   conteudo:["Conteúdo","Redes sociais e vídeos"],
 };
@@ -5385,6 +5603,7 @@ function gotoView(name,el){
   if(name==="templates") renderTemplates();
   if(name==="ligacoes") renderLigacoes();
   if(name==="notas") renderNotasMirror();
+  if(name==="habitos") renderHabitos();
 }
 
 // ══════════════════════════════════════
@@ -5409,6 +5628,7 @@ function renderAll(){
   if(document.getElementById("view-foco")?.classList.contains("active")) renderFoco();
   if(document.getElementById("view-financeiro")?.classList.contains("active")) renderFinanceiro();
   if(document.getElementById("view-notas")?.classList.contains("active")) renderNotasMirror();
+  if(document.getElementById("view-habitos")?.classList.contains("active")) renderHabitos();
   // Auto-save
   try{ saveData(); }catch(e){ console.warn("Save error:",e); }
 }
@@ -6990,6 +7210,10 @@ function renderFinanceiro(){
   // ── Comissões ──
   renderComissoes();
 
+  // ── Meta Financeira + Top Categoria ──
+  renderMetaFinanceira();
+  renderTopCategoria();
+
   // Despesas Fixas (snapshot mensal independente)
   const fixasList=document.getElementById("fin-fixas-list");
   if(fixasList){
@@ -7218,6 +7442,15 @@ function renderAlertasVencimento(){
 
 // ── COMISSÕES ────────────────────────────────────
 let FIN_COMISSOES = [];
+
+// ── META DE GASTOS MENSAL ─────────────────────────
+let FIN_META_GASTOS = 0; // 0 = não definida
+
+// ── TRACKER DE HÁBITOS ───────────────────────────
+let HABITS = [];
+let nextHabId = 1;
+// HABITS_DONE: { "habId_YYYY-MM-DD": true }
+let HABITS_DONE = {};
 
 function toggleComissForm(){
   const f = document.getElementById("fin-comiss-form");
@@ -7876,6 +8109,10 @@ function saveData(){
       FIN_CARTOES, nextCartaoId,
       FIN_ORCAMENTO,
       FIN_COMISSOES,
+      FIN_META_GASTOS,
+      HABITS,
+      HABITS_DONE,
+      nextHabId,
       finYear,
       finMonth,
       nextFinId,
@@ -7959,6 +8196,10 @@ function loadData(){
     if(data.nextFinId!=null)     nextFinId=data.nextFinId;
     if(data.nextFixaId!=null)    nextFixaId=data.nextFixaId;
     if(data.FIN_COMISSOES)       FIN_COMISSOES.splice(0,FIN_COMISSOES.length,...data.FIN_COMISSOES);
+    if(data.FIN_META_GASTOS!=null) FIN_META_GASTOS = data.FIN_META_GASTOS;
+    if(data.HABITS)              HABITS.splice(0,HABITS.length,...data.HABITS);
+    if(data.HABITS_DONE)         Object.assign(HABITS_DONE, data.HABITS_DONE);
+    if(data.nextHabId!=null)     nextHabId = data.nextHabId;
     // Restaurar meta fixada
     try{ const pg=localStorage.getItem("bsx_pinned_goal"); if(pg) pinnedGoalId=parseInt(pg)||null; }catch(e){}
 
@@ -8291,6 +8532,236 @@ function addAgendaItem(){
   renderAgenda();
 }
 
+// ══════════════════════════════════════
+//  ORDENS DO DIA
+// ══════════════════════════════════════
+function renderOrdensDodia(allItems, todayStr){
+  const listEl = document.getElementById("ordens-list");
+  const resumoEl = document.getElementById("ordens-resumo");
+  if(!listEl) return;
+
+  if(!allItems || !allItems.length){
+    listEl.innerHTML = '<div style="font-size:.8rem;color:var(--muted);text-align:center;padding:16px">Nenhuma tarefa ou reunião para hoje. Aproveite o dia! ✨</div>';
+    if(resumoEl) resumoEl.textContent = "dia livre";
+    return;
+  }
+
+  const doneCount = allItems.filter(i=>i.done).length;
+  if(resumoEl) resumoEl.textContent = doneCount+"/"+allItems.length+" concluídos";
+
+  const urgIcons = {paontem:"🚨",urgente:"🟠",alto:"🔶",medio:"🟡",pouco:"🔵"};
+  listEl.innerHTML = allItems.map(i=>{
+    const task = i.source==="task" ? TASKS.find(t=>t.id===i.taskId) : null;
+    const tagClass = i.done ? "ordem-tag-done" : (i.tipo==="reuniao"?"ordem-tag-meet":"ordem-tag-urg");
+    const tagLabel = i.done ? "✓ feito" : (i.tipo==="reuniao"?"reunião":(task?urgIcons[task.urg]||"":"📌"));
+    const clickAction = i.source==="task"
+      ? `cycleStatus(${i.taskId});renderAgenda()`
+      : `toggleAgendaDone('${i.id}')`;
+    return `<div class="ordem-item" onclick="${clickAction}" style="cursor:pointer">
+      <div class="ordem-time">${i.hora||"—"}</div>
+      <div class="ordem-icon">${i.tipo==="reuniao"?"📅":(task?task.icon||"✅":"📌")}</div>
+      <div class="ordem-info">
+        <div class="ordem-nome" style="${i.done?"text-decoration:line-through;opacity:.6":""}">${i.titulo.replace(/^[^\w\s]+\s*/,"")}</div>
+        ${i.nota?`<div style="font-size:.66rem;color:var(--muted);margin-top:1px">${i.nota}</div>`:""}
+      </div>
+      <span class="ordem-tag ${tagClass}">${tagLabel}</span>
+    </div>`;
+  }).join("");
+}
+
+// ══════════════════════════════════════
+//  META FINANCEIRA MENSAL
+// ══════════════════════════════════════
+function editMetaGastos(){
+  const atual = FIN_META_GASTOS > 0 ? FIN_META_GASTOS : "";
+  const val = prompt("Defina sua meta de gastos para o mês (R$):\n(0 para desativar)", atual);
+  if(val === null) return;
+  const n = parseFloat(val.replace(",","."));
+  FIN_META_GASTOS = isNaN(n) ? 0 : Math.max(0, n);
+  try{ saveData(); }catch(e){}
+  renderMetaFinanceira();
+}
+
+function renderMetaFinanceira(){
+  const el = document.getElementById("fin-meta-content");
+  if(!el) return;
+  if(!FIN_META_GASTOS){
+    el.innerHTML = '<div style="font-size:.78rem;color:var(--muted);margin-top:8px">Clique em <strong>Editar</strong> para definir sua meta mensal de gastos.</div>';
+    return;
+  }
+  // Calcular total de despesas do mês atual
+  const mk = monthKey(finYear, finMonth);
+  const despExtra = FIN_TRANSACTIONS.filter(t=>(t.tipo==="despesa_extra"||t.tipo==="despesa_fixa")&&t.data&&t.data.startsWith(mk)).reduce((s,t)=>s+t.valor,0);
+  const despFixas = getFixas().reduce((s,f)=>s+f.valor,0);
+  const total = despExtra + despFixas;
+  const pct = FIN_META_GASTOS > 0 ? Math.min(Math.round(total/FIN_META_GASTOS*100),100) : 0;
+  const cor = pct >= 90 ? "var(--red)" : pct >= 70 ? "var(--orange)" : "var(--green)";
+  const label = pct >= 90 ? "⚠️ Limite atingido!" : pct >= 70 ? "Atenção — acima de 70%" : "No controle";
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px">
+      <div style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:${cor}">${fmtBRL(total)}</div>
+      <div style="font-size:.7rem;color:var(--muted)">meta: ${fmtBRL(FIN_META_GASTOS)}</div>
+    </div>
+    <div class="fin-meta-bar-track">
+      <div class="fin-meta-bar-fill" style="width:${pct}%;background:${cor}"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:.68rem">
+      <span style="color:${cor};font-weight:700">${label}</span>
+      <span style="color:var(--muted)">${pct}% da meta</span>
+    </div>`;
+}
+
+function renderTopCategoria(){
+  const el = document.getElementById("fin-top-cat");
+  if(!el) return;
+  const mk = monthKey(finYear, finMonth);
+  const cats = {};
+  FIN_TRANSACTIONS.filter(t=>(t.tipo==="despesa_extra"||t.tipo==="despesa_fixa")&&t.data&&t.data.startsWith(mk)).forEach(t=>{
+    const c = t.categoria||t.category||"Outros";
+    if(!cats[c]) cats[c]={val:0,count:0};
+    cats[c].val += t.valor;
+    cats[c].count++;
+  });
+  const sorted = Object.entries(cats).sort((a,b)=>b[1].val-a[1].val).slice(0,4);
+  if(!sorted.length){
+    el.innerHTML = '<div style="font-size:.78rem;color:var(--muted)">Lance despesas para ver o ranking.</div>';
+    return;
+  }
+  const maxVal = sorted[0][1].val;
+  el.innerHTML = sorted.map(([cat,d],i)=>{
+    const pct = maxVal > 0 ? Math.round(d.val/maxVal*100) : 0;
+    const medals = ["🥇","🥈","🥉","4️⃣"];
+    return `<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+        <span style="font-size:.72rem;font-weight:700;color:var(--text)">${medals[i]} ${cat}</span>
+        <span style="font-size:.68rem;color:var(--muted)">${fmtBRL(d.val)} · ${d.count} lanç.</span>
+      </div>
+      <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:99px;transition:width .5s"></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ══════════════════════════════════════
+//  TRACKER DE HÁBITOS
+// ══════════════════════════════════════
+function toggleHabForm(){
+  const f = document.getElementById("hab-form");
+  if(f) f.style.display = f.style.display==="none" ? "" : "none";
+}
+
+function addHabito(){
+  const nome = (document.getElementById("hab-inp-nome")?.value||"").trim();
+  if(!nome){ alert("Informe o nome do hábito."); return; }
+  HABITS.push({
+    id: nextHabId++,
+    nome,
+    icon: document.getElementById("hab-inp-icon")?.value||"✅",
+    cat: document.getElementById("hab-inp-cat")?.value||"pessoal",
+    freq: document.getElementById("hab-inp-freq")?.value||"diario",
+    criadoEm: new Date().toISOString().split("T")[0],
+  });
+  ["hab-inp-nome","hab-inp-icon"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  toggleHabForm();
+  try{ saveData(); }catch(e){}
+  renderHabitos();
+}
+
+function deleteHabito(id){
+  if(!confirm("Remover este hábito?")) return;
+  const idx = HABITS.findIndex(h=>h.id===id);
+  if(idx>=0) HABITS.splice(idx,1);
+  try{ saveData(); }catch(e){}
+  renderHabitos();
+}
+
+function toggleHabitoDone(id){
+  const today = new Date().toISOString().split("T")[0];
+  const key = id+"_"+today;
+  if(HABITS_DONE[key]){
+    delete HABITS_DONE[key];
+  } else {
+    HABITS_DONE[key] = true;
+    // XP por hábito concluído
+    if(typeof totalXP !== "undefined"){
+      totalXP += 10;
+      if(typeof saveData==="function") try{ saveData(); }catch(e){}
+    }
+  }
+  try{ saveData(); }catch(e){}
+  renderHabitos();
+  updateMetrics();
+}
+
+function getHabitStreak(hab){
+  let streak = 0;
+  const d = new Date();
+  while(true){
+    const ds = d.toISOString().split("T")[0];
+    if(!HABITS_DONE[hab.id+"_"+ds]) break;
+    streak++;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+
+function renderHabitos(){
+  const listEl = document.getElementById("hab-list");
+  const hojeEl = document.getElementById("hab-hoje-num");
+  const totalEl = document.getElementById("hab-total-num");
+  const streakEl = document.getElementById("hab-streak-num");
+  if(!listEl) return;
+
+  const today = new Date().toISOString().split("T")[0];
+  const doneToday = HABITS.filter(h=>HABITS_DONE[h.id+"_"+today]).length;
+  const maxStreak = HABITS.length ? Math.max(...HABITS.map(h=>getHabitStreak(h)), 0) : 0;
+
+  if(hojeEl) hojeEl.textContent = doneToday+"/"+HABITS.length;
+  if(totalEl) totalEl.textContent = HABITS.length;
+  if(streakEl) streakEl.textContent = maxStreak;
+
+  if(!HABITS.length){
+    listEl.innerHTML = '<div class="hab-empty">Nenhum hábito cadastrado ainda.<br>Clique em <strong>+ Novo Hábito</strong> para começar.</div>';
+    return;
+  }
+
+  // Gera os últimos 7 dias
+  const last7 = [];
+  const dWeek = new Date();
+  for(let i=6;i>=0;i--){
+    const dd = new Date(dWeek);
+    dd.setDate(dd.getDate()-i);
+    last7.push({ds:dd.toISOString().split("T")[0], label:["D","S","T","Q","Q","S","S"][dd.getDay()]});
+  }
+
+  listEl.innerHTML = HABITS.map(h=>{
+    const done = !!HABITS_DONE[h.id+"_"+today];
+    const streak = getHabitStreak(h);
+    const catColors = {saude:"var(--green)",trabalho:"var(--blue)",estudo:"var(--accent)",financas:"var(--orange)",espiritualidade:"var(--purple,#9c6fe0)",pessoal:"var(--muted)"};
+    const cor = catColors[h.cat]||"var(--accent)";
+    const week7 = last7.map(day=>{
+      const isToday = day.ds===today;
+      const isDone = !!HABITS_DONE[h.id+"_"+day.ds];
+      const isFuture = day.ds > today;
+      const cls = isDone?"done":(isToday?"today-empty":(isFuture?"future":""));
+      return `<div class="hab-day ${cls}" title="${day.ds}">${day.label}</div>`;
+    }).join("");
+    return `<div class="hab-card${done?" done-today":""}">
+      <div class="hab-icon">${h.icon||"✅"}</div>
+      <div class="hab-info">
+        <div class="hab-name" style="${done?"text-decoration:line-through;opacity:.7":""}">${h.nome}</div>
+        <div class="hab-streak">${streak>0?"🔥 "+streak+" dia"+(streak>1?"s":"")+" seguido"+(streak>1?"s":""):"—"} · +10 XP por check</div>
+        <div class="hab-week">${week7}</div>
+      </div>
+      <button class="hab-check-btn${done?" done":""}" onclick="toggleHabitoDone(${h.id})" title="${done?"Desmarcar":"Marcar como feito hoje"}">
+        ${done?"✓":"○"}
+      </button>
+      <button onclick="deleteHabito(${h.id})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.9rem;padding:4px;opacity:.5" title="Remover hábito">✕</button>
+    </div>`;
+  }).join("");
+}
+
 function renderAgenda(){
   const perEl=document.getElementById("agenda-periods");
   const titleEl=document.getElementById("agenda-title");
@@ -8327,6 +8798,9 @@ function renderAgenda(){
     if(!b.hora) return -1;
     return a.hora.localeCompare(b.hora);
   });
+
+  // ── Ordens do Dia ──────────────────────────────
+  renderOrdensDodia(allItems, todayStr);
 
   perEl.innerHTML=AGENDA_PERIODS.map(p=>{
     const items=allItems.filter(i=>{
