@@ -1283,9 +1283,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
   transition:box-shadow .22s;
 }
 .bento-stat:hover{box-shadow:var(--card-shadow-hover)}
-.bento-stat-green::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--green)}
-.bento-stat-blue::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--blue)}
-.bento-stat-red::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--red)}
+.bento-stat-green::after,.bento-stat-blue::after,.bento-stat-red::after{display:none}
 .bento-stat-icon{font-size:1rem;margin-bottom:8px;opacity:.7}
 .bento-stat-val{
   font-family:'Outfit',sans-serif;
@@ -2659,20 +2657,20 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <span style="color:var(--muted);font-size:1rem">+</span>
       <input id="qi-name" type="text" placeholder="Nova tarefa rápida..." onkeydown="if(event.key==='Enter')quickAdd()" style="flex:1;min-width:100px">
       <select id="qi-urg" class="add-select">
-        <option value="paontem">🔴 Pra Ontem</option>
-        <option value="urgente" selected>🟠 Urgente</option>
-        <option value="alto">🟡 Alto</option>
-        <option value="medio">🔵 Médio</option>
-        <option value="pouco">⚪ Pouco Urgente</option>
+        <option value="paontem">Pra Ontem</option>
+        <option value="urgente" selected>Urgente</option>
+        <option value="alto">Alto</option>
+        <option value="medio">Médio</option>
+        <option value="pouco">Pouco Urgente</option>
       </select>
       <select id="qi-cat" class="add-select">
-        <option value="allure">✨ Allure</option>
+        <option value="allure">Allure</option>
         <option value="exacta">🏢 Exacta</option>
-        <option value="conteudo">📲 Conteúdo</option>
-        <option value="financeiro">💰 Financeiro</option>
+        <option value="conteudo">Conteúdo</option>
+        <option value="financeiro">Financeiro</option>
         <option value="posvenda">🤝 Pós-Venda</option>
         <option value="equipe">👥 Equipe</option>
-        <option value="outros">📋 Outros</option>
+        <option value="outros">Outros</option>
       </select>
       <input id="qi-date" type="date" class="add-select" style="color-scheme:dark">
       <input id="qi-time" type="time" class="add-select" style="color-scheme:dark;width:90px" title="Horário (opcional)">
@@ -2684,33 +2682,33 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <span style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.1em">Filtrar:</span>
       <button class="filter-chip active" onclick="setDashFilter('all',this)">Todas</button>
       <div class="filter-divider"></div>
-      <button class="filter-chip fc-red" onclick="setDashFilter('paontem',this)">🔴 Pra Ontem</button>
-      <button class="filter-chip fc-red" onclick="setDashFilter('urgente',this)">🟠 Urgente</button>
-      <button class="filter-chip" onclick="setDashFilter('alto',this)">🟡 Alto</button>
-      <button class="filter-chip fc-blue" onclick="setDashFilter('medio',this)">🔵 Médio</button>
-      <button class="filter-chip" onclick="setDashFilter('pouco',this)">⚪ Pouco Urgente</button>
+      <button class="filter-chip fc-red" onclick="setDashFilter('paontem',this)">Pra Ontem</button>
+      <button class="filter-chip fc-red" onclick="setDashFilter('urgente',this)">Urgente</button>
+      <button class="filter-chip" onclick="setDashFilter('alto',this)">Alto</button>
+      <button class="filter-chip fc-blue" onclick="setDashFilter('medio',this)">Médio</button>
+      <button class="filter-chip" onclick="setDashFilter('pouco',this)">Pouco Urgente</button>
       <div class="filter-divider"></div>
-      <button class="filter-chip fc-purple" onclick="setDashFilter('allure',this)">✨ Allure</button>
-      <button class="filter-chip" onclick="setDashFilter('conteudo',this)">📲 Conteúdo</button>
-      <button class="filter-chip fc-green" onclick="setDashFilter('financeiro',this)">💰 Financeiro</button>
-      <button class="filter-chip" onclick="setDashFilter('outros',this)">📋 Outros</button>
+      <button class="filter-chip fc-purple" onclick="setDashFilter('allure',this)">Allure</button>
+      <button class="filter-chip" onclick="setDashFilter('conteudo',this)">Conteúdo</button>
+      <button class="filter-chip fc-green" onclick="setDashFilter('financeiro',this)">Financeiro</button>
+      <button class="filter-chip" onclick="setDashFilter('outros',this)">Outros</button>
       <span class="filter-count" id="dash-filter-count"></span>
     </div>
 
     <!-- TASK SECTIONS -->
-    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:#ff1e3c"></span>🔴 Pra Ontem — Ação Imediata</div></div>
+    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:#ff1e3c"></span>Pra Ontem — Ação Imediata</div></div>
     <div class="task-list" id="s-paontem"></div>
 
-    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--red)"></span>🟠 Urgente — Matar logo</div></div>
+    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--red)"></span>Urgente — Matar logo</div></div>
     <div class="task-list" id="s-urgente"></div>
 
-    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--orange)"></span>🟡 Alto — Esta semana</div></div>
+    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--orange)"></span>Alto — Esta semana</div></div>
     <div class="task-list" id="s-alto"></div>
 
-    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--blue)"></span>🔵 Médio — No fluxo</div></div>
+    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--blue)"></span>Médio — No fluxo</div></div>
     <div class="task-list" id="s-medio"></div>
 
-    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--dim)"></span>⚪ Pouco Urgente — Quando der</div></div>
+    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--dim)"></span>Pouco Urgente — Quando der</div></div>
     <div class="task-list" id="s-pouco"></div>
   </div><!-- /tasks-inline -->
 
@@ -2728,20 +2726,20 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <span style="color:var(--muted);font-size:1rem">+</span>
       <input id="all-name" type="text" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter')allAdd()" style="flex:1;min-width:0">
       <select id="all-urg" style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:.72rem;color:var(--dim);outline:none;cursor:pointer;color-scheme:dark">
-        <option value="paontem">🔴 Pra Ontem</option>
-        <option value="urgente" selected>🟠 Urgente</option>
-        <option value="alto">🟡 Alto</option>
-        <option value="medio">🔵 Médio</option>
-        <option value="pouco">⚪ Pouco Urgente</option>
+        <option value="paontem">Pra Ontem</option>
+        <option value="urgente" selected>Urgente</option>
+        <option value="alto">Alto</option>
+        <option value="medio">Médio</option>
+        <option value="pouco">Pouco Urgente</option>
       </select>
       <select id="all-cat" style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:.72rem;color:var(--dim);outline:none;cursor:pointer;color-scheme:dark">
-        <option value="allure">✨ Allure</option>
+        <option value="allure">Allure</option>
         <option value="exacta">🏢 Exacta</option>
-        <option value="conteudo">📲 Conteúdo</option>
-        <option value="financeiro">💰 Financeiro</option>
+        <option value="conteudo">Conteúdo</option>
+        <option value="financeiro">Financeiro</option>
         <option value="posvenda">🤝 Pós-Venda</option>
         <option value="equipe">👥 Equipe</option>
-        <option value="outros">📋 Outros</option>
+        <option value="outros">Outros</option>
       </select>
       <input id="all-date" type="date" style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:.72rem;color:var(--dim);outline:none;cursor:pointer;color-scheme:dark">
       <button class="btn btn-primary" onclick="allAdd()">+ Adicionar</button>
@@ -2750,18 +2748,18 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <div class="filter-bar" id="all-filter-bar" style="margin-top:4px">
       <button class="filter-chip active" onclick="setAllFilter('all',this)">Todas</button>
       <div class="filter-divider"></div>
-      <button class="filter-chip fc-red" onclick="setAllFilter('paontem',this)">🔴 Pra Ontem</button>
-      <button class="filter-chip fc-red" onclick="setAllFilter('urgente',this)">🟠 Urgente</button>
-      <button class="filter-chip" onclick="setAllFilter('alto',this)">🟡 Alto</button>
-      <button class="filter-chip fc-blue" onclick="setAllFilter('medio',this)">🔵 Médio</button>
+      <button class="filter-chip fc-red" onclick="setAllFilter('paontem',this)">Pra Ontem</button>
+      <button class="filter-chip fc-red" onclick="setAllFilter('urgente',this)">Urgente</button>
+      <button class="filter-chip" onclick="setAllFilter('alto',this)">Alto</button>
+      <button class="filter-chip fc-blue" onclick="setAllFilter('medio',this)">Médio</button>
       <div class="filter-divider"></div>
       <button class="filter-chip fc-green" onclick="setAllFilter('done',this)">✅ Concluídas</button>
       <button class="filter-chip fc-blue" onclick="setAllFilter('proc',this)">▶ Em Andamento</button>
       <button class="filter-chip" onclick="setAllFilter('pending',this)">○ Pendentes</button>
       <div class="filter-divider"></div>
-      <button class="filter-chip fc-purple" onclick="setAllFilter('allure',this)">✨ Allure</button>
-      <button class="filter-chip" onclick="setAllFilter('conteudo',this)">📲 Conteúdo</button>
-      <button class="filter-chip fc-green" onclick="setAllFilter('financeiro',this)">💰 Financeiro</button>
+      <button class="filter-chip fc-purple" onclick="setAllFilter('allure',this)">Allure</button>
+      <button class="filter-chip" onclick="setAllFilter('conteudo',this)">Conteúdo</button>
+      <button class="filter-chip fc-green" onclick="setAllFilter('financeiro',this)">Financeiro</button>
       <span class="filter-count" id="all-filter-count"></span>
     </div>
     <div class="task-list" id="s-all"></div>
@@ -2991,7 +2989,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="form-row">
           <label class="form-label">Classificação</label>
           <select class="form-input" id="pf-class">
-            <option value="fin">💰 Financeiro</option>
+            <option value="fin">Financeiro</option>
             <option value="est" selected>🎯 Estratégico</option>
             <option value="ope">⚙️ Operacional</option>
             <option value="int">🧠 Intelectual</option>
@@ -3314,7 +3312,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
   <!-- ═══════════════ CONQUISTAS ═══════════════ -->
   <!-- ═══════════════ TEMPLATES ═══════════════ -->
   <div class="view" id="view-templates">
-    <div style="font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:900;color:var(--text);margin-bottom:6px">📋 Templates de Tarefas</div>
+    <div style="font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:900;color:var(--text);margin-bottom:6px">Templates de Tarefas</div>
     <div style="font-size:.78rem;color:var(--muted);margin-bottom:22px">Pacotes prontos. Clique para adicionar todas as tarefas de uma vez.</div>
 
     <div class="tpl-grid" id="tpl-grid"></div>
@@ -3368,10 +3366,10 @@ textarea.form-input{border-radius:16px;resize:vertical}
       </div>
       <div class="form-row"><label class="form-label">Classificação</label>
         <select class="form-input" id="gf-class">
-          <option value="fin">💰 Financeiro</option>
+          <option value="fin">Financeiro</option>
           <option value="est">🎯 Estratégico</option>
           <option value="ope">⚙️ Operacional</option>
-          <option value="out">📋 Outros</option>
+          <option value="out">Outros</option>
         </select>
       </div>
       <div class="btn-row">
@@ -3706,23 +3704,23 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="tp-prop">
           <span class="tp-prop-label">Urgência</span>
           <select id="tp-urg">
-            <option value="paontem">🔴 Pra Ontem</option>
-            <option value="urgente">🟠 Urgente</option>
-            <option value="alto">🟡 Alto</option>
-            <option value="medio">🔵 Médio</option>
-            <option value="pouco">⚪ Pouco Urgente</option>
+            <option value="paontem">Pra Ontem</option>
+            <option value="urgente">Urgente</option>
+            <option value="alto">Alto</option>
+            <option value="medio">Médio</option>
+            <option value="pouco">Pouco Urgente</option>
           </select>
         </div>
         <div class="tp-prop">
           <span class="tp-prop-label">Categoria</span>
           <select id="tp-cat">
-            <option value="allure">✨ Allure</option>
+            <option value="allure">Allure</option>
             <option value="exacta">🏢 Exacta</option>
-            <option value="conteudo">📲 Conteúdo</option>
-            <option value="financeiro">💰 Financeiro</option>
+            <option value="conteudo">Conteúdo</option>
+            <option value="financeiro">Financeiro</option>
             <option value="posvenda">🤝 Pós-Venda</option>
             <option value="equipe">👥 Equipe</option>
-            <option value="outros">📋 Outros</option>
+            <option value="outros">Outros</option>
           </select>
         </div>
         <div class="tp-prop">
@@ -5039,14 +5037,14 @@ const viewMeta={
   reunioes:["🎙 Reuniões + IA","Transcrições e análise automática"],
   ligacoes:["📞 Ligações Pendentes","Contatos e follow-ups para ligar"],
   projetos:["📁 Projetos","Iniciativas com tarefas vinculadas"],
-  financeiro:["💰 Financeiro Pessoal","Gestão financeira completa"],
+  financeiro:["Financeiro Pessoal","Gestão financeira completa"],
   metas:["🎯 Metas","Objetivos com progresso automático"],
-  templates:["📋 Templates","Pacotes de tarefas prontas"],
+  templates:["Templates","Pacotes de tarefas prontas"],
   conquistas:["🏆 Conquistas & XP","Evolução, arquétipo e badges"],
   relatorio:["📈 Relatório Semanal","Análise com Inteligência Artificial"],
   notas:["📝 Notas Rápidas","Pautas, anotações e referências"],
   config:["⚙️ Configurações","Backup, perfil e preferências"],
-  conteudo:["📲 Conteúdo","Redes sociais e vídeos"],
+  conteudo:["Conteúdo","Redes sociais e vídeos"],
 };
 function gotoView(name,el){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
@@ -6092,7 +6090,7 @@ const FIN_CATS = {
     "🚗 Uber / Transporte","⛽ Gasolina / Carro","🌿 THC","💊 Farmácia / Saúde",
     "🩺 Saúde (consultas)","🎒 Escola","🐾 Pets","🛍️ Compras / Roupas",
     "🎯 Lazer","🔁 PIX Aleatório","📱 Assinaturas","🏢 Gastos Allure",
-    "🧑‍🍼 Babá / Funcionário","🏡 Casa / Imóvel","📋 Outros"
+    "🧑‍🍼 Babá / Funcionário","🏡 Casa / Imóvel","Outros"
   ],
   investimento: [
     "📈 RDB / CDB","💰 Aporte Nubank","🏘️ Consórcio EVOY","📊 Outros Investimentos"
@@ -6101,7 +6099,7 @@ const FIN_CATS = {
     "🍔 iFood","🥖 Padaria","🛒 Mercado","🍽️ Restaurante","🏪 Conveniência",
     "🚗 Uber","⛽ Posto / Pedágio","🌿 THC","💊 Farmácia","🎒 Escola",
     "🛍️ Compras","🐾 Pets","📱 Assinaturas","🏢 Gastos Allure",
-    "🧴 Higiene / Beleza","🎲 Gasto Aleatório","📋 Outros"
+    "🧴 Higiene / Beleza","🎲 Gasto Aleatório","Outros"
   ],
 };
 
@@ -6160,7 +6158,7 @@ function addTransaction(){
   const nome=(document.getElementById("fin-tx-nome")?.value||"").trim();
   const val=parseFloat(document.getElementById("fin-tx-val")?.value)||0;
   const tipo=document.getElementById("fin-tx-tipo")?.value||"despesa_extra";
-  const cat=document.getElementById("fin-tx-cat")?.value||"📋 Outros";
+  const cat=document.getElementById("fin-tx-cat")?.value||"Outros";
   if(!nome||!val){alert("Informe descrição e valor.");return;}
   const tx = {
     id:nextFinId++,nome,valor:val,tipo,categoria:cat,
@@ -6601,7 +6599,7 @@ Sua missão: extrair MINUCIOSAMENTE TODAS as transações deste ${tipo==="fatura
 
 REGRAS CRÍTICAS DE PRECISÃO:
 1. Identifique CADA linha que represente uma transação financeira. Se tiver 100 transações, retorne 100 — NÃO RESUMA, NÃO AGRUPE.
-2. Quando NÃO tiver certeza da categoria, use "📋 Outros" e marque "needsReview": true.
+2. Quando NÃO tiver certeza da categoria, use "Outros" e marque "needsReview": true.
 3. Se o nome estiver muito codificado/abreviado e você não souber o que é, use o nome cru e marque "needsReview": true.
 4. NUNCA invente transações. Só extraia o que está literalmente no texto.
 
@@ -6619,7 +6617,7 @@ Retorne APENAS JSON válido (sem markdown):
       "nome": "descrição limpa",
       "valor": 99.90,
       "tipo": "${tipo==="fatura"?"cartao":"receita | despesa_extra | despesa_fixa | investimento"}",
-      "categoria": "categoria da lista (ou '📋 Outros' se incerto)",
+      "categoria": "categoria da lista (ou 'Outros' se incerto)",
       "data": "YYYY-MM-DD",
       "needsReview": false,
       "motivo_review": "string opcional"
@@ -6668,7 +6666,7 @@ Responda APENAS com o JSON.`;
       const newId = nextFinId++;
       const newTx = {
         id: newId, nome: tx.nome, valor: Math.abs(tx.valor),
-        tipo: tx.tipo||"despesa_extra", categoria: tx.categoria||"📋 Outros",
+        tipo: tx.tipo||"despesa_extra", categoria: tx.categoria||"Outros",
         data: tx.data||new Date().toISOString().split("T")[0], origem: "ia",
         needsReview: !!tx.needsReview, motivoReview: tx.motivo_review || ""
       };
@@ -8082,7 +8080,7 @@ let nextProjId = 1;
 
 const PROJ_STATUS_LABEL = {plan:"📋 Planejamento",anda:"🚀 Em Andamento",paus:"⏸ Pausado",conc:"✅ Concluído",canc:"❌ Cancelado"};
 const PROJ_STATUS_BADGE = {plan:"ps-plan",anda:"ps-anda",paus:"ps-paus",conc:"ps-conc",canc:"ps-canc"};
-const PROJ_CLASS_LABEL  = {fin:"💰 Financeiro",est:"🎯 Estratégico",ope:"⚙️ Operacional",int:"🧠 Intelectual"};
+const PROJ_CLASS_LABEL  = {fin:"Financeiro",est:"🎯 Estratégico",ope:"⚙️ Operacional",int:"🧠 Intelectual"};
 const PROJ_CLASS_BADGE  = {fin:"cl-fin",est:"cl-est",ope:"cl-ope",int:"cl-int"};
 
 function toggleProjForm(){
@@ -8744,10 +8742,10 @@ function renderNotasMirror(){
   // ─── TAREFAS PENDENTES ───
   const URG_ORDER = ["paontem","urgente","alto","medio","pouco"];
   const URG_INFO = {
-    paontem: {label:"🔴 Pra Ontem", color:"#ff1e3c"},
-    urgente: {label:"🟠 Urgente",   color:"#ff4d6d"},
-    alto:    {label:"🟡 Alto",      color:"#ffaa3c"},
-    medio:   {label:"🔵 Médio",     color:"#5b9fff"},
+    paontem: {label:"Pra Ontem", color:"#ff1e3c"},
+    urgente: {label:"Urgente",   color:"#ff4d6d"},
+    alto:    {label:"Alto",      color:"#ffaa3c"},
+    medio:   {label:"Médio",     color:"#5b9fff"},
     pouco:   {label:"⚪ Pouco",     color:"#888"},
   };
   const pendentes = TASKS.filter(t=>!doneSet.has(t.id)).filter(t=>matchSearch((t.name||"")+(t.cat||"")));
