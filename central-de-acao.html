@@ -597,6 +597,13 @@ input[type="date"]{color-scheme:dark}
 .meeting-card.open .meeting-chevron{transform:rotate(90deg)}
 .meeting-body{border-top:1px solid var(--border);padding:20px 22px}
 .meeting-archived{opacity:.75}
+.meeting-status-agendada{background:rgba(91,159,255,.12);color:#5b9fff;border:1px solid rgba(91,159,255,.25)}
+.meeting-status-concluida{background:rgba(61,255,160,.1);color:var(--green);border:1px solid rgba(61,255,160,.2)}
+.meeting-header-meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.meeting-time-chip{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:600;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-border);padding:2px 8px;border-radius:20px}
+.meeting-loc-chip{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;color:var(--muted);background:var(--surface);border:1px solid var(--border);padding:2px 8px;border-radius:20px}
+.meeting-notes-area{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;color:var(--text);font-size:.82rem;line-height:1.65;font-family:inherit;resize:vertical;min-height:80px;outline:none;transition:border-color .2s}
+.meeting-notes-area:focus{border-color:var(--accent-border)}
 .meeting-actions{display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap}
 .meeting-action-btn{
   font-size:.72rem;font-weight:600;padding:5px 14px;border-radius:20px;
@@ -2614,9 +2621,13 @@ label.form-label{
     <div class="new-meeting-panel" id="new-meeting-panel">
       <div class="panel-title">🎙 Nova Reunião</div>
       <div class="form-grid">
-        <div class="form-row"><label class="form-label">Título da Reunião</label><input class="form-input" id="nm-title" placeholder="Ex: Reunião Equipe Swat..."></div>
-        <div class="form-row"><label class="form-label">Data</label><input class="form-input" id="nm-date" type="date"></div>
+        <div class="form-row"><label class="form-label">Título da Reunião</label><input class="form-input" id="nm-title" placeholder="Ex: Reunião com cliente João..."></div>
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="form-label">Data</label><input class="form-input" id="nm-date" type="date"></div>
+          <div><label class="form-label">Horário</label><input class="form-input" id="nm-time" type="time" placeholder="14:00"></div>
+        </div>
       </div>
+      <div class="form-row"><label class="form-label">📍 Local</label><input class="form-input" id="nm-location" placeholder="Ex: Escritório do cliente, Zoom, Presencial..."></div>
       <div class="form-grid">
         <div class="form-row"><label class="form-label">Participantes (PIC)</label><input class="form-input" id="nm-pic" placeholder="Ex: Você, colaborador, cliente..."></div>
         <div class="form-row"><label class="form-label">Equipe / Contexto</label>
@@ -4208,9 +4219,12 @@ function renderCalendar(){
   });
 
   // Meetings
-  meetings.forEach(m=>{
+  meetings.filter(m=>!m.archived).forEach(m=>{
     if(!m.date) return;
-    addEv(m.date, "🎙 "+m.title, "ev-p");
+    const status = getMeetingStatus(m);
+    const timeLabel = m.time ? ` ${m.time}` : "";
+    const icon = status==="concluida" ? "✅" : "📅";
+    addEv(m.date, icon+timeLabel+" "+m.title, "ev-p");
   });
 
   // Compute first weekday of month (0=Sun)
@@ -4315,7 +4329,12 @@ function toggleNewMeeting(){
   const p=document.getElementById("new-meeting-panel");
   p.classList.toggle("open");
   if(p.classList.contains("open")){
-    document.getElementById("nm-date").value=new Date().toISOString().split("T")[0];
+    const now=new Date();
+    document.getElementById("nm-date").value=now.toISOString().split("T")[0];
+    // Pre-fill next round hour as suggestion
+    const nextH=String(now.getHours()+1).padStart(2,"0");
+    const nmTime=document.getElementById("nm-time");
+    if(nmTime&&!nmTime.value) nmTime.value=nextH+":00";
   }
 }
 function saveMeeting(){
@@ -4325,10 +4344,13 @@ function saveMeeting(){
     id: Date.now(),
     title,
     date: document.getElementById("nm-date").value,
+    time: document.getElementById("nm-time").value||"",
+    location: document.getElementById("nm-location").value.trim(),
     pic: document.getElementById("nm-pic").value,
     team: document.getElementById("nm-team").value,
     agenda: document.getElementById("nm-agenda").value,
     transcript: document.getElementById("nm-transcript").value,
+    notes: "",
     analyzed: false, aiData: null
   };
   meetings.unshift(meeting);
@@ -4343,10 +4365,13 @@ function saveMeetingAndAnalyze(){
     id: Date.now(),
     title,
     date: document.getElementById("nm-date").value,
+    time: document.getElementById("nm-time").value||"",
+    location: document.getElementById("nm-location").value.trim(),
     pic: document.getElementById("nm-pic").value,
     team: document.getElementById("nm-team").value,
     agenda: document.getElementById("nm-agenda").value,
     transcript: document.getElementById("nm-transcript").value,
+    notes: "",
     analyzed: false, aiData: null
   };
   meetings.unshift(meeting);
@@ -4356,7 +4381,14 @@ function saveMeetingAndAnalyze(){
   setTimeout(()=>analyzeMeeting(meeting.id), 200);
 }
 function clearForm(){
-  ["nm-title","nm-date","nm-pic","nm-agenda","nm-transcript"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  ["nm-title","nm-date","nm-time","nm-location","nm-pic","nm-agenda","nm-transcript"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+}
+
+function getMeetingStatus(m){
+  if(m.archived) return "arquivada";
+  const hasContent = (m.transcript&&m.transcript.trim()) || (m.notes&&m.notes.trim());
+  if(hasContent) return "concluida";
+  return "agendada";
 }
 
 function buildMeetingCard(m, isArchived=false){
@@ -4364,23 +4396,42 @@ function buildMeetingCard(m, isArchived=false){
   card.className="meeting-card" + (isArchived?" meeting-archived":"");
   card.id=`mc-${m.id}`;
   const dateStr=m.date?new Date(m.date+"T12:00:00").toLocaleDateString("pt-BR"):"—";
+  const status = getMeetingStatus(m);
+
+  const statusBadge = isArchived
+    ? `<span class="badge" style="background:rgba(255,170,60,.12);color:#ffaa3c;border:1px solid rgba(255,170,60,.25)">📦 Arquivada</span>`
+    : status==="concluida"
+      ? `<span class="badge meeting-status-concluida">✅ Concluída</span>`
+      : `<span class="badge meeting-status-agendada">📅 Agendada</span>`;
+
+  const timeChip = m.time ? `<span class="meeting-time-chip">🕐 ${m.time}</span>` : "";
+  const locChip  = m.location ? `<span class="meeting-loc-chip">📍 ${escHtml(m.location)}</span>` : "";
+
+  const aiBadge = m.analyzed ? `<span class="badge b-done" style="font-size:.6rem">IA ✓</span>` : "";
+
   card.innerHTML=`
     <div class="meeting-head" onclick="toggleMeetingCard(${m.id})">
-      <div class="meeting-icon">${isArchived?"📦":"🎙"}</div>
+      <div class="meeting-icon">${isArchived?"📦":status==="concluida"?"✅":"📅"}</div>
       <div class="meeting-info">
         <div class="meeting-title">${escHtml(m.title)}</div>
-        <div class="meeting-meta">${dateStr} · ${escHtml(m.team||"")} · ${escHtml(m.pic||"—")}</div>
+        <div class="meeting-header-meta">
+          <span style="font-size:.7rem;color:var(--muted)">${dateStr}</span>
+          ${timeChip}${locChip}
+          <span style="font-size:.7rem;color:var(--muted)">${escHtml(m.team||"")}${m.pic?" · "+escHtml(m.pic):""}</span>
+        </div>
       </div>
-      <div class="meeting-badges">
-        ${isArchived?'<span class="badge" style="background:rgba(255,170,60,.12);color:#ffaa3c;border:1px solid rgba(255,170,60,.25)">Arquivada</span>':
-          m.analyzed?'<span class="badge b-done">IA analisada ✓</span>':'<span class="badge b-ns">Pendente análise</span>'}
-      </div>
+      <div class="meeting-badges">${statusBadge}${aiBadge}</div>
       <div class="meeting-chevron">▶</div>
     </div>
     <div class="meeting-body">
-      ${m.agenda?`<div style="margin-bottom:12px"><label class="form-label">Pautas / Agenda</label><div style="font-size:.82rem;line-height:1.65;color:var(--text);white-space:pre-wrap;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.agenda)}</div></div>`:''}
-      ${m.transcript?`<div style="margin-bottom:14px"><label class="form-label">Transcrição</label><div style="font-size:.78rem;line-height:1.65;color:var(--dim);white-space:pre-wrap;max-height:160px;overflow-y:auto;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.transcript)}</div></div>`:''}
-      ${!isArchived&&!m.analyzed?`<button class="btn btn-ai" id="btn-ai-${m.id}" onclick="analyzeMeeting(${m.id})">✨ Analisar com IA</button>`:''}
+      ${m.agenda?`<div style="margin-bottom:12px"><label class="form-label">📋 Pauta</label><div style="font-size:.82rem;line-height:1.65;color:var(--text);white-space:pre-wrap;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.agenda)}</div></div>`:''}
+      ${m.transcript?`<div style="margin-bottom:14px"><label class="form-label">🎙 Transcrição</label><div style="font-size:.78rem;line-height:1.65;color:var(--dim);white-space:pre-wrap;max-height:160px;overflow-y:auto;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.transcript)}</div></div>`:''}
+      <div style="margin-bottom:14px">
+        <label class="form-label">📝 Notas Pós-Reunião</label>
+        <textarea class="meeting-notes-area" id="notes-${m.id}" placeholder="Resuma o que foi discutido, decisões tomadas, próximos passos...">${escHtml(m.notes||"")}</textarea>
+        <button class="meeting-action-btn" style="margin-top:6px" onclick="saveMeetingNotes(${m.id})">💾 Salvar notas</button>
+      </div>
+      ${!isArchived?`<button class="btn btn-ai" id="btn-ai-${m.id}" onclick="analyzeMeeting(${m.id})">${m.analyzed?"🔄 Reanalisar com IA":"✨ Analisar com IA"}</button>`:''}
       <div id="ai-result-${m.id}">${m.analyzed&&m.aiData?renderAIResult(m.aiData,m.id):''}</div>
       <div class="meeting-actions">
         ${isArchived
@@ -4391,6 +4442,16 @@ function buildMeetingCard(m, isArchived=false){
       </div>
     </div>`;
   return card;
+}
+
+function saveMeetingNotes(id){
+  const m=meetings.find(x=>x.id===id); if(!m)return;
+  const ta=document.getElementById(`notes-${id}`); if(!ta)return;
+  m.notes=ta.value.trim();
+  saveData();
+  // feedback visual
+  const btn=ta.nextElementSibling;
+  if(btn){ btn.textContent="✅ Salvo!"; btn.style.color="var(--green)"; setTimeout(()=>{ btn.textContent="💾 Salvar notas"; btn.style.color=""; },1800); }
 }
 
 function renderMeetings(){
@@ -7163,11 +7224,14 @@ function renderAgenda(){
       nota:t.cat, done:doneSet.has(t.id),
       source:"task",taskId:t.id,
     })),
-    ...meetings.filter(m=>m.date===todayStr).map(m=>({
-      id:"m"+m.id, titulo:"🎙 "+m.title,
-      hora:"", tipo:"reuniao",
-      nota:m.team||"", done:m.status==="arquivada",
-      source:"meeting",
+    ...meetings.filter(m=>m.date===todayStr&&!m.archived).map(m=>({
+      id:"m"+m.id,
+      titulo:(getMeetingStatus(m)==="concluida"?"✅ ":"📅 ")+m.title,
+      hora:m.time||"",
+      tipo:"reuniao",
+      nota:[m.team, m.location].filter(Boolean).join(" · ")||"",
+      done:getMeetingStatus(m)==="concluida",
+      source:"meeting",meetingId:m.id,
     })),
   ].sort((a,b)=>{
     if(!a.hora&&!b.hora) return 0;
