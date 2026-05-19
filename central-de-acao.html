@@ -2499,6 +2499,38 @@ textarea.form-input{border-radius:16px;resize:vertical}
   .topbar{padding:14px 16px}
 }
 
+/* ══ CONTEÚDO ══ */
+.cnt-hero{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:22px;padding:20px 26px;margin-bottom:16px;box-shadow:var(--card-shadow);display:flex;align-items:center;gap:0}
+.cnt-kpi{flex:1;text-align:center;border-right:1px solid var(--border);padding:0 12px}
+.cnt-kpi-val{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;line-height:1}
+.cnt-kpi-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text);font-weight:700;margin-top:4px}
+.cnt-kpi-sub{font-size:.58rem;color:var(--muted);margin-top:2px}
+.cnt-kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:start}
+.cnt-col{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px;min-height:120px}
+.cnt-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cnt-col-title{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em}
+.cnt-col-count{font-size:.6rem;background:var(--border);color:var(--muted);padding:2px 7px;border-radius:99px;font-weight:700}
+.cnt-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .18s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.cnt-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:var(--card-shadow-hover)}
+.cnt-card-plat{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.cnt-card-title{font-size:.78rem;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:5px}
+.cnt-card-hook{font-size:.66rem;color:var(--dim);font-style:italic;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cnt-card-foot{display:flex;align-items:center;justify-content:space-between}
+.cnt-card-date{font-size:.6rem;color:var(--muted)}
+.cnt-card-format{font-size:.6rem;padding:2px 7px;border-radius:6px;font-weight:700}
+.cnt-fmt-reels{background:rgba(255,0,100,.12);color:#ff0064}
+.cnt-fmt-carrossel{background:rgba(91,143,238,.15);color:var(--blue)}
+.cnt-fmt-post{background:rgba(160,122,232,.15);color:var(--purple)}
+.cnt-fmt-story{background:rgba(52,197,122,.12);color:var(--green)}
+.cnt-fmt-video_longo{background:rgba(255,59,48,.12);color:#ff3b30}
+.cnt-fmt-texto{background:var(--surface);color:var(--dim)}
+.cnt-perf-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.cnt-perf-row:last-child{border-bottom:none}
+.cnt-perf-plat{font-size:.9rem}
+.cnt-perf-title{flex:1;font-size:.74rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cnt-perf-eng{font-size:.68rem;font-weight:700;color:var(--accent)}
+.cnt-met-input{width:60px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:.68rem;color:var(--text);font-family:'Inter',sans-serif;text-align:center}
+
 /* ══ DASHBOARD RÁPIDO ══ */
 .dash-hoje-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-dim);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:.72rem;font-weight:700;color:var(--accent);margin-top:8px}
 .dash-quote-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 22px;margin-top:14px;display:flex;align-items:flex-start;gap:14px;box-shadow:var(--card-shadow)}
@@ -3241,19 +3273,113 @@ textarea.form-input{border-radius:16px;resize:vertical}
 
   <!-- ═══════════════ CONTEÚDO ═══════════════ -->
   <div class="view" id="view-conteudo">
-    <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
-      <div class="met p"><div class="met-label">Posts Instagram</div><div class="met-val">3</div><div class="met-sub">meta do mês</div></div>
-      <div class="met y"><div class="met-label">Vídeos</div><div class="met-val">3</div><div class="met-sub">criar e postar</div></div>
-      <div class="met b"><div class="met-label">Programações</div><div class="met-val">—</div><div class="met-sub">a agendar</div></div>
+
+    <!-- HERO: KPIs -->
+    <div class="cnt-hero" id="cnt-hero">
+      <div class="cnt-kpi">
+        <div class="cnt-kpi-val" id="cnt-k-pub" style="color:var(--green)">0</div>
+        <div class="cnt-kpi-lbl">Publicados</div>
+        <div class="cnt-kpi-sub">este mês</div>
+      </div>
+      <div class="cnt-kpi">
+        <div class="cnt-kpi-val" id="cnt-k-prod" style="color:var(--blue)">0</div>
+        <div class="cnt-kpi-lbl">Em Produção</div>
+        <div class="cnt-kpi-sub">criando agora</div>
+      </div>
+      <div class="cnt-kpi">
+        <div class="cnt-kpi-val" id="cnt-k-agend" style="color:var(--accent)">0</div>
+        <div class="cnt-kpi-lbl">Agendados</div>
+        <div class="cnt-kpi-sub">prontos p/ postar</div>
+      </div>
+      <div class="cnt-kpi">
+        <div class="cnt-kpi-val" id="cnt-k-ideias" style="color:var(--orange,#f5a623)">0</div>
+        <div class="cnt-kpi-lbl">Ideias</div>
+        <div class="cnt-kpi-sub">no banco</div>
+      </div>
+      <div class="cnt-kpi" style="border-right:none">
+        <div class="cnt-kpi-val" id="cnt-k-eng" style="color:var(--purple)">—</div>
+        <div class="cnt-kpi-lbl">Eng. Total</div>
+        <div class="cnt-kpi-sub">likes + views + saves</div>
+      </div>
+      <div style="display:flex;align-items:center;margin-left:auto;padding-left:20px">
+        <button class="btn btn-primary" onclick="toggleCntForm()">+ Novo Post</button>
+      </div>
     </div>
-    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--purple)"></span>Tarefas de Conteúdo</div></div>
-    <div class="task-list" id="s-cont-tasks"></div>
-    <div class="sec-h" style="margin-top:20px"><div class="sec-title"><span class="sec-dot" style="background:var(--accent)"></span>Roteiro de Vídeos</div></div>
-    <div class="notes-grid">
-      <div class="note-card"><h4>🎬 Vídeo 1</h4><textarea placeholder="Tema, roteiro, CTA...">Tema do vídeo 1...</textarea></div>
-      <div class="note-card"><h4>🎬 Vídeo 2</h4><textarea placeholder="Tema, roteiro, CTA...">Tema do vídeo 2...</textarea></div>
-      <div class="note-card"><h4>🎬 Vídeo 3</h4><textarea placeholder="Tema, roteiro, CTA...">Tema do vídeo 3...</textarea></div>
+
+    <!-- FORM NOVO POST -->
+    <div id="cnt-form" style="display:none;background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--accent);border-radius:22px;padding:22px 26px;margin-bottom:18px;box-shadow:var(--card-shadow)">
+      <div style="font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:var(--accent);margin-bottom:16px;text-transform:uppercase;letter-spacing:.08em">✦ Novo Conteúdo</div>
+      <div class="form-grid">
+        <div class="form-row"><label class="form-label">Título / Tema</label><input class="form-input" id="cnt-f-titulo" placeholder="Ex: Como funciona o consórcio?"></div>
+        <div class="form-row"><label class="form-label">Plataforma</label>
+          <select class="form-input" id="cnt-f-plat">
+            <option value="instagram">📸 Instagram</option>
+            <option value="tiktok">🎵 TikTok</option>
+            <option value="youtube">▶️ YouTube</option>
+            <option value="whatsapp">💬 WhatsApp Status</option>
+            <option value="linkedin">💼 LinkedIn</option>
+            <option value="outros">📱 Outros</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label class="form-label">Formato</label>
+          <select class="form-input" id="cnt-f-format">
+            <option value="reels">🎬 Reels / Vídeo curto</option>
+            <option value="carrossel">🃏 Carrossel</option>
+            <option value="post">🖼️ Post / Foto</option>
+            <option value="story">📲 Story</option>
+            <option value="video_longo">🎥 Vídeo longo</option>
+            <option value="texto">✏️ Texto / Caption</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">Status inicial</label>
+          <select class="form-input" id="cnt-f-status">
+            <option value="ideia">💡 Ideia</option>
+            <option value="producao">✏️ Em Produção</option>
+            <option value="revisao">👁️ Revisão</option>
+            <option value="agendado">📅 Agendado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label class="form-label">Data planejada</label><input class="form-input" id="cnt-f-data" type="date"></div>
+        <div class="form-row"><label class="form-label">Hook / CTA</label><input class="form-input" id="cnt-f-hook" placeholder="Gancho de abertura ou chamada pra ação..."></div>
+      </div>
+      <div class="form-row" style="margin-bottom:14px"><label class="form-label">Notas / Roteiro</label><textarea class="form-input" id="cnt-f-notas" rows="2" placeholder="Pontos principais, script, referências..." style="resize:vertical"></textarea></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="addPost()">Salvar Conteúdo</button>
+        <button class="btn btn-ghost" onclick="toggleCntForm()">Cancelar</button>
+      </div>
     </div>
+
+    <!-- PIPELINE KANBAN -->
+    <div style="font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:10px">📋 Pipeline de Conteúdo</div>
+    <div class="cnt-kanban" id="cnt-kanban"></div>
+
+    <!-- PERFORMANCE POR PLATAFORMA -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px">
+      <!-- Posts Publicados + Métricas -->
+      <div style="background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 22px;box-shadow:var(--card-shadow)">
+        <div style="font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--green);margin-bottom:12px">📊 Performance — Publicados</div>
+        <div id="cnt-perf-list">
+          <div style="font-size:.78rem;color:var(--muted)">Nenhum post publicado ainda.</div>
+        </div>
+      </div>
+      <!-- Por Plataforma -->
+      <div style="background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 22px;box-shadow:var(--card-shadow)">
+        <div style="font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:12px">📱 Por Plataforma</div>
+        <div id="cnt-by-plat"></div>
+      </div>
+    </div>
+
+    <!-- TAREFAS DE CONTEÚDO (do sistema de tarefas) -->
+    <div style="margin-top:18px">
+      <div style="font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);margin-bottom:10px">✅ Tarefas vinculadas ao Conteúdo</div>
+      <div class="task-list" id="s-cont-tasks"></div>
+      <div id="s-cont-empty" style="display:none;font-size:.78rem;color:var(--muted);padding:10px 0">Nenhuma tarefa com categoria Conteúdo. Crie uma em Tarefas com a categoria 📲 Conteúdo.</div>
+    </div>
+
   </div>
 
   <!-- ═══════════════ FINANCEIRO ═══════════════ -->
@@ -5578,7 +5704,7 @@ const viewMeta={
   notas:["📝 Notas Rápidas","Pautas, anotações e referências"],
   habitos:["🔁 Tracker de Hábitos","Consistência diária com XP e streaks"],
   config:["⚙️ Configurações","Backup, perfil e preferências"],
-  conteudo:["Conteúdo","Redes sociais e vídeos"],
+  conteudo:["📲 Conteúdo","Pipeline de posts · métricas · performance"],
 };
 function gotoView(name,el){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
@@ -5604,6 +5730,7 @@ function gotoView(name,el){
   if(name==="ligacoes") renderLigacoes();
   if(name==="notas") renderNotasMirror();
   if(name==="habitos") renderHabitos();
+  if(name==="conteudo") renderConteudo();
 }
 
 // ══════════════════════════════════════
@@ -5629,6 +5756,7 @@ function renderAll(){
   if(document.getElementById("view-financeiro")?.classList.contains("active")) renderFinanceiro();
   if(document.getElementById("view-notas")?.classList.contains("active")) renderNotasMirror();
   if(document.getElementById("view-habitos")?.classList.contains("active")) renderHabitos();
+  if(document.getElementById("view-conteudo")?.classList.contains("active")) renderConteudo();
   // Auto-save
   try{ saveData(); }catch(e){ console.warn("Save error:",e); }
 }
@@ -7443,6 +7571,11 @@ function renderAlertasVencimento(){
 // ── COMISSÕES ────────────────────────────────────
 let FIN_COMISSOES = [];
 
+// ── CONTEÚDO ─────────────────────────────────────
+let CONTENT_POSTS = [];
+let nextPostId = 1;
+// Post: { id, titulo, plataforma, formato, status, dataPlan, hook, notas, criadoEm, metricas:{likes,views,saves,comments} }
+
 // ── META DE GASTOS MENSAL ─────────────────────────
 let FIN_META_GASTOS = 0; // 0 = não definida
 
@@ -8108,6 +8241,8 @@ function saveData(){
       FIN_CONTAS, nextContaId,
       FIN_CARTOES, nextCartaoId,
       FIN_ORCAMENTO,
+      CONTENT_POSTS,
+      nextPostId,
       FIN_COMISSOES,
       FIN_META_GASTOS,
       HABITS,
@@ -8195,6 +8330,8 @@ function loadData(){
     if(data.finMonth!=null)      finMonth=data.finMonth;
     if(data.nextFinId!=null)     nextFinId=data.nextFinId;
     if(data.nextFixaId!=null)    nextFixaId=data.nextFixaId;
+    if(data.CONTENT_POSTS)       CONTENT_POSTS.splice(0,CONTENT_POSTS.length,...data.CONTENT_POSTS);
+    if(data.nextPostId!=null)    nextPostId = data.nextPostId;
     if(data.FIN_COMISSOES)       FIN_COMISSOES.splice(0,FIN_COMISSOES.length,...data.FIN_COMISSOES);
     if(data.FIN_META_GASTOS!=null) FIN_META_GASTOS = data.FIN_META_GASTOS;
     if(data.HABITS)              HABITS.splice(0,HABITS.length,...data.HABITS);
@@ -8530,6 +8667,195 @@ function addAgendaItem(){
   ["ag-titulo","ag-hora","ag-nota"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   toggleAgendaForm();
   renderAgenda();
+}
+
+// ══════════════════════════════════════
+//  CONTEÚDO
+// ══════════════════════════════════════
+const CNT_PLAT_ICONS = {instagram:"📸",tiktok:"🎵",youtube:"▶️",whatsapp:"💬",linkedin:"💼",outros:"📱"};
+const CNT_PLAT_COLORS = {instagram:"#e1306c",tiktok:"#000",youtube:"#ff0000",whatsapp:"#25d366",linkedin:"#0a66c2",outros:"var(--dim)"};
+const CNT_STATUS_LABELS = {ideia:"💡 Ideia",producao:"✏️ Produção",revisao:"👁️ Revisão",agendado:"📅 Agendado",publicado:"✅ Publicado"};
+const CNT_STATUS_COLS = ["ideia","producao","revisao","agendado","publicado"];
+const CNT_STATUS_COLORS = {ideia:"var(--orange,#f5a623)",producao:"var(--blue)",revisao:"var(--accent)",agendado:"var(--purple)",publicado:"var(--green)"};
+
+function toggleCntForm(){
+  const f = document.getElementById("cnt-form");
+  if(f) f.style.display = f.style.display==="none" ? "" : "none";
+}
+
+function addPost(){
+  const titulo = (document.getElementById("cnt-f-titulo")?.value||"").trim();
+  if(!titulo){ alert("Informe o título/tema do conteúdo."); return; }
+  CONTENT_POSTS.push({
+    id: nextPostId++,
+    titulo,
+    plataforma: document.getElementById("cnt-f-plat")?.value||"instagram",
+    formato: document.getElementById("cnt-f-format")?.value||"reels",
+    status: document.getElementById("cnt-f-status")?.value||"ideia",
+    dataPlan: document.getElementById("cnt-f-data")?.value||"",
+    hook: document.getElementById("cnt-f-hook")?.value||"",
+    notas: document.getElementById("cnt-f-notas")?.value||"",
+    criadoEm: new Date().toISOString().split("T")[0],
+    metricas: {likes:0,views:0,saves:0,comments:0},
+  });
+  ["cnt-f-titulo","cnt-f-data","cnt-f-hook","cnt-f-notas"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  toggleCntForm();
+  try{ saveData(); }catch(e){}
+  renderConteudo();
+}
+
+function movePostStatus(id, newStatus){
+  const p = CONTENT_POSTS.find(x=>x.id===id);
+  if(!p) return;
+  p.status = newStatus;
+  if(newStatus==="publicado" && !p.dataPost) p.dataPost = new Date().toISOString().split("T")[0];
+  try{ saveData(); }catch(e){}
+  renderConteudo();
+}
+
+function deletePost(id){
+  if(!confirm("Remover este conteúdo?")) return;
+  const idx = CONTENT_POSTS.findIndex(x=>x.id===id);
+  if(idx>=0) CONTENT_POSTS.splice(idx,1);
+  try{ saveData(); }catch(e){}
+  renderConteudo();
+}
+
+function savePostMetricas(id){
+  const p = CONTENT_POSTS.find(x=>x.id===id);
+  if(!p) return;
+  const fields = ["likes","views","saves","comments"];
+  fields.forEach(f=>{
+    const el = document.getElementById("cnt-met-"+id+"-"+f);
+    if(el) p.metricas[f] = parseInt(el.value)||0;
+  });
+  try{ saveData(); }catch(e){}
+  renderConteudo();
+}
+
+function renderConteudo(){
+  // ── KPIs ──
+  const now = new Date();
+  const monthStr = now.toISOString().slice(0,7);
+  const pub = CONTENT_POSTS.filter(p=>p.status==="publicado");
+  const pubMes = pub.filter(p=>(p.dataPost||p.dataPlan||"").startsWith(monthStr));
+  const prod = CONTENT_POSTS.filter(p=>p.status==="producao");
+  const agend = CONTENT_POSTS.filter(p=>p.status==="agendado");
+  const ideias = CONTENT_POSTS.filter(p=>p.status==="ideia");
+  const engTotal = pub.reduce((s,p)=>{
+    const m = p.metricas||{};
+    return s + (m.likes||0) + (m.views||0) + (m.saves||0) + (m.comments||0);
+  },0);
+
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setEl("cnt-k-pub", pubMes.length);
+  setEl("cnt-k-prod", prod.length);
+  setEl("cnt-k-agend", agend.length);
+  setEl("cnt-k-ideias", ideias.length);
+  setEl("cnt-k-eng", engTotal > 0 ? engTotal.toLocaleString("pt-BR") : "—");
+
+  // ── Kanban Pipeline ──
+  const kanban = document.getElementById("cnt-kanban");
+  if(kanban){
+    kanban.innerHTML = CNT_STATUS_COLS.map(status=>{
+      const col = CONTENT_POSTS.filter(p=>p.status===status);
+      const cor = CNT_STATUS_COLORS[status];
+      const nextStatus = CNT_STATUS_COLS[CNT_STATUS_COLS.indexOf(status)+1];
+      const cards = col.map(p=>{
+        const platIcon = CNT_PLAT_ICONS[p.plataforma]||"📱";
+        const platColor = CNT_PLAT_COLORS[p.plataforma]||"var(--dim)";
+        const fmtClass = "cnt-fmt-"+(p.formato||"post");
+        const dateLabel = p.dataPlan ? new Date(p.dataPlan+"T12:00:00").toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}) : "";
+        const metStr = status==="publicado"
+          ? `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+              <span title="Likes" style="font-size:.62rem;color:var(--muted)">❤️ <input class="cnt-met-input" id="cnt-met-${p.id}-likes" value="${p.metricas?.likes||0}" onchange="savePostMetricas(${p.id})" type="number" min="0"></span>
+              <span title="Views" style="font-size:.62rem;color:var(--muted)">👁️ <input class="cnt-met-input" id="cnt-met-${p.id}-views" value="${p.metricas?.views||0}" onchange="savePostMetricas(${p.id})" type="number" min="0"></span>
+              <span title="Saves" style="font-size:.62rem;color:var(--muted)">🔖 <input class="cnt-met-input" id="cnt-met-${p.id}-saves" value="${p.metricas?.saves||0}" onchange="savePostMetricas(${p.id})" type="number" min="0"></span>
+              <span title="Comentários" style="font-size:.62rem;color:var(--muted)">💬 <input class="cnt-met-input" id="cnt-met-${p.id}-comments" value="${p.metricas?.comments||0}" onchange="savePostMetricas(${p.id})" type="number" min="0"></span>
+            </div>` : "";
+        const moveBtn = nextStatus
+          ? `<button onclick="movePostStatus(${p.id},'${nextStatus}')" style="font-size:.6rem;padding:2px 7px;background:var(--accent-dim);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--accent);font-weight:700;white-space:nowrap">→ ${CNT_STATUS_LABELS[nextStatus].split(" ")[1]||CNT_STATUS_LABELS[nextStatus]}</button>` : "";
+        return `<div class="cnt-card">
+          <div class="cnt-card-plat"><span style="color:${platColor}">${platIcon}</span><span>${p.plataforma.charAt(0).toUpperCase()+p.plataforma.slice(1)}</span></div>
+          <div class="cnt-card-title">${escHtml(p.titulo)}</div>
+          ${p.hook?`<div class="cnt-card-hook">"${escHtml(p.hook)}"</div>`:""}
+          <div class="cnt-card-foot">
+            <span class="cnt-card-format ${fmtClass}">${({reels:"Reels",carrossel:"Carrossel",post:"Post",story:"Story",video_longo:"Vídeo",texto:"Texto"}[p.formato]||p.formato)}</span>
+            <span class="cnt-card-date">${dateLabel}</span>
+          </div>
+          ${metStr}
+          <div style="display:flex;justify-content:space-between;margin-top:7px">
+            ${moveBtn}
+            <button onclick="deletePost(${p.id})" style="font-size:.6rem;background:none;border:none;cursor:pointer;color:var(--muted);padding:2px">✕</button>
+          </div>
+        </div>`;
+      }).join("") || `<div style="font-size:.7rem;color:var(--muted);text-align:center;padding:14px;opacity:.6">Vazio</div>`;
+
+      return `<div class="cnt-col">
+        <div class="cnt-col-head">
+          <span class="cnt-col-title" style="color:${cor}">${CNT_STATUS_LABELS[status]}</span>
+          <span class="cnt-col-count">${col.length}</span>
+        </div>
+        ${cards}
+      </div>`;
+    }).join("");
+  }
+
+  // ── Performance publicados ──
+  const perfEl = document.getElementById("cnt-perf-list");
+  if(perfEl){
+    if(!pub.length){
+      perfEl.innerHTML = '<div style="font-size:.78rem;color:var(--muted)">Nenhum post publicado ainda. Mova um post para "Publicado" e registre as métricas.</div>';
+    } else {
+      const sorted = [...pub].sort((a,b)=>{
+        const engA=(a.metricas?.likes||0)+(a.metricas?.views||0)+(a.metricas?.saves||0)+(a.metricas?.comments||0);
+        const engB=(b.metricas?.likes||0)+(b.metricas?.views||0)+(b.metricas?.saves||0)+(b.metricas?.comments||0);
+        return engB-engA;
+      }).slice(0,6);
+      perfEl.innerHTML = sorted.map(p=>{
+        const m = p.metricas||{};
+        const eng = (m.likes||0)+(m.views||0)+(m.saves||0)+(m.comments||0);
+        return `<div class="cnt-perf-row">
+          <span class="cnt-perf-plat">${CNT_PLAT_ICONS[p.plataforma]||"📱"}</span>
+          <div class="cnt-perf-title">${escHtml(p.titulo)}</div>
+          <span class="cnt-perf-eng">❤️${m.likes||0} 👁️${m.views>999?(m.views/1000).toFixed(1)+"k":m.views||0} 🔖${m.saves||0}</span>
+        </div>`;
+      }).join("");
+    }
+  }
+
+  // ── Por Plataforma ──
+  const platEl = document.getElementById("cnt-by-plat");
+  if(platEl){
+    const platCount = {};
+    CONTENT_POSTS.forEach(p=>{ platCount[p.plataforma]=(platCount[p.plataforma]||0)+1; });
+    const sorted = Object.entries(platCount).sort((a,b)=>b[1]-a[1]);
+    if(!sorted.length){
+      platEl.innerHTML = '<div style="font-size:.78rem;color:var(--muted)">Crie posts para ver a distribuição.</div>';
+    } else {
+      const max = sorted[0][1];
+      platEl.innerHTML = sorted.map(([plat,count])=>`
+        <div style="margin-bottom:9px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <span style="font-size:.74rem;font-weight:700;color:var(--text)">${CNT_PLAT_ICONS[plat]||"📱"} ${plat.charAt(0).toUpperCase()+plat.slice(1)}</span>
+            <span style="font-size:.68rem;color:var(--muted)">${count} post${count>1?"s":""}</span>
+          </div>
+          <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:${Math.round(count/max*100)}%;background:${CNT_PLAT_COLORS[plat]||"var(--accent)"};border-radius:99px;transition:width .5s"></div>
+          </div>
+        </div>`).join("");
+    }
+  }
+
+  // ── Tarefas de Conteúdo ──
+  const ctEl = document.getElementById("s-cont-tasks");
+  const ctEmpty = document.getElementById("s-cont-empty");
+  if(ctEl){
+    const contTasks = TASKS.filter(t=>t.cat==="conteudo");
+    ctEl.innerHTML = "";
+    contTasks.forEach(t=>ctEl.appendChild(mkRow(t)));
+    if(ctEmpty) ctEmpty.style.display = contTasks.length ? "none" : "";
+  }
 }
 
 // ══════════════════════════════════════
