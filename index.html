@@ -5073,7 +5073,7 @@ function initRecognition() {
 
     const ta = document.getElementById("nm-transcript");
     if (ta) {
-      ta.value = finalTranscript + (interim ? `[${interim}]` : "");
+      ta.value = finalTranscript + (interim ? interim + "▌" : "");
       // Auto-scroll para o final
       ta.scrollTop = ta.scrollHeight;
     }
@@ -5203,9 +5203,9 @@ async function startAssemblyRecording() {
           finalTranscript += prefix + text + " ";
           if (ta) { ta.value = finalTranscript; ta.scrollTop = ta.scrollHeight; }
         } else {
-          // Partial — mostra em tempo real sem salvar
-          const prefix = speaker ? `[${speaker}] ` : "";
-          if (ta) { ta.value = finalTranscript + `[${prefix}${text}]`; ta.scrollTop = ta.scrollHeight; }
+          // Partial — fluido sem colchetes, cursor no fim
+          const pPrefix = speaker ? `(${speaker}) ` : "";
+          if (ta) { ta.value = finalTranscript + pPrefix + text + "▌"; ta.scrollTop = ta.scrollHeight; }
         }
 
       } else if (data.type === "Termination") {
