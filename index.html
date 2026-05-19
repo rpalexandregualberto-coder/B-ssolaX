@@ -3612,60 +3612,110 @@ textarea.form-input{border-radius:16px;resize:vertical}
 
   <div class="view" id="view-conquistas">
 
-    <!-- Hero -->
-    <div class="gami-hero" id="gami-hero">
-      <div class="gami-hero-left">
-        <div class="gami-level-big" id="gh-level">NÍVEL 1</div>
-        <h2 id="gh-title">Iniciante</h2>
-        <div style="font-size:.8rem;color:var(--dim);margin-top:6px" id="gh-next">Próximo nível em <strong style="color:var(--accent)" id="gh-xp-next">500</strong> XP</div>
-        <div style="margin-top:14px">
-          <div style="height:10px;background:var(--border);border-radius:99px;overflow:hidden;width:300px;max-width:100%">
-            <div id="gh-bar" style="height:100%;background:linear-gradient(90deg,var(--accent),#c05a30);border-radius:99px;width:0%;transition:width .8s cubic-bezier(.4,0,.2,1)"></div>
+    <!-- ═══ HERO RANKING ═══ -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
+
+      <!-- CARD PERFIL XP -->
+      <div style="grid-column:1/3;background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--accent-border);border-radius:22px;padding:24px 28px;box-shadow:var(--card-shadow);position:relative;overflow:hidden">
+        <!-- Glow bg -->
+        <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,var(--accent-dim) 0%,transparent 70%);pointer-events:none"></div>
+        <div style="display:flex;align-items:center;gap:24px;position:relative">
+          <!-- Avatar / Nível -->
+          <div style="text-align:center;flex-shrink:0">
+            <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c05a30);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:900;color:#fff;margin-bottom:6px;box-shadow:0 4px 20px var(--accent-dim)" id="rank-avatar-circle">G</div>
+            <div style="font-family:'Outfit',sans-serif;font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)" id="gh-level">NÍV. 1</div>
+          </div>
+          <!-- Info -->
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+              <div style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:900;color:var(--text)" id="gh-title">Iniciante</div>
+              <div style="font-size:.62rem;font-weight:800;padding:3px 10px;border-radius:8px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-border)" id="rank-archetype-badge">Explorador</div>
+            </div>
+            <div style="font-size:.75rem;color:var(--muted);margin-bottom:12px">Próximo nível em <strong style="color:var(--accent)" id="gh-xp-next">500</strong> XP</div>
+            <!-- Barra XP -->
+            <div style="height:10px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:6px">
+              <div id="gh-bar" style="height:100%;background:linear-gradient(90deg,var(--accent),#c05a30);border-radius:99px;width:0%;transition:width 1s cubic-bezier(.4,0,.2,1)"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted)">
+              <span id="rank-xp-label">0 XP</span>
+              <span id="rank-xp-max">500 XP</span>
+            </div>
+          </div>
+          <!-- XP Total -->
+          <div style="text-align:center;flex-shrink:0">
+            <div class="gami-xp-total" id="gh-xp" style="font-size:2.8rem">0</div>
+            <div class="gami-xp-label">XP Total</div>
           </div>
         </div>
       </div>
-      <div style="text-align:center">
-        <div class="gami-xp-total" id="gh-xp">0</div>
-        <div class="gami-xp-label">XP Total</div>
-        <div class="xp-streak" style="justify-content:center;margin-top:10px;font-size:.78rem">
-          🔥 <span id="gh-streak">0</span> dias de streak
+
+      <!-- STREAK CARD -->
+      <div style="background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--orange-border);border-radius:22px;padding:22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px">
+        <div style="font-size:2.5rem">🔥</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:2.2rem;font-weight:900;color:var(--orange);line-height:1" id="gh-streak">0</div>
+        <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--muted)">dias de streak</div>
+        <div style="font-size:.65rem;color:var(--dim);margin-top:4px" id="rank-streak-status">Comece hoje!</div>
+      </div>
+
+    </div>
+
+    <!-- ═══ STATS RÁPIDOS ═══ -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;text-align:center;backdrop-filter:var(--card-blur)">
+        <div style="font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;color:var(--accent)" id="gs-tarefas">0</div>
+        <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-top:4px">Tarefas Concluídas</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;text-align:center;backdrop-filter:var(--card-blur)">
+        <div style="font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;color:var(--red)" id="gs-urgentes">0</div>
+        <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-top:4px">Urgentes Resolvidas</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;text-align:center;backdrop-filter:var(--card-blur)">
+        <div style="font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;color:var(--blue)" id="gs-reunioes">0</div>
+        <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-top:4px">Reuniões com IA</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;text-align:center;backdrop-filter:var(--card-blur)">
+        <div style="font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;color:var(--purple)" id="gs-projetos">0</div>
+        <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-top:4px">Projetos Ativos</div>
+      </div>
+    </div>
+
+    <!-- ═══ XP POR CATEGORIA + ARQUÉTIPO ═══ -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+      <!-- XP por Categoria -->
+      <div style="background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:20px;padding:20px 24px;box-shadow:var(--card-shadow)">
+        <div style="font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:14px">XP por Categoria</div>
+        <div id="rank-xp-cats">
+          <div style="text-align:center;padding:20px;color:var(--muted);font-size:.75rem">Conclua tarefas para ver o ranking por categoria</div>
         </div>
       </div>
+
+      <!-- Arquétipo -->
+      <div class="archetype-card" style="margin:0">
+        <div class="archetype-icon" id="arch-icon">🌱</div>
+        <div class="archetype-info">
+          <div class="archetype-title">Arquétipo Dominante</div>
+          <div class="archetype-name" id="arch-name">Iniciante</div>
+          <div class="archetype-desc" id="arch-desc">Complete mais tarefas para descobrir seu arquétipo dominante.</div>
+        </div>
+        <div class="archetype-bars" id="arch-bars"></div>
+      </div>
+
     </div>
 
-    <!-- Stats -->
-    <div class="gami-stats-grid">
-      <div class="gami-stat">
-        <div class="gami-stat-val" style="color:var(--accent)" id="gs-tarefas">0</div>
-        <div class="gami-stat-label">Tarefas concluídas</div>
-      </div>
-      <div class="gami-stat">
-        <div class="gami-stat-val" style="color:var(--red)" id="gs-urgentes">0</div>
-        <div class="gami-stat-label">Urgentes resolvidas</div>
-      </div>
-      <div class="gami-stat">
-        <div class="gami-stat-val" style="color:var(--blue)" id="gs-reunioes">0</div>
-        <div class="gami-stat-label">Reuniões analisadas</div>
-      </div>
-      <div class="gami-stat">
-        <div class="gami-stat-val" style="color:var(--purple)" id="gs-projetos">0</div>
-        <div class="gami-stat-label">Projetos ativos</div>
+    <!-- ═══ PRÓXIMAS CONQUISTAS ═══ -->
+    <div style="background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--blue-border);border-radius:20px;padding:20px 24px;box-shadow:var(--card-shadow);margin-bottom:14px">
+      <div style="font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:14px">Próximas Conquistas — Quase lá!</div>
+      <div id="rank-proximas" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+        <div style="text-align:center;padding:16px;color:var(--muted);font-size:.75rem">Carregando...</div>
       </div>
     </div>
 
-    <!-- Arquétipo -->
-    <div class="archetype-card">
-      <div class="archetype-icon" id="arch-icon">🌱</div>
-      <div class="archetype-info">
-        <div class="archetype-title">Seu Arquétipo Dominante</div>
-        <div class="archetype-name" id="arch-name">Iniciante</div>
-        <div class="archetype-desc" id="arch-desc">Complete mais tarefas para descobrir seu arquétipo dominante.</div>
-      </div>
-      <div class="archetype-bars" id="arch-bars"></div>
+    <!-- ═══ CONQUISTAS DESBLOQUEADAS ═══ -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text)">Todas as Conquistas</div>
+      <span style="font-size:.7rem;color:var(--muted)" id="conquistas-count">0 / 0 desbloqueadas</span>
     </div>
-
-    <!-- Conquistas -->
-    <div class="sec-h"><div class="sec-title"><span class="sec-dot" style="background:var(--accent)"></span>🏅 Conquistas</div><span class="sec-cnt" id="conquistas-count">0 / 0</span></div>
     <div class="conquistas-grid" id="conquistas-grid"></div>
 
   </div>
@@ -8498,19 +8548,92 @@ function renderGamification(){
   const arch = ARCHETYPES.find(a=>a.key===domCat)||ARCHETYPES[ARCHETYPES.length-1];
   if(archSpan) archSpan.textContent=arch.icon+" "+arch.name;
 
-  // View conquistas
+  // View conquistas — Ranking
   const ghXP=document.getElementById("gh-xp");
   const ghLevel=document.getElementById("gh-level");
   const ghTitle=document.getElementById("gh-title");
   const ghBar=document.getElementById("gh-bar");
   const ghNext=document.getElementById("gh-xp-next");
   const ghStreak=document.getElementById("gh-streak");
-  if(ghXP) ghXP.textContent=totalXP;
-  if(ghLevel) ghLevel.textContent="NÍVEL "+(LEVELS.indexOf(level)+1);
+  const lvlNum = LEVELS.indexOf(level)+1;
+  if(ghXP) ghXP.textContent=totalXP.toLocaleString("pt-BR");
+  if(ghLevel) ghLevel.textContent="NÍV. "+lvlNum;
   if(ghTitle) ghTitle.textContent=level.title;
   if(ghBar) ghBar.style.width=pct+"%";
-  if(ghNext) ghNext.textContent=nextXP>0?nextXP:"MAX";
+  if(ghNext) ghNext.textContent=nextXP>0?nextXP.toLocaleString("pt-BR"):"MAX";
   if(ghStreak) ghStreak.textContent=streakDays;
+
+  // Avatar inicial
+  const avatarCircle = document.getElementById("rank-avatar-circle");
+  const profileName = document.getElementById("profile-name");
+  if(avatarCircle && profileName) avatarCircle.textContent = (profileName.textContent||"U")[0].toUpperCase();
+
+  // Labels XP na barra
+  const xpLabelEl = document.getElementById("rank-xp-label");
+  const xpMaxEl   = document.getElementById("rank-xp-max");
+  if(xpLabelEl) xpLabelEl.textContent = totalXP.toLocaleString("pt-BR")+" XP";
+  if(xpMaxEl)   xpMaxEl.textContent   = level.max.toLocaleString("pt-BR")+" XP";
+
+  // Badge arquétipo no hero
+  const archBadge = document.getElementById("rank-archetype-badge");
+  if(archBadge) archBadge.textContent = arch.icon+" "+arch.name;
+
+  // Streak status
+  const streakStatus = document.getElementById("rank-streak-status");
+  if(streakStatus){
+    if(streakDays===0) streakStatus.textContent="Comece hoje!";
+    else if(streakDays<3) streakStatus.textContent="Bom começo!";
+    else if(streakDays<7) streakStatus.textContent="Vai bem!";
+    else if(streakDays<14) streakStatus.textContent="Na sequência!";
+    else streakStatus.textContent="Imparável!";
+  }
+
+  // XP por Categoria (ranking)
+  const rankCatsEl = document.getElementById("rank-xp-cats");
+  if(rankCatsEl){
+    const catsSorted = Object.entries(catXPAcc).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const maxCatXP = catsSorted[0]?.[1]||1;
+    if(!catsSorted.length){
+      rankCatsEl.innerHTML=`<div style="text-align:center;padding:16px;color:var(--muted);font-size:.75rem">Conclua tarefas para ver o ranking</div>`;
+    } else {
+      rankCatsEl.innerHTML = catsSorted.map(([cat,xp],i)=>{
+        const archInfo = ARCHETYPES.find(a=>a.key===cat)||{icon:"📋",color:"var(--muted)"};
+        const pctBar = Math.round(xp/maxCatXP*100);
+        const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":"";
+        return `<div style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:.74rem;font-weight:600;color:var(--text)">${medal} ${archInfo.icon} ${cat}</span>
+            <span style="font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:800;color:${archInfo.color}">${xp} XP</span>
+          </div>
+          <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden">
+            <div style="width:${pctBar}%;height:100%;background:${archInfo.color};border-radius:99px;transition:width .6s ease"></div>
+          </div>
+        </div>`;
+      }).join("");
+    }
+  }
+
+  // Próximas Conquistas (as 4 mais próximas de desbloquear)
+  const proximasEl = document.getElementById("rank-proximas");
+  if(proximasEl){
+    const locked = ALL_CONQUISTAS.filter(c=>!conquistas_unlocked.has(c.id));
+    // Tenta dar score de "proximidade" baseado no check
+    // Simplificado: pega as primeiras 4 locked
+    const proximas = locked.slice(0,4);
+    if(!proximas.length){
+      proximasEl.innerHTML=`<div style="text-align:center;padding:16px;color:var(--green);font-size:.8rem">🏆 Você desbloqueou todas as conquistas!</div>`;
+    } else {
+      proximasEl.innerHTML = proximas.map(c=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--blue-border)">
+          <div style="font-size:1.6rem;opacity:.5">${c.icon}</div>
+          <div style="flex:1">
+            <div style="font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:2px">${c.name}</div>
+            <div style="font-size:.64rem;color:var(--muted)">${c.desc}</div>
+          </div>
+          <div style="font-size:.65rem;font-weight:800;color:var(--blue);background:var(--blue-dim);border:1px solid var(--blue-border);border-radius:6px;padding:2px 8px;white-space:nowrap">+${c.xp} XP</div>
+        </div>`).join("");
+    }
+  }
 
   // Stats
   const done=doneSet.size;
@@ -8543,21 +8666,26 @@ function renderGamification(){
     }).join("");
   }
 
-  // Conquistas
+  // Conquistas — unlocked primeiro
   const grid=document.getElementById("conquistas-grid");
   const cntEl=document.getElementById("conquistas-count");
   if(grid){
-    grid.innerHTML=ALL_CONQUISTAS.map(con=>{
+    const sorted=[...ALL_CONQUISTAS].sort((a,b)=>{
+      const au=conquistas_unlocked.has(a.id)?1:0;
+      const bu=conquistas_unlocked.has(b.id)?1:0;
+      return bu-au;
+    });
+    grid.innerHTML=sorted.map(con=>{
       const unlocked=conquistas_unlocked.has(con.id);
-      return `<div class="conquista-card${unlocked?" unlocked":" locked"}">
+      return `<div class="conquista-card${unlocked?" unlocked":" locked"}" title="${unlocked?"Desbloqueada!":con.desc}">
         <span class="conquista-icon">${con.icon}</span>
         <div class="conquista-name">${con.name}</div>
         <div class="conquista-desc">${con.desc}</div>
-        <div class="conquista-xp">${unlocked?"✓ ":"+"}${con.xp} XP</div>
+        <div class="conquista-xp">${unlocked?"✓ "+con.xp+" XP":"+"+con.xp+" XP"}</div>
       </div>`;
     }).join("");
   }
-  if(cntEl) cntEl.textContent=conquistas_unlocked.size+" / "+ALL_CONQUISTAS.length;
+  if(cntEl) cntEl.textContent=conquistas_unlocked.size+" / "+ALL_CONQUISTAS.length+" desbloqueadas";
 }
 
 // ── Hook no cycleStatus para ganhar XP ─────────
