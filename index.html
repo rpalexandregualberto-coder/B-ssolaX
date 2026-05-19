@@ -3796,6 +3796,27 @@ textarea.form-input{border-radius:16px;resize:vertical}
       </div>
     </div>
 
+    <!-- COMPARTILHAR COM AMIGOS -->
+    <div style="background:linear-gradient(135deg,rgba(52,197,122,.07),rgba(91,143,238,.06));border:1px solid var(--green-border);border-radius:14px;padding:20px 22px;margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="font-size:1.4rem">🔗</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em">Compartilhar com Amigos</div>
+      </div>
+      <div style="font-size:.78rem;color:var(--dim);margin-bottom:14px;line-height:1.6">
+        Gera um link especial que já abre o app com a IA configurada automaticamente. Seu amigo clica, o app abre pronto — sem precisar cadastrar nada.
+        <br><strong style="color:var(--orange)">Use apenas com pessoas de confiança</strong> — o link contém sua chave API.
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button onclick="gerarLinkConvite()" class="btn btn-primary" style="padding:10px 20px;font-size:.8rem;background:var(--green);border-color:var(--green)">
+          Gerar Link de Convite
+        </button>
+        <div style="font-size:.7rem;color:var(--muted)">O link é copiado automaticamente — cole no WhatsApp</div>
+      </div>
+      <div style="margin-top:12px;padding:10px 14px;background:var(--surface);border-radius:9px;border:1px solid var(--border);font-size:.7rem;color:var(--muted)">
+        <strong style="color:var(--text)">Como funciona:</strong> seu amigo abre o link → app carrega com IA pronta → link some da barra de endereço → seguro.
+      </div>
+    </div>
+
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:18px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
         <div style="font-size:1.4rem">💾</div>
@@ -5514,10 +5535,63 @@ function showKeyError(msg){
 
 function loadApiKey(){
   try{
+    // 1. Verifica se veio uma chave via URL (?k=sk-ant-...)
+    const params = new URLSearchParams(window.location.search);
+    const urlKey  = params.get("k") || params.get("apikey");
+    const urlNome = params.get("nome") || params.get("name") || "";
+
+    if(urlKey && urlKey.startsWith("sk-ant-")){
+      userApiKey = urlKey;
+      localStorage.setItem("central_acao_apikey", urlKey);
+      if(urlNome) localStorage.setItem("central_acao_username", urlNome);
+      // Limpa a URL (não fica visível na barra do navegador)
+      try{
+        const clean = window.location.pathname;
+        window.history.replaceState({}, document.title, clean);
+      }catch(e){}
+      // Toast de boas-vindas
+      setTimeout(()=>{
+        const who = urlNome ? `, ${urlNome}` : "";
+        showToastConvite(`Bem-vindo${who}! IA configurada automaticamente.`);
+      }, 1200);
+      updateApiKeyUI();
+      return;
+    }
+
+    // 2. Carrega do localStorage normalmente
     const stored = localStorage.getItem("central_acao_apikey");
     if(stored){ userApiKey = stored; }
   }catch(e){}
   updateApiKeyUI();
+}
+
+function showToastConvite(msg){
+  const t = document.createElement("div");
+  t.style.cssText=`position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--green);color:#fff;font-family:'Outfit',sans-serif;font-weight:700;
+    font-size:.85rem;padding:12px 24px;border-radius:14px;z-index:99999;
+    box-shadow:0 8px 32px rgba(0,0,0,.3);animation:toastIn .4s ease;white-space:nowrap`;
+  t.textContent = "✅ " + msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 5000);
+}
+
+// ── GERAR LINK DE CONVITE ──────────────────────────────────────
+function gerarLinkConvite(){
+  if(!userApiKey || !userApiKey.startsWith("sk-ant-")){
+    alert("Configure e salve sua API key em Configurações antes de gerar o link.");
+    return;
+  }
+  const nome = prompt("Nome do amigo (opcional — aparece na boas-vindas):");
+  const base = window.location.origin + window.location.pathname;
+  const link = base + "?k=" + encodeURIComponent(userApiKey) + (nome ? "&nome="+encodeURIComponent(nome) : "");
+
+  // Copia para área de transferência
+  navigator.clipboard.writeText(link).then(()=>{
+    showToastConvite("Link copiado! Envie para seu amigo pelo WhatsApp.");
+  }).catch(()=>{
+    prompt("Copie o link abaixo:", link);
+  });
 }
 
 // ══════════════════════════════════════
