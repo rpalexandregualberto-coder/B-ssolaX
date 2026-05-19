@@ -11,9 +11,9 @@
 :root{
   /* ── LIGHT MODE (padrão) — baseado na referência visual ── */
   --bg:#f0ebe5;
-  --surface:rgba(255,255,255,0.95);
-  --card:rgba(255,255,255,0.90);
-  --card-hover:rgba(255,255,255,0.98);
+  --surface:rgba(255,255,255,0.82);
+  --card:rgba(255,255,255,0.68);
+  --card-hover:rgba(255,255,255,0.85);
   --border:rgba(0,0,0,0.00);
   --border-light:rgba(0,0,0,0.06);
   --accent:#e8835a;
@@ -89,118 +89,117 @@ body{
 }
 
 /* ══════════════════════════════════════
-   SIDEBAR — estreita, ícone-only, sempre escura
+   SIDEBAR — estreita, ícone-only, glass transparente
 ══════════════════════════════════════ */
 .sidebar{
   position:fixed;left:0;top:0;bottom:0;
   width:68px;
-  background:#1a1625;
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  border-right:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.52);
+  backdrop-filter:blur(28px);
+  -webkit-backdrop-filter:blur(28px);
+  border-right:1px solid rgba(255,255,255,0.65);
   display:flex;flex-direction:column;
   align-items:center;
   z-index:200;
-  box-shadow:4px 0 32px rgba(0,0,0,0.18);
+  box-shadow:2px 0 24px rgba(0,0,0,0.07);
+}
+[data-theme="dark"] .sidebar{
+  background:rgba(18,14,36,0.78);
+  border-right:1px solid rgba(255,255,255,0.06);
+  box-shadow:4px 0 32px rgba(0,0,0,0.35);
 }
 .main{margin-left:68px;min-height:100vh;position:relative}
 
 /* ─── Logo no topo ─── */
 .logo-wrap{
-  padding:16px 0 12px;
-  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:16px 0 14px;
+  border-bottom:1px solid rgba(0,0,0,0.06);
   width:100%;display:flex;justify-content:center;flex-shrink:0;
 }
+[data-theme="dark"] .logo-wrap{border-bottom-color:rgba(255,255,255,0.07)}
 .logo-compass{
   width:40px;height:40px;flex-shrink:0;
-  background:linear-gradient(135deg,#e8835a 0%,#c05a30 100%);
-  border-radius:14px;
+  background:#1c1c2e;
+  border-radius:12px;
   display:flex;align-items:center;justify-content:center;
-  font-size:1.2rem;
-  box-shadow:0 4px 18px rgba(232,131,90,.40);
   cursor:pointer;
-  transition:transform .18s, box-shadow .18s;
+  transition:transform .18s, opacity .18s;
 }
-.logo-compass:hover{transform:scale(1.08);box-shadow:0 6px 22px rgba(232,131,90,.55)}
+[data-theme="dark"] .logo-compass{background:rgba(255,255,255,0.12)}
+.logo-compass:hover{transform:scale(1.07);opacity:.85}
+.logo-compass svg{display:block}
 /* Ocultar textos não usados */
 .logo-brand,.logo-name,.logo-tagline,.logo-x,.logo-mark,.logo-title,.logo-sub{display:none}
 
 /* ─── Avatar e footer ─── */
 .sidebar-footer-wrap{
-  padding:12px 0 16px;
-  border-top:1px solid rgba(255,255,255,0.06);
-  width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;
+  padding:10px 0 14px;
+  border-top:1px solid rgba(0,0,0,0.06);
+  width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;
 }
+[data-theme="dark"] .sidebar-footer-wrap{border-top-color:rgba(255,255,255,0.07)}
 .avatar{
-  width:38px;height:38px;
+  width:36px;height:36px;
   background:linear-gradient(135deg,#e8835a,#c05a30);
-  border-radius:11px;
+  border-radius:10px;
   display:flex;align-items:center;justify-content:center;
-  font-family:'Outfit',sans-serif;font-weight:900;font-size:.8rem;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:.78rem;
   color:#fff;flex-shrink:0;
-  box-shadow:0 3px 12px rgba(232,131,90,.35);
+  box-shadow:0 2px 10px rgba(232,131,90,.30);
   cursor:pointer;
   transition:transform .18s, box-shadow .18s;
 }
-.avatar:hover{transform:scale(1.08);box-shadow:0 5px 18px rgba(232,131,90,.50)}
+.avatar:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(232,131,90,.45)}
 .sidebar-profile,.profile-info,.profile-status,.sidebar-xp,.sidebar-footer{display:none}
 .xp-level-row,.xp-bar-wrap,.xp-info-row,.xp-archetype,.xp-streak,.user-row,.user-name,.user-role{display:none}
 
 /* ─── Nav ─── */
-.nav-wrap{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:none;width:100%;display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav-wrap{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:none;width:100%;display:flex;flex-direction:column;align-items:center;gap:2px}
 .nav-wrap::-webkit-scrollbar{display:none}
 .nav-group-label{display:none}
-.nav-divider{width:28px;height:1px;background:rgba(255,255,255,0.07);margin:5px 0;flex-shrink:0}
+.nav-divider{width:32px;height:1px;background:rgba(0,0,0,0.08);margin:6px 0;flex-shrink:0}
+[data-theme="dark"] .nav-divider{background:rgba(255,255,255,0.08)}
 .nav-btn{
   display:flex;align-items:center;justify-content:center;
-  width:44px;height:44px;border-radius:14px;
-  cursor:pointer;font-size:1.05rem;
-  color:rgba(255,255,255,0.38);transition:all .18s;
+  width:44px;height:44px;border-radius:13px;
+  cursor:pointer;
+  color:rgba(28,28,46,0.38);
+  transition:all .18s;
   border:none;background:none;
   position:relative;
 }
-.nav-btn:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75)}
+.nav-btn svg{stroke:currentColor;transition:stroke .18s}
+[data-theme="dark"] .nav-btn{color:rgba(255,255,255,0.35)}
+.nav-btn:hover{background:rgba(0,0,0,0.06);color:rgba(28,28,46,0.75)}
+[data-theme="dark"] .nav-btn:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.78)}
 .nav-btn.active{
-  background:rgba(232,131,90,0.18);
+  background:rgba(232,131,90,0.14);
   color:#e8835a;
-  box-shadow:0 0 0 1px rgba(232,131,90,0.30);
 }
+[data-theme="dark"] .nav-btn.active{background:rgba(232,131,90,0.18)}
 /* Tooltip no hover */
 .nav-btn::after{
   content:attr(title);
-  position:absolute;left:56px;top:50%;transform:translateY(-50%);
-  background:#1a1625;color:#fff;
-  font-size:.72rem;font-weight:600;font-family:'Inter',sans-serif;
+  position:absolute;left:54px;top:50%;transform:translateY(-50%);
+  background:rgba(28,28,46,0.92);color:#fff;
+  font-size:.7rem;font-weight:600;font-family:'Inter',sans-serif;
   padding:5px 10px;border-radius:8px;
   white-space:nowrap;pointer-events:none;
   opacity:0;transition:opacity .15s;
   border:1px solid rgba(255,255,255,0.10);
-  box-shadow:0 4px 16px rgba(0,0,0,0.3);
+  box-shadow:0 4px 16px rgba(0,0,0,0.22);
   z-index:9999;
 }
 .nav-btn:hover::after{opacity:1}
-.nav-icon{font-size:1.05rem;line-height:1}
+.nav-icon{font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center}
 .nav-badge{
-  position:absolute;top:6px;right:6px;
-  font-size:.48rem;font-weight:800;
-  padding:1px 4px;border-radius:99px;min-width:14px;text-align:center;line-height:1.4;
+  position:absolute;top:5px;right:5px;
+  font-size:.44rem;font-weight:800;
+  padding:1px 3px;border-radius:99px;min-width:13px;text-align:center;line-height:1.4;
 }
 .nb-red{background:#e05470;color:#fff}
 .nb-blue{background:#5b8fee;color:#fff}
-
-/* Sidebar XP — compacto */
-.sidebar-xp{padding:10px 0;border-top:1px solid rgba(255,255,255,0.06);width:100%;display:flex;justify-content:center}
-.xp-level-row{display:none}
-.xp-bar-wrap{display:none}
-.xp-info-row{display:none}
-.xp-archetype{display:none}
-.xp-streak{display:none}
-
-/* ─── Footer ─── */
-.sidebar-footer{display:none}
-.user-row{display:none}
-.user-name{display:none}
-.user-role{display:none}
+.sidebar-xp{display:none}
 
 /* ══════════════════════════════════════
    MAIN CONTENT
@@ -208,22 +207,77 @@ body{
 
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:16px 44px;
-  border-bottom:1px solid var(--border-light);
-  background:var(--topbar-bg);
+  gap:16px;
+  padding:13px 44px;
+  border-bottom:1px solid rgba(0,0,0,0.06);
+  background:rgba(255,255,255,0.72);
   backdrop-filter:blur(32px);
   -webkit-backdrop-filter:blur(32px);
   position:sticky;top:0;z-index:100;
-  box-shadow:var(--topbar-shadow);
+  box-shadow:0 1px 0 rgba(0,0,0,0.05), 0 4px 20px rgba(0,0,0,0.04);
 }
+[data-theme="dark"] .topbar{
+  background:rgba(18,14,36,0.78);
+  border-bottom-color:rgba(255,255,255,0.07);
+  box-shadow:0 1px 0 rgba(255,255,255,0.04), 0 4px 24px rgba(0,0,0,0.30);
+}
+.topbar-left{min-width:160px}
 .topbar-h{
   font-family:'Outfit',sans-serif;
   font-size:1.05rem;font-weight:800;
   letter-spacing:-.025em;
   color:var(--text);
 }
-.topbar-sub{font-size:.7rem;color:var(--muted);margin-top:1px;letter-spacing:.01em}
-.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-sub{font-size:.68rem;color:var(--muted);margin-top:1px}
+/* Barra de busca centralizada — pill */
+.topbar-search{
+  flex:1;max-width:380px;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.80);
+  border:1px solid rgba(0,0,0,0.09);
+  border-radius:99px;
+  padding:8px 18px;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:.8rem;font-family:'Inter',sans-serif;
+  transition:all .18s;
+  box-shadow:0 1px 6px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] .topbar-search{
+  background:rgba(255,255,255,0.07);
+  border-color:rgba(255,255,255,0.10);
+}
+.topbar-search:hover{border-color:rgba(0,0,0,0.18);box-shadow:0 2px 12px rgba(0,0,0,0.09)}
+[data-theme="dark"] .topbar-search:hover{border-color:rgba(255,255,255,0.20)}
+.topbar-search span{flex:1;text-align:left}
+.topbar-search kbd{
+  font-size:.6rem;background:rgba(0,0,0,0.07);
+  border:1px solid rgba(0,0,0,0.10);border-radius:5px;
+  padding:1px 6px;color:var(--muted);font-family:'Inter',sans-serif;
+}
+[data-theme="dark"] .topbar-search kbd{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12)}
+.topbar-right{display:flex;align-items:center;gap:6px;min-width:160px;justify-content:flex-end}
+/* Botões ícone no topbar */
+.topbar-icon-btn{
+  width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);transition:all .17s;
+}
+.topbar-icon-btn:hover{background:rgba(0,0,0,0.06);color:var(--text)}
+[data-theme="dark"] .topbar-icon-btn:hover{background:rgba(255,255,255,0.08);color:var(--text)}
+.topbar-icon-danger:hover{color:var(--red)!important}
+/* Avatar no topbar */
+.topbar-avatar{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,#e8835a,#c05a30);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:.72rem;
+  color:#fff;cursor:pointer;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(232,131,90,.28);
+  transition:transform .17s,box-shadow .17s;
+}
+.topbar-avatar:hover{transform:scale(1.06);box-shadow:0 4px 14px rgba(232,131,90,.40)}
 .chip{
   display:flex;align-items:center;gap:5px;
   font-size:.7rem;font-weight:600;
@@ -2362,41 +2416,84 @@ label.form-label{
 <aside class="sidebar">
   <!-- LOGO NO TOPO -->
   <div class="logo-wrap">
-    <div class="logo-compass" onclick="gotoView('dashboard',document.querySelector('.nav-btn.active'))">🧭</div>
+    <div class="logo-compass" onclick="gotoView('dashboard',document.querySelector('.nav-btn.active'))">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" opacity=".9"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5" fill="white" opacity=".9"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5" fill="white" opacity=".9"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5" fill="white" opacity=".5"/>
+      </svg>
+    </div>
   </div>
 
   <!-- NAVEGAÇÃO -->
   <div class="nav-wrap">
-    <button class="nav-btn active" title="Dashboard" onclick="gotoView('dashboard',this)"><span class="nav-icon">⚡</span></button>
-    <button class="nav-btn" title="Modo Foco" onclick="gotoView('foco',this)"><span class="nav-icon">🎯</span><span class="nav-badge" style="background:var(--accent);color:#fff" id="cnt-foco">0</span></button>
-    <button class="nav-btn" title="Agenda do Dia" onclick="gotoView('agenda',this)"><span class="nav-icon">⏰</span></button>
-    <button class="nav-btn" title="Tarefas" onclick="gotoView('tarefas',this)"><span class="nav-icon">✅</span></button>
-    <button class="nav-btn" title="Calendário" onclick="gotoView('calendar',this)"><span class="nav-icon">📅</span></button>
+    <button class="nav-btn active" title="Dashboard" onclick="gotoView('dashboard',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    </button>
+    <button class="nav-btn" title="Modo Foco" onclick="gotoView('foco',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+      <span class="nav-badge" style="background:var(--accent);color:#fff" id="cnt-foco">0</span>
+    </button>
+    <button class="nav-btn" title="Agenda do Dia" onclick="gotoView('agenda',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+    </button>
+    <button class="nav-btn" title="Tarefas" onclick="gotoView('tarefas',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    </button>
+    <button class="nav-btn" title="Calendário" onclick="gotoView('calendar',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </button>
     <div class="nav-divider"></div>
-    <button class="nav-btn" title="Reuniões + IA" onclick="gotoView('reunioes',this)"><span class="nav-icon">🎙</span><span class="nav-badge nb-red" id="cnt-meetings">0</span></button>
-    <button class="nav-btn" title="Ligações" onclick="gotoView('ligacoes',this)"><span class="nav-icon">📞</span><span class="nav-badge nb-red" id="cnt-ligacoes" style="display:none">0</span></button>
-    <button class="nav-btn" title="Projetos" onclick="gotoView('projetos',this)"><span class="nav-icon">📁</span><span class="nav-badge nb-blue" id="cnt-projetos">0</span></button>
-    <button class="nav-btn" title="Conteúdo" onclick="gotoView('conteudo',this)"><span class="nav-icon">📲</span></button>
+    <button class="nav-btn" title="Reuniões + IA" onclick="gotoView('reunioes',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      <span class="nav-badge nb-red" id="cnt-meetings">0</span>
+    </button>
+    <button class="nav-btn" title="Ligações" onclick="gotoView('ligacoes',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.07 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      <span class="nav-badge nb-red" id="cnt-ligacoes" style="display:none">0</span>
+    </button>
+    <button class="nav-btn" title="Projetos" onclick="gotoView('projetos',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      <span class="nav-badge nb-blue" id="cnt-projetos">0</span>
+    </button>
+    <button class="nav-btn" title="Conteúdo" onclick="gotoView('conteudo',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
+    </button>
     <div class="nav-divider"></div>
-    <button class="nav-btn" title="Financeiro" onclick="gotoView('financeiro',this)"><span class="nav-icon">💰</span></button>
-    <button class="nav-btn" title="Metas" onclick="gotoView('metas',this)"><span class="nav-icon">🎯</span><span class="nav-badge" id="cnt-metas" style="background:var(--accent);color:#fff;display:none">0</span></button>
-    <button class="nav-btn" title="Templates" onclick="gotoView('templates',this)"><span class="nav-icon">📋</span></button>
-    <button class="nav-btn" title="Conquistas & XP" onclick="gotoView('conquistas',this)"><span class="nav-icon">🏆</span></button>
-    <button class="nav-btn" title="Relatório IA" onclick="gotoView('relatorio',this)"><span class="nav-icon">📈</span></button>
-    <button class="nav-btn" title="Notas Rápidas" onclick="gotoView('notas',this)"><span class="nav-icon">📝</span></button>
+    <button class="nav-btn" title="Financeiro" onclick="gotoView('financeiro',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    </button>
+    <button class="nav-btn" title="Metas" onclick="gotoView('metas',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      <span class="nav-badge" id="cnt-metas" style="background:var(--accent);color:#fff;display:none">0</span>
+    </button>
+    <button class="nav-btn" title="Templates" onclick="gotoView('templates',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+    </button>
+    <button class="nav-btn" title="Conquistas" onclick="gotoView('conquistas',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+    </button>
+    <button class="nav-btn" title="Relatório IA" onclick="gotoView('relatorio',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </button>
+    <button class="nav-btn" title="Notas" onclick="gotoView('notas',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+    </button>
   </div>
 
   <!-- RODAPÉ: Avatar + Configs -->
   <div class="sidebar-footer-wrap">
-    <button class="nav-btn" title="Configurações" onclick="gotoView('config',this)"><span class="nav-icon">⚙️</span></button>
+    <button class="nav-btn" title="Configurações" onclick="gotoView('config',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
     <div class="avatar" id="profile-avatar" title="Perfil" onclick="gotoView('config',document.querySelector('[title=Configurações]'))">U</div>
-    <!-- Hidden XP/Profile (preservado pra JS) -->
+    <!-- IDs preservados para o JS -->
     <div style="display:none">
-      <div class="xp-level-row"><span class="xp-level-badge" id="xp-level-badge">Nv 1</span><span class="xp-archetype" id="xp-archetype">Iniciante</span></div>
-      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
-      <div class="xp-info-row"><span id="xp-current-label">0 / 500 XP</span><div class="xp-streak"><span>🔥</span><span id="xp-streak-count">0 dias</span></div></div>
-      <div id="profile-name">Usuário</div>
-      <div id="profile-sub">—</div>
+      <span id="xp-level-badge">Nv 1</span><span id="xp-archetype">Iniciante</span>
+      <div id="xp-bar-fill" style="width:0%"></div>
+      <span id="xp-current-label">0 / 500 XP</span><span id="xp-streak-count">0 dias</span>
+      <div id="profile-name">Usuário</div><div id="profile-sub">—</div>
     </div>
   </div>
 
@@ -2405,26 +2502,42 @@ label.form-label{
 <!-- MAIN -->
 <main class="main">
   <div class="topbar">
-    <div>
+    <!-- ESQUERDA: título da view -->
+    <div class="topbar-left">
       <div class="topbar-h" id="view-title">Dashboard</div>
       <div class="topbar-sub" id="view-sub">Visão geral · 2026</div>
     </div>
+    <!-- CENTRO: barra de busca pill -->
+    <button onclick="openSearch()" class="topbar-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Buscar...</span>
+      <kbd>Ctrl+K</kbd>
+    </button>
+    <!-- DIREITA: ações -->
     <div class="topbar-right">
-      <button onclick="openSearch()" style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 14px;cursor:pointer;color:var(--muted);font-size:.78rem;font-family:'Inter',sans-serif;transition:all .18s" onmouseover="this.style.borderColor='var(--border-light)'" onmouseout="this.style.borderColor='var(--border)'">
-        🔍 Buscar <span style="font-size:.62rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:var(--muted);margin-left:4px">Ctrl+K</span>
-      </button>
       <div id="save-indicator" style="font-size:.68rem;color:var(--green);opacity:0;transition:opacity .4s;white-space:nowrap;display:flex;align-items:center;gap:4px">
-        ✓ Salvo
+        Salvo
       </div>
-      <button onclick="toggleTheme()" id="theme-toggle-btn" title="Alternar Dark/Light Mode" style="background:none;border:1px solid var(--border);border-radius:99px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.95rem;transition:all .2s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">☀️</button>
-      <button onclick="exportBackup()" title="Baixar backup de todos os dados (JSON)" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.72rem;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">⬇ Exportar</button>
-      <label title="Restaurar dados de um backup JSON" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.72rem;transition:all .15s;display:inline-flex;align-items:center;gap:4px" onmouseover="this.style.color='var(--blue)';this.style.borderColor='var(--blue)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">
-        ⬆ Importar
+      <div class="chip chip-red" style="font-size:.68rem"><span id="days-left">9</span>d restantes</div>
+      <div class="chip chip-yellow" style="font-size:.68rem"><span id="pct-chip">0%</span></div>
+      <!-- Botão tema -->
+      <button onclick="toggleTheme()" id="theme-toggle-btn" title="Alternar tema" class="topbar-icon-btn">
+        <svg id="theme-icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="theme-icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+      <!-- Backup -->
+      <button onclick="exportBackup()" title="Exportar backup" class="topbar-icon-btn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <label title="Importar backup" class="topbar-icon-btn" style="cursor:pointer">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <input type="file" accept="application/json,.json" onchange="importBackup(event)" style="display:none">
       </label>
-      <button onclick="clearData()" title="Limpar todos os dados" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.72rem;transition:all .15s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">🗑 Reset</button>
-      <div class="chip chip-red">⏳ <span id="days-left">9</span> dias</div>
-      <div class="chip chip-yellow"><span id="pct-chip">0%</span> concluído</div>
+      <button onclick="clearData()" title="Limpar dados" class="topbar-icon-btn topbar-icon-danger">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+      </button>
+      <!-- Avatar -->
+      <div class="topbar-avatar" onclick="gotoView('config',document.querySelector('[title=Configurações]'))" title="Configurações" id="topbar-avatar">AG</div>
     </div>
   </div>
 
@@ -2436,12 +2549,8 @@ label.form-label{
     <!-- VIEW TABS -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
       <div class="view-tabs">
-        <button class="view-tab tab-dash active" id="tab-dash" onclick="switchDashView('dash')">
-          ⚡ Dashboard
-        </button>
-        <button class="view-tab tab-board" id="tab-board" onclick="switchDashView('board')">
-          🗂 Kanban
-        </button>
+        <button class="view-tab tab-dash active" id="tab-dash" onclick="switchDashView('dash')">Dashboard</button>
+        <button class="view-tab tab-board" id="tab-board" onclick="switchDashView('board')">Kanban</button>
       </div>
       <div style="display:flex;align-items:center;gap:8px" id="dash-view-actions">
         <!-- actions shown per tab -->
@@ -2451,7 +2560,7 @@ label.form-label{
     <!-- ALERTA PRAZO VENCIDO -->
     <div class="alert-vencidas" id="alert-vencidas">
       <div class="alert-vencidas-head">
-        <div class="alert-vencidas-title">🚨 Tarefas com prazo vencido <span id="cnt-vencidas" style="background:var(--red);color:#fff;border-radius:99px;padding:1px 8px;font-size:.65rem">0</span></div>
+        <div class="alert-vencidas-title">Tarefas com prazo vencido <span id="cnt-vencidas" style="background:var(--red);color:#fff;border-radius:99px;padding:1px 8px;font-size:.65rem">0</span></div>
         <button onclick="document.getElementById('alert-vencidas').classList.remove('show')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem">✕</button>
       </div>
       <div class="task-list" id="s-vencidas"></div>
@@ -2493,7 +2602,7 @@ label.form-label{
 
       <!-- STAT: Concluídas -->
       <div class="bento-stat bento-stat-green">
-        <div class="bento-stat-icon">✅</div>
+        <div class="bento-stat-icon" style="color:var(--green)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="bento-stat-val" id="m-done">0</div>
         <div class="bento-stat-label">Concluídas</div>
         <div class="bento-stat-bar-wrap"><div class="bento-stat-bar" id="bar-done" style="width:0%;background:var(--green)"></div></div>
@@ -2501,7 +2610,7 @@ label.form-label{
 
       <!-- STAT: Em Processo -->
       <div class="bento-stat bento-stat-blue">
-        <div class="bento-stat-icon">▶</div>
+        <div class="bento-stat-icon" style="color:var(--blue)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 8 12 12 14 14"/></svg></div>
         <div class="bento-stat-val" id="m-proc">0</div>
         <div class="bento-stat-label">Em Processo</div>
         <div class="bento-stat-bar-wrap"><div class="bento-stat-bar" id="bar-proc" style="width:0%;background:var(--blue)"></div></div>
@@ -2509,7 +2618,7 @@ label.form-label{
 
       <!-- STAT: Pendentes -->
       <div class="bento-stat bento-stat-red">
-        <div class="bento-stat-icon">⏳</div>
+        <div class="bento-stat-icon" style="color:var(--red)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
         <div class="bento-stat-val" id="m-pend">15</div>
         <div class="bento-stat-label">Pendentes</div>
         <div class="bento-stat-bar-wrap"><div class="bento-stat-bar" id="bar-pend" style="width:100%;background:var(--red)"></div></div>
@@ -2517,7 +2626,7 @@ label.form-label{
 
       <!-- CHART: Pizza Status -->
       <div class="bento-chart">
-        <div class="bento-chart-title">📊 Status das Tarefas <span class="chart-total-pill" id="pizza-total-pill"></span></div>
+        <div class="bento-chart-title">Status das Tarefas <span class="chart-total-pill" id="pizza-total-pill"></span></div>
         <div class="pizza-wrap" style="margin-top:14px">
           <div class="pizza-svg-wrap">
             <svg id="pizza-svg" width="110" height="110" viewBox="0 0 120 120" style="transform:rotate(-90deg)"></svg>
@@ -2532,7 +2641,7 @@ label.form-label{
 
       <!-- CHART: Urgência -->
       <div class="bento-chart">
-        <div class="bento-chart-title">⚡ Por Urgência <span class="chart-total-pill" id="col-total-pill"></span></div>
+        <div class="bento-chart-title">Por Urgência <span class="chart-total-pill" id="col-total-pill"></span></div>
         <div class="col-chart-wrap" style="margin-top:14px">
           <div class="col-chart-bars" id="col-chart-bars"></div>
           <div class="col-chart-baseline"></div>
@@ -8980,14 +9089,16 @@ function toggleTheme(){
 }
 
 function setTheme(theme){
+  const sunIcon = document.getElementById("theme-icon-sun");
+  const moonIcon = document.getElementById("theme-icon-moon");
   if(theme === "dark"){
     document.documentElement.setAttribute("data-theme", "dark");
-    const btn = document.getElementById("theme-toggle-btn");
-    if(btn) btn.textContent = "🌙";
+    if(sunIcon) sunIcon.style.display = "none";
+    if(moonIcon) moonIcon.style.display = "block";
   } else {
     document.documentElement.removeAttribute("data-theme");
-    const btn = document.getElementById("theme-toggle-btn");
-    if(btn) btn.textContent = "☀️";
+    if(sunIcon) sunIcon.style.display = "block";
+    if(moonIcon) moonIcon.style.display = "none";
   }
   try{ localStorage.setItem("central_acao_theme", theme); }catch(e){}
 }
