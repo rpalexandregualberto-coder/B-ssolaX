@@ -4,7 +4,7 @@ Esse documento orienta o Claude Code sobre como trabalhar com este projeto.
 
 ## Visão geral
 
-**Central de Ação** é um SaaS de produtividade pessoal single-file (HTML+CSS+JS sem framework), com integração de IA via API da Anthropic. Está rodando em produção em https://centraldeacao.netlify.app.
+**Central de Ação** é um SaaS de produtividade pessoal single-file (HTML+CSS+JS sem framework), com integração de IA via API da Anthropic. Está rodando em produção no **Vercel** (não Netlify — Netlify foi abandonado).
 
 O proprietário, Alexandre (Gualberto), é representante de consórcio em Salvador/BA e está validando o produto pra comercialização junto com outro CRM (https://charm-echo-sphere.lovable.app/relatorios).
 
@@ -77,22 +77,23 @@ E **sempre validar `userApiKey`** antes do fetch (pra mostrar erro humano em vez
 3. Validar JS: extrair `<script>` e rodar `node --check`
 4. Validar HTML: `tail -3 index.html` deve mostrar `</div>\n</body>\n</html>`
 5. Sincronizar `central-de-acao.html` (`cat index.html > central-de-acao.html`)
-6. Sugerir ao usuário re-publicar no Netlify
+6. Sugerir ao usuário re-publicar no **Vercel** (push no repositório ou redeploy manual no dashboard do Vercel)
 
 ## Estilo visual
 
-Dark theme premium:
+Glassmorphism + Mesh Gradient (redesign 2026-05):
 - Fonte: Outfit (títulos) + Inter (corpo)
-- Cor de destaque: `--accent: #c8f135` (lime neon)
-- Cores funcionais: green `#3dffa0`, red `#ff4d6d`, blue `#5b9fff`, orange `#ffaa3c`
-- Bordas arredondadas (10-14px), gradients sutis, glassmorphism em alguns painéis
+- **Dark mode (padrão):** fundo `#16112a`, cards `rgba(30,24,52,0.62)` + `backdrop-filter:blur(20px)`, accent `#a07ae8` (violeta)
+- **Light mode (`data-theme="light"`):** fundo `#f5f0ff`, cards `rgba(255,255,255,0.72)` + blur, accent `#7c5fe6`, mesh pêssego/azul/lavanda
+- Bordas arredondadas (16–28px), sombras difusas, sem neon glow
+- Variáveis-chave: `--card-blur`, `--card-shadow`, `--card-shadow-hover`
 
 ## Próximas evoluções planejadas
 
 1. **Adaptação pro nicho de Representante de Consórcio** (módulo Vendas/Negócios, comissões, categorias específicas)
 2. **Backend pra comercialização** (Supabase + Asaas + proxy IA + créditos)
 3. **PWA + mobile-first** (instalar como app)
-4. **Visual refinado tipo "Investment Dashboard"** (Glassmorphism + Mesh Gradients + Bento Grid + dual mode light/dark) — referência pendente do usuário
+4. **Visual refinado tipo "Investment Dashboard"** — ✅ CONCLUÍDO (Glassmorphism + Mesh Gradients + Bento Grid + dual mode light/dark)
 
 ## Pontos de atenção pro usuário
 
