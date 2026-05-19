@@ -604,6 +604,31 @@ input[type="date"]{color-scheme:dark}
 .meeting-loc-chip{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;color:var(--muted);background:var(--surface);border:1px solid var(--border);padding:2px 8px;border-radius:20px}
 .meeting-notes-area{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;color:var(--text);font-size:.82rem;line-height:1.65;font-family:inherit;resize:vertical;min-height:80px;outline:none;transition:border-color .2s}
 .meeting-notes-area:focus{border-color:var(--accent-border)}
+.meeting-tab{font-size:.72rem;font-weight:600;padding:5px 14px;border-radius:7px;border:none;background:transparent;cursor:pointer;color:var(--muted);transition:all .15s}
+.meeting-tab.active{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-border)}
+.pipeline-group{margin-bottom:28px}
+.pipeline-group-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.pipeline-group-label::after{content:"";flex:1;height:1px;background:var(--border)}
+.pipeline-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start;transition:border-color .15s;margin-bottom:8px}
+.pipeline-card:hover{border-color:var(--accent-border)}
+.pipeline-card-time{min-width:52px;text-align:center;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:10px;padding:6px 4px;flex-shrink:0}
+.pipeline-card-time-val{font-size:1rem;font-weight:900;color:var(--accent);font-family:'Outfit',sans-serif;line-height:1}
+.pipeline-card-time-day{font-size:.58rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+.pipeline-card-time.no-time{background:var(--surface);border-color:var(--border)}
+.pipeline-card-time.no-time .pipeline-card-time-val{font-size:.65rem;color:var(--muted)}
+.pipeline-card-body{flex:1;min-width:0}
+.pipeline-card-title{font-size:.92rem;font-weight:700;color:var(--text);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pipeline-card-meta{font-size:.72rem;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
+.pipeline-card-agenda{font-size:.73rem;color:var(--dim);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pipeline-card-actions{display:flex;gap:6px;flex-wrap:wrap}
+.pipeline-action{font-size:.68rem;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);transition:all .15s;white-space:nowrap}
+.pipeline-action:hover{background:var(--surface)}
+.pipeline-action.ai:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-dim)}
+.pipeline-action.notes:hover{color:#5b9fff;border-color:rgba(91,159,255,.4);background:rgba(91,159,255,.08)}
+.pipeline-action.detail:hover{color:var(--green);border-color:rgba(61,255,160,.3);background:rgba(61,255,160,.07)}
+.pipeline-empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:.82rem}
+.pipeline-concluida-strip{border-left:3px solid var(--green)}
+.pipeline-agendada-strip{border-left:3px solid #5b9fff}
 .meeting-actions{display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap}
 .meeting-action-btn{
   font-size:.72rem;font-weight:600;padding:5px 14px;border-radius:20px;
@@ -2613,21 +2638,23 @@ label.form-label{
 
     <!-- AVISO discreto se NAO tiver chave salva -->
 
-    <div style="display:flex;gap:9px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px;flex-wrap:wrap">
       <button class="btn btn-primary" onclick="toggleNewMeeting()">+ Nova Reunião</button>
-      <button class="btn btn-ghost" onclick="toggleNewMeeting()">Cancelar</button>
+      <button class="btn btn-ghost" id="btn-cancel-meeting" onclick="toggleNewMeeting()" style="display:none">Cancelar</button>
+      <div style="display:flex;gap:4px;margin-left:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px">
+        <button class="meeting-tab active" id="tab-pipeline" onclick="switchMeetingTab('pipeline')">📅 Pipeline</button>
+        <button class="meeting-tab" id="tab-historico" onclick="switchMeetingTab('historico')">📋 Histórico</button>
+      </div>
     </div>
 
     <div class="new-meeting-panel" id="new-meeting-panel">
       <div class="panel-title">🎙 Nova Reunião</div>
-      <div class="form-grid">
-        <div class="form-row"><label class="form-label">Título da Reunião</label><input class="form-input" id="nm-title" placeholder="Ex: Reunião com cliente João..."></div>
-        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div><label class="form-label">Data</label><input class="form-input" id="nm-date" type="date"></div>
-          <div><label class="form-label">Horário</label><input class="form-input" id="nm-time" type="time" placeholder="14:00"></div>
-        </div>
+      <div class="form-row"><label class="form-label">Título da Reunião</label><input class="form-input" id="nm-title" placeholder="Ex: Reunião com cliente João..."></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:13px">
+        <div class="form-row" style="margin-bottom:0"><label class="form-label">Data</label><input class="form-input" id="nm-date" type="date"></div>
+        <div class="form-row" style="margin-bottom:0"><label class="form-label">Horário</label><input class="form-input" id="nm-time" type="time"></div>
+        <div class="form-row" style="margin-bottom:0"><label class="form-label">📍 Local</label><input class="form-input" id="nm-location" placeholder="Escritório, Zoom..."></div>
       </div>
-      <div class="form-row"><label class="form-label">📍 Local</label><input class="form-input" id="nm-location" placeholder="Ex: Escritório do cliente, Zoom, Presencial..."></div>
       <div class="form-grid">
         <div class="form-row"><label class="form-label">Participantes (PIC)</label><input class="form-input" id="nm-pic" placeholder="Ex: Você, colaborador, cliente..."></div>
         <div class="form-row"><label class="form-label">Equipe / Contexto</label>
@@ -2677,11 +2704,12 @@ label.form-label{
       </div>
     </div>
 
-    <div class="meeting-list" id="meeting-list">
+    <div class="meeting-list" id="meeting-list" style="display:none">
       <div style="text-align:center;padding:40px;color:var(--muted);font-size:.82rem">
         Nenhuma reunião registrada ainda. Clique em <strong style="color:var(--accent)">+ Nova Reunião</strong> para começar.
       </div>
     </div>
+    <div id="meeting-pipeline" style=""></div>
   </div>
 
   <!-- ═══════════════ LIGAÇÕES PENDENTES ═══════════════ -->
@@ -4327,14 +4355,17 @@ function renderPV(){
 // ══════════════════════════════════════
 function toggleNewMeeting(){
   const p=document.getElementById("new-meeting-panel");
+  const cancelBtn=document.getElementById("btn-cancel-meeting");
   p.classList.toggle("open");
-  if(p.classList.contains("open")){
+  const isOpen=p.classList.contains("open");
+  if(cancelBtn) cancelBtn.style.display=isOpen?"":"none";
+  if(isOpen){
     const now=new Date();
     document.getElementById("nm-date").value=now.toISOString().split("T")[0];
-    // Pre-fill next round hour as suggestion
     const nextH=String(now.getHours()+1).padStart(2,"0");
     const nmTime=document.getElementById("nm-time");
     if(nmTime&&!nmTime.value) nmTime.value=nextH+":00";
+    document.getElementById("nm-title")?.focus();
   }
 }
 function saveMeeting(){
@@ -4455,6 +4486,7 @@ function saveMeetingNotes(id){
 }
 
 function renderMeetings(){
+  if(activeMeetingTab==="pipeline"){ renderMeetingPipeline(); return; }
   const list=document.getElementById("meeting-list"); if(!list)return;
 
   const ativas  = meetings.filter(m=>!m.archived);
@@ -4500,6 +4532,142 @@ function renderMeetings(){
     arquiv.forEach(m=>archList.appendChild(buildMeetingCard(m,true)));
     list.appendChild(section);
   }
+}
+
+// ══════════════════════════════════════
+//  MEETING TABS & PIPELINE
+// ══════════════════════════════════════
+let activeMeetingTab = "pipeline";
+
+function switchMeetingTab(tab){
+  activeMeetingTab = tab;
+  document.getElementById("tab-pipeline").classList.toggle("active", tab==="pipeline");
+  document.getElementById("tab-historico").classList.toggle("active", tab==="historico");
+  document.getElementById("meeting-pipeline").style.display = tab==="pipeline" ? "" : "none";
+  document.getElementById("meeting-list").style.display     = tab==="historico" ? "" : "none";
+  if(tab==="pipeline") renderMeetingPipeline();
+  if(tab==="historico") renderMeetings();
+}
+
+function renderMeetingPipeline(){
+  const container = document.getElementById("meeting-pipeline");
+  if(!container) return;
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().split("T")[0];
+
+  // Tomorrow
+  const tmrw = new Date(today); tmrw.setDate(tmrw.getDate()+1);
+  const tmrwStr = tmrw.toISOString().split("T")[0];
+
+  // End of this week (Sunday)
+  const endWeek = new Date(today);
+  endWeek.setDate(endWeek.getDate() + (7 - endWeek.getDay()));
+  const endWeekStr = endWeek.toISOString().split("T")[0];
+
+  // End of next week
+  const endNextWeek = new Date(endWeek); endNextWeek.setDate(endNextWeek.getDate()+7);
+  const endNextWeekStr = endNextWeek.toISOString().split("T")[0];
+
+  // Active non-archived future meetings (today onwards), sorted asc
+  const upcoming = meetings
+    .filter(m => !m.archived && m.date >= todayStr)
+    .sort((a,b)=> {
+      if(a.date!==b.date) return a.date.localeCompare(b.date);
+      return (a.time||"23:59").localeCompare(b.time||"23:59");
+    });
+
+  // Past meetings needing attention (last 14 days, no notes/transcript)
+  const past14 = new Date(today); past14.setDate(past14.getDate()-14);
+  const past14Str = past14.toISOString().split("T")[0];
+  const pendingPast = meetings
+    .filter(m => !m.archived && m.date < todayStr && m.date >= past14Str && getMeetingStatus(m)==="agendada")
+    .sort((a,b)=>b.date.localeCompare(a.date));
+
+  if(!upcoming.length && !pendingPast.length){
+    container.innerHTML=`<div class="pipeline-empty">📅 Nenhuma reunião agendada.<br><span style="color:var(--dim)">Clique em <strong style="color:var(--accent)">+ Nova Reunião</strong> para agendar.</span></div>`;
+    return;
+  }
+
+  const DIAS_SEMANA=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+  const MESES_CURTO=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+
+  function buildPipelineCard(m){
+    const status = getMeetingStatus(m);
+    const d = new Date(m.date+"T12:00:00");
+    const diaLabel = DIAS_SEMANA[d.getDay()]+" "+d.getDate()+" "+MESES_CURTO[d.getMonth()];
+    const stripClass = status==="concluida" ? "pipeline-concluida-strip" : "pipeline-agendada-strip";
+    const timeBlock = m.time
+      ? `<div class="pipeline-card-time"><div class="pipeline-card-time-val">${m.time}</div><div class="pipeline-card-time-day">${diaLabel}</div></div>`
+      : `<div class="pipeline-card-time no-time"><div class="pipeline-card-time-val">Sem hora</div><div class="pipeline-card-time-day">${diaLabel}</div></div>`;
+
+    const locTag = m.location ? `<span>📍 ${escHtml(m.location)}</span>` : "";
+    const teamTag = m.team ? `<span>🏷 ${escHtml(m.team)}</span>` : "";
+    const picTag = m.pic ? `<span>👥 ${escHtml(m.pic)}</span>` : "";
+    const statusTag = status==="concluida"
+      ? `<span style="color:var(--green);font-size:.65rem;font-weight:700">✅ Concluída</span>`
+      : `<span style="color:#5b9fff;font-size:.65rem;font-weight:700">📅 Agendada</span>`;
+
+    const aiBtn = `<button class="pipeline-action ai" onclick="openMeetingForAI(${m.id})">${m.analyzed?"🔄 Reanalisar":"✨ Analisar IA"}</button>`;
+    const notesBtn = `<button class="pipeline-action notes" onclick="openMeetingForNotes(${m.id})">📝 Notas</button>`;
+    const detailBtn = `<button class="pipeline-action detail" onclick="switchMeetingTab('historico');setTimeout(()=>{toggleMeetingCard(${m.id});document.getElementById('mc-${m.id}')?.scrollIntoView({behavior:'smooth',block:'center'})},80)">👁 Ver</button>`;
+
+    return `<div class="pipeline-card ${stripClass}" id="pc-${m.id}">
+      ${timeBlock}
+      <div class="pipeline-card-body">
+        <div class="pipeline-card-title">${escHtml(m.title)}</div>
+        <div class="pipeline-card-meta">${locTag}${teamTag}${picTag}${statusTag}</div>
+        ${m.agenda?`<div class="pipeline-card-agenda">📋 ${escHtml(m.agenda)}</div>`:""}
+        <div class="pipeline-card-actions">${detailBtn}${notesBtn}${aiBtn}</div>
+      </div>
+    </div>`;
+  }
+
+  let html = "";
+
+  // Groups for upcoming
+  const grupos = [
+    { label:"🔴 Hoje",           items: upcoming.filter(m=>m.date===todayStr) },
+    { label:"🟡 Amanhã",         items: upcoming.filter(m=>m.date===tmrwStr) },
+    { label:"🔵 Esta semana",     items: upcoming.filter(m=>m.date>tmrwStr && m.date<=endWeekStr) },
+    { label:"🟣 Próxima semana",  items: upcoming.filter(m=>m.date>endWeekStr && m.date<=endNextWeekStr) },
+    { label:"⚪ Mais adiante",    items: upcoming.filter(m=>m.date>endNextWeekStr) },
+  ];
+
+  grupos.forEach(g=>{
+    if(!g.items.length) return;
+    html += `<div class="pipeline-group">
+      <div class="pipeline-group-label">${g.label} <span style="font-size:.65rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">${g.items.length} reunião${g.items.length!==1?"ões":""}</span></div>
+      ${g.items.map(buildPipelineCard).join("")}
+    </div>`;
+  });
+
+  // Pending past (no notes)
+  if(pendingPast.length){
+    html += `<div class="pipeline-group">
+      <div class="pipeline-group-label" style="color:var(--orange)">⚠️ Sem registro <span style="font-size:.65rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">Reuniões passadas sem notas</span></div>
+      ${pendingPast.map(buildPipelineCard).join("")}
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function openMeetingForNotes(id){
+  switchMeetingTab("historico");
+  setTimeout(()=>{
+    const card = document.getElementById(`mc-${id}`);
+    if(card){
+      if(!card.classList.contains("open")) card.classList.add("open");
+      card.scrollIntoView({behavior:"smooth", block:"center"});
+      setTimeout(()=>document.getElementById(`notes-${id}`)?.focus(), 400);
+    }
+  }, 100);
+}
+
+function openMeetingForAI(id){
+  switchMeetingTab("historico");
+  setTimeout(()=>analyzeMeeting(id), 150);
 }
 
 function archiveMeeting(id){
@@ -4719,6 +4887,7 @@ function gotoView(name,el){
   const titleEl=document.getElementById("view-title"); if(titleEl) titleEl.textContent=t;
   const subEl=document.getElementById("view-sub");     if(subEl)   subEl.textContent=s;
   if(name==="dashboard") switchDashView(currentDashView||"dash");
+  if(name==="reunioes"){ switchMeetingTab(activeMeetingTab||"pipeline"); }
   if(name==="calendar")renderCalendar();
   if(name==="foco"){
     currentQuote=Math.floor(Math.random()*QUOTES.length);
