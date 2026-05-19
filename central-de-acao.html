@@ -2247,6 +2247,92 @@ textarea.form-input{border-radius:16px;resize:vertical}
 .fin-cat-bar-track{height:6px;background:var(--border);border-radius:99px;overflow:hidden}
 .fin-cat-bar-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.4,0,.2,1)}
 
+/* ── ALERTAS DE VENCIMENTO ── */
+.fin-alertas-card{
+  background:var(--card);
+  backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);
+  border:1px solid var(--red-border);border-radius:22px;
+  padding:18px 24px;margin-bottom:14px;
+  box-shadow:var(--card-shadow);
+}
+.fin-alertas-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.fin-alertas-title{font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--red)}
+.fin-alerta-row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-radius:12px;
+  background:var(--surface);margin-bottom:7px;
+  border:1px solid var(--border);transition:all .15s;
+}
+.fin-alerta-row:hover{border-color:var(--red-border);background:var(--red-dim)}
+.fin-alerta-badge{
+  font-size:.6rem;font-weight:800;padding:3px 8px;border-radius:6px;
+  white-space:nowrap;flex-shrink:0;
+}
+.fin-alerta-badge.hoje{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+.fin-alerta-badge.amanha{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border)}
+.fin-alerta-badge.breve{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)}
+.fin-alerta-nome{font-size:.8rem;font-weight:600;color:var(--text);flex:1}
+.fin-alerta-val{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:var(--red)}
+.fin-alerta-dia{font-size:.65rem;color:var(--muted)}
+
+/* ── SAÚDE FINANCEIRA ── */
+.fin-saude-card{
+  background:var(--card);
+  backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);
+  border-radius:18px;padding:18px 20px;
+  box-shadow:var(--card-shadow);
+  display:flex;flex-direction:column;gap:10px;
+}
+.fin-saude-score{
+  font-family:'Outfit',sans-serif;font-size:2.8rem;font-weight:900;
+  line-height:1;letter-spacing:-2px;
+}
+.fin-saude-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+.fin-saude-bar-track{height:8px;background:var(--border);border-radius:99px;overflow:hidden;margin:4px 0}
+.fin-saude-bar-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.fin-saude-item{display:flex;align-items:center;justify-content:space-between;font-size:.7rem;color:var(--dim)}
+.fin-saude-item strong{font-weight:700;color:var(--text)}
+
+/* ── COMPARATIVO MENSAL ── */
+.fin-comp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px}
+.fin-comp-item{text-align:center;padding:12px 8px;border-radius:12px;background:var(--surface);border:1px solid var(--border)}
+.fin-comp-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.fin-comp-val{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900}
+.fin-comp-delta{font-size:.62rem;margin-top:4px;font-weight:700}
+.fin-comp-delta.up{color:var(--green)}
+.fin-comp-delta.down{color:var(--red)}
+.fin-comp-delta.neutral{color:var(--muted)}
+
+/* ── FLUXO SEMANAL ── */
+.fin-fluxo-bars{display:flex;align-items:flex-end;gap:8px;height:80px;margin-top:10px}
+.fin-fluxo-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.fin-fluxo-bar-wrap{flex:1;display:flex;flex-direction:column;justify-content:flex-end;width:100%;gap:2px}
+.fin-fluxo-bar{border-radius:4px 4px 0 0;width:100%;min-height:2px;transition:height .5s ease}
+.fin-fluxo-label{font-size:.58rem;color:var(--muted);font-weight:600}
+
+/* ── COMISSÕES (consórcio) ── */
+.fin-comiss-card{
+  background:var(--card);
+  backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);
+  border:1px solid var(--green-border);border-radius:22px;
+  padding:18px 24px;margin-bottom:14px;
+  box-shadow:var(--card-shadow);
+}
+.fin-comiss-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.fin-comiss-title{font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--green)}
+.fin-comiss-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fin-comiss-item{padding:14px;border-radius:14px;background:var(--surface);border:1px solid var(--border);text-align:center}
+.fin-comiss-val{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:900}
+.fin-comiss-label{font-size:.62rem;color:var(--muted);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.07em}
+.fin-comiss-add-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.fin-comiss-list{margin-top:10px;display:flex;flex-direction:column;gap:7px;max-height:200px;overflow-y:auto}
+.fin-comiss-tx{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:11px;background:var(--surface);border:1px solid var(--border)}
+.fin-comiss-tx-nome{flex:1;font-size:.78rem;font-weight:600;color:var(--text)}
+.fin-comiss-tx-val{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:var(--green)}
+.fin-comiss-tx-status{font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:6px}
+.fin-comiss-tx-status.recebida{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+.fin-comiss-tx-status.pendente{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border)}
+
 /* Upload de fatura/extrato */
 .fin-upload-card{
   background:var(--card);
@@ -2473,9 +2559,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <button class="nav-btn" title="Templates" onclick="gotoView('templates',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
     </button>
-    <button class="nav-btn" title="Conquistas" onclick="gotoView('conquistas',this)">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
-    </button>
+    <!-- Conquistas removida por pedido do usuário -->
     <button class="nav-btn" title="Relatório IA" onclick="gotoView('relatorio',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     </button>
@@ -3090,9 +3174,55 @@ textarea.form-input{border-radius:16px;resize:vertical}
       </div>
     </div>
 
+    <!-- ── GRID: Saúde + Comparativo + Fluxo Semanal ── -->
+    <div style="display:grid;grid-template-columns:180px 1fr 1fr;gap:14px;margin-bottom:14px">
+
+      <!-- Saúde Financeira -->
+      <div class="fin-saude-card">
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:6px">Saúde Financeira</div>
+          <div class="fin-saude-score" id="fin-saude-score">—</div>
+          <div class="fin-saude-label" id="fin-saude-label" style="color:var(--muted)">aguardando dados</div>
+        </div>
+        <div class="fin-saude-bar-track"><div class="fin-saude-bar-fill" id="fin-saude-bar" style="width:0%;background:var(--green)"></div></div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div class="fin-saude-item"><span>Comprometimento</span><strong id="fin-saude-comp">—</strong></div>
+          <div class="fin-saude-item"><span>Poupança</span><strong id="fin-saude-poup">—</strong></div>
+          <div class="fin-saude-item"><span>Fixas/Renda</span><strong id="fin-saude-fixas">—</strong></div>
+        </div>
+      </div>
+
+      <!-- Comparativo Mensal -->
+      <div class="fin-card" style="margin-bottom:0">
+        <div class="fin-card-head">
+          <span class="fin-card-title" style="font-size:.72rem">Comparativo — Este Mês vs Anterior</span>
+        </div>
+        <div class="fin-comp-grid" id="fin-comp-grid">
+          <div class="fin-comp-item"><div class="fin-comp-label">Entradas</div><div class="fin-comp-val" id="fc-rec-val">—</div><div class="fin-comp-delta neutral" id="fc-rec-delta">vs. anterior</div></div>
+          <div class="fin-comp-item"><div class="fin-comp-label">Despesas</div><div class="fin-comp-val" id="fc-desp-val">—</div><div class="fin-comp-delta neutral" id="fc-desp-delta">vs. anterior</div></div>
+          <div class="fin-comp-item"><div class="fin-comp-label">Saldo</div><div class="fin-comp-val" id="fc-saldo-val">—</div><div class="fin-comp-delta neutral" id="fc-saldo-delta">vs. anterior</div></div>
+        </div>
+      </div>
+
+      <!-- Fluxo Semanal -->
+      <div class="fin-card" style="margin-bottom:0">
+        <div class="fin-card-head">
+          <span class="fin-card-title" style="font-size:.72rem">Fluxo Semanal</span>
+          <div style="display:flex;gap:10px;font-size:.62rem">
+            <span style="color:var(--green);font-weight:700">Entradas</span>
+            <span style="color:var(--red);font-weight:700">Saídas</span>
+          </div>
+        </div>
+        <div class="fin-fluxo-bars" id="fin-fluxo-bars">
+          <div style="text-align:center;width:100%;color:var(--muted);font-size:.72rem;padding:16px">Lance transações para ver o fluxo</div>
+        </div>
+      </div>
+
+    </div>
+
     <!-- KPIs Semanais -->
     <div style="background:linear-gradient(135deg,rgba(107,159,255,.08),rgba(107,159,255,.02));border:1px solid var(--blue-border);border-radius:16px;padding:16px 22px;margin-bottom:16px">
-      <div style="font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:12px">📊 KPIs Semanais — Metas de Controle</div>
+      <div style="font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:12px">KPIs — Metas de Controle</div>
       <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px" id="fin-kpis"></div>
     </div>
 
@@ -3123,6 +3253,59 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="fin-stat-val" style="color:var(--green)" id="fin-fixas-pagas">0/0</div>
         <div class="fin-stat-sub">contas do mês</div>
       </div>
+    </div>
+
+    <!-- ── Alertas de Vencimento + Comissões ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+      <!-- ALERTAS DE VENCIMENTO -->
+      <div class="fin-alertas-card">
+        <div class="fin-alertas-head">
+          <div class="fin-alertas-title">Vencimentos Próximos</div>
+          <div style="font-size:.65rem;color:var(--muted)" id="fin-alertas-resumo">próximos 7 dias</div>
+        </div>
+        <div id="fin-alertas-list">
+          <div style="text-align:center;padding:18px;color:var(--muted);font-size:.75rem">Sem vencimentos nos próximos 7 dias</div>
+        </div>
+      </div>
+
+      <!-- COMISSÕES — Consórcio -->
+      <div class="fin-comiss-card">
+        <div class="fin-comiss-head">
+          <div class="fin-comiss-title">Comissões — Consórcio</div>
+          <button class="btn btn-primary" style="padding:4px 12px;font-size:.65rem" onclick="toggleComissForm()">+ Lançar</button>
+        </div>
+        <div class="fin-comiss-grid">
+          <div class="fin-comiss-item">
+            <div class="fin-comiss-val" style="color:var(--green)" id="fc-comiss-recebida">R$ 0</div>
+            <div class="fin-comiss-label">Recebidas</div>
+          </div>
+          <div class="fin-comiss-item">
+            <div class="fin-comiss-val" style="color:var(--orange)" id="fc-comiss-pendente">R$ 0</div>
+            <div class="fin-comiss-label">Pendentes</div>
+          </div>
+          <div class="fin-comiss-item">
+            <div class="fin-comiss-val" style="color:var(--blue)" id="fc-comiss-total">R$ 0</div>
+            <div class="fin-comiss-label">Total Mês</div>
+          </div>
+        </div>
+        <!-- Form escondido -->
+        <div id="fin-comiss-form" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+          <div class="fin-comiss-add-row">
+            <input class="fin-input" id="fc-comiss-nome" placeholder="Ex: Venda cota imóvel 60k..." style="flex:2;min-width:140px">
+            <input class="fin-input" id="fc-comiss-val-input" type="number" placeholder="R$" style="width:90px">
+            <select class="fin-input" id="fc-comiss-status" style="width:120px">
+              <option value="recebida">Recebida</option>
+              <option value="pendente">Pendente</option>
+            </select>
+            <button class="btn btn-primary" onclick="addComissao()" style="font-size:.7rem">Salvar</button>
+          </div>
+        </div>
+        <div class="fin-comiss-list" id="fin-comiss-list">
+          <div style="text-align:center;padding:14px;color:var(--muted);font-size:.72rem">Nenhuma comissão lançada este mês</div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Upload IA -->
@@ -6495,6 +6678,21 @@ function renderFinanceiro(){
     }
   }
 
+  // ── Saúde Financeira ──
+  renderSaudeFinanceira(totalEntradas, totalDespesas, totalInvest, totalFixasCad);
+
+  // ── Comparativo Mensal ──
+  renderComparativoMensal(totalEntradas, totalDespesas, saldo);
+
+  // ── Fluxo Semanal ──
+  renderFluxoSemanal(tx);
+
+  // ── Alertas de Vencimento ──
+  renderAlertasVencimento();
+
+  // ── Comissões ──
+  renderComissoes();
+
   // Despesas Fixas (snapshot mensal independente)
   const fixasList=document.getElementById("fin-fixas-list");
   if(fixasList){
@@ -6532,6 +6730,258 @@ function renderFinanceiro(){
         </div>`).join("");
     }
   }
+}
+
+// ── SAÚDE FINANCEIRA ─────────────────────────────
+function renderSaudeFinanceira(entradas, despesas, invest, fixas){
+  const scoreEl = document.getElementById("fin-saude-score");
+  const labelEl = document.getElementById("fin-saude-label");
+  const barEl   = document.getElementById("fin-saude-bar");
+  const compEl  = document.getElementById("fin-saude-comp");
+  const poupEl  = document.getElementById("fin-saude-poup");
+  const fixasEl = document.getElementById("fin-saude-fixas");
+  if(!scoreEl) return;
+
+  if(!entradas){
+    scoreEl.textContent = "—";
+    if(labelEl) labelEl.textContent = "lance entradas pra calcular";
+    return;
+  }
+
+  const comprometimento = entradas > 0 ? (despesas / entradas) * 100 : 0;
+  const poupanca       = entradas > 0 ? (invest / entradas) * 100 : 0;
+  const fixasPct       = entradas > 0 ? (fixas / entradas) * 100 : 0;
+
+  // Score 0-100: 50 pts por comprometimento < 70%, 30 pts por poupança > 10%, 20 pts por fixas < 50%
+  let score = 0;
+  if(comprometimento <= 50)      score += 50;
+  else if(comprometimento <= 70) score += 35;
+  else if(comprometimento <= 90) score += 15;
+  if(poupanca >= 20)      score += 30;
+  else if(poupanca >= 10) score += 20;
+  else if(poupanca >= 5)  score += 10;
+  if(fixasPct <= 40)      score += 20;
+  else if(fixasPct <= 55) score += 12;
+  else if(fixasPct <= 70) score += 5;
+
+  scoreEl.textContent = score;
+
+  let color, label;
+  if(score >= 80){ color="var(--green)"; label="Excelente"; }
+  else if(score >= 60){ color="var(--blue)"; label="Boa"; }
+  else if(score >= 40){ color="var(--orange)"; label="Atenção"; }
+  else { color="var(--red)"; label="Crítica"; }
+
+  scoreEl.style.color = color;
+  if(labelEl){ labelEl.textContent = label; labelEl.style.color = color; }
+  if(barEl){ barEl.style.width = score+"%"; barEl.style.background = color; }
+  if(compEl) compEl.textContent = Math.round(comprometimento)+"%";
+  if(poupEl) poupEl.textContent = Math.round(poupanca)+"%";
+  if(fixasEl) fixasEl.textContent = Math.round(fixasPct)+"%";
+}
+
+// ── COMPARATIVO MENSAL ──────────────────────────
+function renderComparativoMensal(recAtual, despAtual, saldoAtual){
+  // Previous month
+  const prevM = finMonth===0 ? 11 : finMonth-1;
+  const prevY = finMonth===0 ? finYear-1 : finYear;
+  const mkPrev = monthKey(prevY, prevM);
+  const txPrev = FIN_TRANSACTIONS.filter(t=>{
+    if(!t.data) return false;
+    const d = new Date(t.data+"T12:00:00");
+    return d.getFullYear()===prevY && d.getMonth()===prevM;
+  });
+  const fixasPrev = FIN_FIXAS_BY_MONTH[mkPrev]||[];
+
+  const recPrev  = txPrev.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0);
+  const despPrev = txPrev.filter(t=>t.tipo!=="receita"&&t.tipo!=="investimento"&&t.tipo!=="cartao").reduce((s,t)=>s+t.valor,0)
+                   + fixasPrev.reduce((s,f)=>s+f.valor,0);
+  const saldoPrev = recPrev - despPrev;
+
+  const fmt = v => fmtBRL(v);
+  const delta = (curr, prev) => {
+    if(!prev) return {text:"sem dado anterior", cls:"neutral"};
+    const d = curr - prev;
+    const pct = Math.abs(Math.round(d/prev*100));
+    return { text:(d>=0?"+":"-")+" "+pct+"%", cls: d>=0?"up":"down" };
+  };
+
+  const recD  = delta(recAtual, recPrev);
+  const despD = delta(despAtual, despPrev);
+  const sldD  = delta(saldoAtual, saldoPrev);
+
+  const setV = (id, v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  const setC = (id, cls) => { const e=document.getElementById(id); if(e){e.className="fin-comp-delta "+cls;} };
+
+  setV("fc-rec-val",  fmt(recAtual));
+  setV("fc-desp-val", fmt(despAtual));
+  setV("fc-saldo-val",fmt(saldoAtual));
+  document.getElementById("fc-rec-val")  && (document.getElementById("fc-rec-val").style.color  = "var(--green)");
+  document.getElementById("fc-desp-val") && (document.getElementById("fc-desp-val").style.color = "var(--red)");
+  document.getElementById("fc-saldo-val")&& (document.getElementById("fc-saldo-val").style.color = saldoAtual>=0?"var(--green)":"var(--red)");
+  setV("fc-rec-delta",  recD.text);  setC("fc-rec-delta",  recD.cls);
+  setV("fc-desp-delta", despD.text); setC("fc-desp-delta", despD.cls);
+  setV("fc-saldo-delta",sldD.text);  setC("fc-saldo-delta",sldD.cls);
+}
+
+// ── FLUXO SEMANAL ───────────────────────────────
+function renderFluxoSemanal(tx){
+  const el = document.getElementById("fin-fluxo-bars");
+  if(!el) return;
+
+  // Agrupa por semana do mês (1-5)
+  const semanas = [{rec:0,desp:0},{rec:0,desp:0},{rec:0,desp:0},{rec:0,desp:0},{rec:0,desp:0}];
+  tx.forEach(t=>{
+    const dia = parseInt((t.data||"").split("-")[2])||1;
+    const sem = Math.min(Math.floor((dia-1)/7), 4);
+    if(t.tipo==="receita") semanas[sem].rec += t.valor;
+    else if(t.tipo!=="cartao") semanas[sem].desp += t.valor;
+  });
+
+  const maxVal = Math.max(...semanas.map(s=>Math.max(s.rec,s.desp)),1);
+
+  if(semanas.every(s=>s.rec===0&&s.desp===0)){
+    el.innerHTML=`<div style="text-align:center;width:100%;color:var(--muted);font-size:.72rem;padding:16px">Lance transações para ver o fluxo</div>`;
+    return;
+  }
+
+  el.innerHTML = semanas.map((s,i)=>{
+    const recH  = Math.max(Math.round(s.rec/maxVal*70),2);
+    const despH = Math.max(Math.round(s.desp/maxVal*70),2);
+    return `<div class="fin-fluxo-col">
+      <div class="fin-fluxo-bar-wrap">
+        <div class="fin-fluxo-bar" style="height:${recH}px;background:var(--green);opacity:.85"></div>
+        <div class="fin-fluxo-bar" style="height:${despH}px;background:var(--red);opacity:.75;border-radius:0 0 4px 4px;margin-top:-4px"></div>
+      </div>
+      <div class="fin-fluxo-label">S${i+1}</div>
+    </div>`;
+  }).join("");
+}
+
+// ── ALERTAS DE VENCIMENTO ───────────────────────
+function renderAlertasVencimento(){
+  const el = document.getElementById("fin-alertas-list");
+  const resumoEl = document.getElementById("fin-alertas-resumo");
+  if(!el) return;
+
+  // Só mostra alertas do mês atual
+  const hoje = new Date();
+  const mesAtual = hoje.getMonth();
+  const anoAtual = hoje.getFullYear();
+  if(finMonth !== mesAtual || finYear !== anoAtual){
+    el.innerHTML=`<div style="text-align:center;padding:14px;color:var(--muted);font-size:.72rem">Alertas disponíveis apenas para o mês atual</div>`;
+    return;
+  }
+
+  const diaHoje = hoje.getDate();
+  const fixas = getFixas();
+  const alertas = fixas
+    .filter(f => !f.paga)
+    .map(f => ({...f, diff: f.dia - diaHoje}))
+    .filter(f => f.diff >= 0 && f.diff <= 7)
+    .sort((a,b) => a.diff - b.diff);
+
+  // Também verifica cartões cadastrados
+  const cartaoAlertas = FIN_CARTOES.map(c=>{
+    const diff = c.dia_vencimento - diaHoje;
+    const fat = faturaAberta(c.id);
+    if(diff >= 0 && diff <= 7 && fat > 0){
+      return {nome:`Fatura ${c.nome}`, valor:fat, dia:c.dia_vencimento, diff, tipo:"cartao"};
+    }
+    return null;
+  }).filter(Boolean);
+
+  const todos = [...alertas, ...cartaoAlertas].sort((a,b)=>a.diff-b.diff);
+
+  if(!todos.length){
+    el.innerHTML=`<div style="text-align:center;padding:18px;color:var(--muted);font-size:.75rem">Nenhum vencimento nos próximos 7 dias</div>`;
+    if(resumoEl) resumoEl.textContent = "tudo em dia";
+    return;
+  }
+
+  if(resumoEl) resumoEl.textContent = todos.length+" vencimento"+(todos.length>1?"s":"");
+
+  el.innerHTML = todos.map(a=>{
+    let badgeCls, badgeText;
+    if(a.diff === 0){ badgeCls="hoje"; badgeText="HOJE"; }
+    else if(a.diff === 1){ badgeCls="amanha"; badgeText="AMANHÃ"; }
+    else { badgeCls="breve"; badgeText=`em ${a.diff} dias`; }
+    return `<div class="fin-alerta-row">
+      <div class="fin-alerta-badge ${badgeCls}">${badgeText}</div>
+      <div>
+        <div class="fin-alerta-nome">${a.nome}</div>
+        <div class="fin-alerta-dia">Dia ${a.dia}</div>
+      </div>
+      <div style="margin-left:auto">
+        <div class="fin-alerta-val">${fmtBRL(a.valor)}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── COMISSÕES ────────────────────────────────────
+let FIN_COMISSOES = [];
+
+function toggleComissForm(){
+  const f = document.getElementById("fin-comiss-form");
+  if(f) f.style.display = f.style.display==="none" ? "block" : "none";
+}
+
+function addComissao(){
+  const nome  = document.getElementById("fc-comiss-nome")?.value.trim();
+  const val   = parseFloat(document.getElementById("fc-comiss-val-input")?.value)||0;
+  const status= document.getElementById("fc-comiss-status")?.value||"pendente";
+  if(!nome||!val) return;
+
+  FIN_COMISSOES.push({
+    id: Date.now(), nome, valor:val, status,
+    mes: monthKey(finYear, finMonth),
+    data: new Date().toISOString().split("T")[0]
+  });
+
+  document.getElementById("fc-comiss-nome").value="";
+  document.getElementById("fc-comiss-val-input").value="";
+  saveData();
+  renderFinanceiro();
+}
+
+function deleteComissao(id){
+  FIN_COMISSOES = FIN_COMISSOES.filter(c=>c.id!==id);
+  saveData(); renderFinanceiro();
+}
+
+function toggleComissaoStatus(id){
+  const c = FIN_COMISSOES.find(c=>c.id===id);
+  if(c) c.status = c.status==="recebida" ? "pendente" : "recebida";
+  saveData(); renderFinanceiro();
+}
+
+function renderComissoes(){
+  const mk = monthKey(finYear, finMonth);
+  const mes = FIN_COMISSOES.filter(c=>c.mes===mk);
+
+  const recebidas = mes.filter(c=>c.status==="recebida").reduce((s,c)=>s+c.valor,0);
+  const pendentes = mes.filter(c=>c.status==="pendente").reduce((s,c)=>s+c.valor,0);
+  const total = recebidas + pendentes;
+
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setEl("fc-comiss-recebida", fmtBRL(recebidas));
+  setEl("fc-comiss-pendente", fmtBRL(pendentes));
+  setEl("fc-comiss-total",    fmtBRL(total));
+
+  const listEl = document.getElementById("fin-comiss-list");
+  if(!listEl) return;
+  if(!mes.length){
+    listEl.innerHTML=`<div style="text-align:center;padding:14px;color:var(--muted);font-size:.72rem">Nenhuma comissão lançada este mês</div>`;
+    return;
+  }
+  listEl.innerHTML = mes.sort((a,b)=>b.id-a.id).map(c=>`
+    <div class="fin-comiss-tx">
+      <div class="fin-comiss-tx-nome">${c.nome}</div>
+      <div class="fin-comiss-tx-val">${fmtBRL(c.valor)}</div>
+      <div class="fin-comiss-tx-status ${c.status}" onclick="toggleComissaoStatus(${c.id})" style="cursor:pointer">${c.status==="recebida"?"Recebida":"Pendente"}</div>
+      <button onclick="deleteComissao(${c.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.7rem;padding:0 4px">✕</button>
+    </div>`).join("");
 }
 
 // ── IMPORT IA ────────────────────────────────────
@@ -7128,6 +7578,7 @@ function saveData(){
       FIN_CONTAS, nextContaId,
       FIN_CARTOES, nextCartaoId,
       FIN_ORCAMENTO,
+      FIN_COMISSOES,
       finYear,
       finMonth,
       nextFinId,
@@ -7210,6 +7661,7 @@ function loadData(){
     if(data.finMonth!=null)      finMonth=data.finMonth;
     if(data.nextFinId!=null)     nextFinId=data.nextFinId;
     if(data.nextFixaId!=null)    nextFixaId=data.nextFixaId;
+    if(data.FIN_COMISSOES)       FIN_COMISSOES.splice(0,FIN_COMISSOES.length,...data.FIN_COMISSOES);
 
     console.log("✅ Dados carregados:", new Date(data.savedAt).toLocaleString("pt-BR"));
     return true;
