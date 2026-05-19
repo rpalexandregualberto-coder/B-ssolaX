@@ -4032,14 +4032,20 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <div style="font-size:1.4rem">🔗</div>
         <div style="font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em">Compartilhar com Amigos</div>
+        <div id="convite-key-badge" style="margin-left:auto;font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--surface);color:var(--muted);border:1px solid var(--border)">verificando...</div>
       </div>
       <div style="font-size:.78rem;color:var(--dim);margin-bottom:14px;line-height:1.6">
         Gera um link especial que já abre o app com a IA configurada automaticamente. Seu amigo clica, o app abre pronto — sem precisar cadastrar nada.
         <br><strong style="color:var(--orange)">Use apenas com pessoas de confiança</strong> — o link contém sua chave API.
       </div>
+      <!-- Aviso se chave não configurada -->
+      <div id="convite-sem-chave" style="display:none;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.25);border-radius:10px;padding:10px 14px;font-size:.75rem;color:var(--red);margin-bottom:12px;line-height:1.6">
+        ⚠️ <strong>Sua API key não está configurada.</strong><br>
+        Vá até a seção <strong>Inteligência Artificial</strong> acima, cole sua chave (começa com <code style="background:var(--surface);padding:1px 5px;border-radius:4px">sk-ant-</code>) e clique <strong>Salvar</strong>. Depois volte aqui para gerar o link.
+      </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <button onclick="gerarLinkConvite()" class="btn btn-primary" style="padding:10px 20px;font-size:.8rem;background:var(--green);border-color:var(--green)">
-          Gerar Link de Convite
+        <button onclick="gerarLinkConvite()" id="convite-btn" class="btn btn-primary" style="padding:10px 20px;font-size:.8rem;background:var(--green);border-color:var(--green)">
+          🔗 Gerar Link de Convite
         </button>
         <div style="font-size:.7rem;color:var(--muted)">O link é copiado automaticamente — cole no WhatsApp</div>
       </div>
@@ -5853,6 +5859,21 @@ function updateApiKeyUI(){
   }
   if(masked && hasKey) masked.textContent = userApiKey.slice(0,12) + "•••••••" + userApiKey.slice(-4);
   if(warnReun) warnReun.style.display = hasKey ? "none" : "block";
+  // Badge e aviso no card de compartilhar
+  const convBadge = document.getElementById("convite-key-badge");
+  const convWarn  = document.getElementById("convite-sem-chave");
+  const convBtn   = document.getElementById("convite-btn");
+  if(convBadge){
+    convBadge.textContent = hasKey ? "✓ IA ativa — pronto pra compartilhar" : "⚠️ API key não configurada";
+    convBadge.style.background = hasKey ? "rgba(52,197,122,.12)" : "rgba(255,77,109,.1)";
+    convBadge.style.color = hasKey ? "var(--green)" : "var(--red)";
+    convBadge.style.borderColor = hasKey ? "rgba(52,197,122,.3)" : "rgba(255,77,109,.3)";
+  }
+  if(convWarn) convWarn.style.display = hasKey ? "none" : "";
+  if(convBtn){
+    convBtn.style.opacity = hasKey ? "1" : ".5";
+    convBtn.title = hasKey ? "" : "Configure a API key primeiro";
+  }
 }
 
 function apikeyShowEdit(){
@@ -5926,8 +5947,12 @@ function showToastConvite(msg){
 
 // ── GERAR LINK DE CONVITE ──────────────────────────────────────
 function gerarLinkConvite(){
+  // Fallback: tenta buscar do localStorage caso a variável não tenha sido populada no boot
+  if(!userApiKey){
+    try{ const s = localStorage.getItem("central_acao_apikey"); if(s) userApiKey = s; }catch(e){}
+  }
   if(!userApiKey || !userApiKey.startsWith("sk-ant-")){
-    alert("Configure e salve sua API key em Configurações antes de gerar o link.");
+    alert("Configure e salve sua API key em Configurações antes de gerar o link.\n\nVá em ⚙️ Configurações → Inteligência Artificial → cole sua chave e clique Salvar.");
     return;
   }
   const nome = prompt("Nome do amigo (opcional — aparece na boas-vindas):");
