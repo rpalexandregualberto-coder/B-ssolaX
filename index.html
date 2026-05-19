@@ -9,64 +9,67 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
+  /* ── LIGHT MODE (padrão) — baseado na referência visual ── */
+  --bg:#f0ebe5;
+  --surface:rgba(255,255,255,0.95);
+  --card:rgba(255,255,255,0.88);
+  --card-hover:rgba(255,255,255,0.98);
+  --border:rgba(0,0,0,0.06);
+  --border-light:rgba(0,0,0,0.11);
+  --accent:#e8835a;
+  --accent-dim:rgba(232,131,90,0.10);
+  --accent-border:rgba(232,131,90,0.28);
+  --red:#e05470;--red-dim:rgba(224,84,112,.10);--red-border:rgba(224,84,112,.25);
+  --blue:#5b8fee;--blue-dim:rgba(91,143,238,.10);--blue-border:rgba(91,143,238,.25);
+  --green:#34c57a;--green-dim:rgba(52,197,122,.10);--green-border:rgba(52,197,122,.25);
+  --orange:#e8835a;--orange-dim:rgba(232,131,90,.10);--orange-border:rgba(232,131,90,.25);
+  --purple:#9c6fe0;--purple-dim:rgba(156,111,224,.10);--purple-border:rgba(156,111,224,.25);
+  --yellow-dim:rgba(232,131,90,.10);--yellow-b:rgba(232,131,90,.25);
+  --text:#1c1c2e;--muted:rgba(28,28,46,0.42);--dim:rgba(28,28,46,0.58);
+  --r:16px;--r-sm:12px;--r-lg:22px;--r-xl:28px;
+  --card-blur:blur(24px);
+  --card-shadow:0 2px 20px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --card-shadow-hover:0 8px 36px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
+  --bg-mesh:radial-gradient(at 88% 5%,  rgba(240,120,80,0.75) 0px, transparent 48%),
+            radial-gradient(at 100% 45%, rgba(225,95,60,0.55)  0px, transparent 45%),
+            radial-gradient(at 75% 90%,  rgba(255,155,100,0.45) 0px, transparent 48%),
+            radial-gradient(at 12% 20%,  rgba(100,155,230,0.58) 0px, transparent 50%),
+            radial-gradient(at 0%  65%,  rgba(80,140,220,0.42)  0px, transparent 50%);
+  --sidebar-bg:rgba(255,255,255,0.88);
+  --sidebar-shadow:4px 0 24px rgba(0,0,0,0.07);
+  --topbar-bg:rgba(255,255,255,0.88);
+  --topbar-shadow:0 2px 16px rgba(0,0,0,0.06);
+}
+
+[data-theme="dark"]{
+  /* ── DARK MODE (alternativo) ── */
   --bg:#16112a;
   --surface:rgba(26,20,46,0.92);
-  --card:rgba(30,24,52,0.62);
-  --card-hover:rgba(40,32,68,0.80);
+  --card:rgba(30,24,52,0.68);
+  --card-hover:rgba(40,32,68,0.82);
   --border:rgba(255,255,255,0.07);
   --border-light:rgba(255,255,255,0.14);
-  --accent:#a07ae8;
-  --accent-dim:rgba(160,122,232,0.12);
-  --accent-border:rgba(160,122,232,0.28);
+  --accent:#e8835a;
+  --accent-dim:rgba(232,131,90,0.12);
+  --accent-border:rgba(232,131,90,0.30);
   --red:#f26878;--red-dim:rgba(242,104,120,.10);--red-border:rgba(242,104,120,.25);
   --blue:#6b9fff;--blue-dim:rgba(107,159,255,.10);--blue-border:rgba(107,159,255,.25);
   --green:#42e89a;--green-dim:rgba(66,232,154,.10);--green-border:rgba(66,232,154,.25);
-  --orange:#f5a742;--orange-dim:rgba(245,167,66,.10);--orange-border:rgba(245,167,66,.25);
+  --orange:#e8835a;--orange-dim:rgba(232,131,90,.10);--orange-border:rgba(232,131,90,.25);
   --purple:#c07aff;--purple-dim:rgba(192,122,255,.10);--purple-border:rgba(192,122,255,.25);
-  --yellow-dim:rgba(160,122,232,.10);--yellow-b:rgba(160,122,232,.25);
+  --yellow-dim:rgba(232,131,90,.10);--yellow-b:rgba(232,131,90,.25);
   --text:#ede8fb;--muted:rgba(255,255,255,0.32);--dim:rgba(255,255,255,0.52);
-  --r:16px;--r-sm:12px;--r-lg:22px;--r-xl:28px;
   --card-blur:blur(20px);
-  --card-shadow:0 8px 32px rgba(0,0,0,0.32), 0 1px 0 rgba(255,255,255,0.06) inset;
-  --card-shadow-hover:0 16px 48px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.08) inset;
-  --bg-mesh:radial-gradient(at 15% 15%, rgba(110,70,200,0.42) 0px, transparent 55%),
-            radial-gradient(at 85% 20%, rgba(45,65,160,0.36) 0px, transparent 55%),
-            radial-gradient(at 5% 80%, rgba(75,35,155,0.30) 0px, transparent 55%),
-            radial-gradient(at 92% 85%, rgba(35,55,120,0.24) 0px, transparent 55%);
-  --sidebar-bg:rgba(18,14,36,0.82);
-  --sidebar-shadow:4px 0 32px rgba(0,0,0,0.42);
-  --topbar-bg:rgba(18,14,36,0.78);
-  --topbar-shadow:0 2px 24px rgba(0,0,0,0.36);
-}
-
-:root[data-theme="light"]{
-  --bg:#f5f0ff;
-  --surface:rgba(255,255,255,0.88);
-  --card:rgba(255,255,255,0.72);
-  --card-hover:rgba(255,255,255,0.92);
-  --border:rgba(200,188,230,0.48);
-  --border-light:rgba(170,152,215,0.72);
-  --accent:#7c5fe6;
-  --accent-dim:rgba(124,95,230,0.10);
-  --accent-border:rgba(124,95,230,0.28);
-  --red:#e05470;--red-dim:rgba(224,84,112,.10);--red-border:rgba(224,84,112,.28);
-  --blue:#4a7fe8;--blue-dim:rgba(74,127,232,.10);--blue-border:rgba(74,127,232,.28);
-  --green:#2eb87a;--green-dim:rgba(46,184,122,.10);--green-border:rgba(46,184,122,.28);
-  --orange:#e8835a;--orange-dim:rgba(232,131,90,.10);--orange-border:rgba(232,131,90,.28);
-  --purple:#9c5fe8;--purple-dim:rgba(156,95,232,.10);--purple-border:rgba(156,95,232,.28);
-  --yellow-dim:rgba(124,95,230,.10);--yellow-b:rgba(124,95,230,.28);
-  --text:#1a1530;--muted:#8070a0;--dim:#a090c0;
-  --card-blur:blur(20px);
-  --card-shadow:0 4px 24px rgba(100,80,160,0.12), 0 1px 0 rgba(255,255,255,0.80) inset;
-  --card-shadow-hover:0 8px 40px rgba(100,80,160,0.22), 0 1px 0 rgba(255,255,255,0.90) inset;
-  --bg-mesh:radial-gradient(at 20% 10%, rgba(255,185,155,0.58) 0px, transparent 55%),
-            radial-gradient(at 82% 15%, rgba(175,198,255,0.52) 0px, transparent 55%),
-            radial-gradient(at 5% 78%, rgba(218,196,255,0.48) 0px, transparent 55%),
-            radial-gradient(at 90% 82%, rgba(255,222,195,0.42) 0px, transparent 55%);
-  --sidebar-bg:rgba(255,255,255,0.82);
-  --sidebar-shadow:4px 0 32px rgba(100,80,160,0.14);
-  --topbar-bg:rgba(255,255,255,0.84);
-  --topbar-shadow:0 2px 20px rgba(100,80,160,0.10);
+  --card-shadow:0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset;
+  --card-shadow-hover:0 16px 48px rgba(0,0,0,0.50), 0 1px 0 rgba(255,255,255,0.08) inset;
+  --bg-mesh:radial-gradient(at 85% 5%,  rgba(232,131,90,0.22) 0px, transparent 50%),
+            radial-gradient(at 15% 15%, rgba(110,70,200,0.38) 0px, transparent 55%),
+            radial-gradient(at 85% 20%, rgba(45,65,160,0.32)  0px, transparent 55%),
+            radial-gradient(at 5%  80%, rgba(75,35,155,0.26)  0px, transparent 55%);
+  --sidebar-bg:rgba(18,14,36,0.85);
+  --sidebar-shadow:4px 0 32px rgba(0,0,0,0.45);
+  --topbar-bg:rgba(18,14,36,0.82);
+  --topbar-shadow:0 2px 24px rgba(0,0,0,0.38);
 }
 html{scroll-behavior:smooth}
 body{
@@ -105,12 +108,12 @@ body{
 }
 .avatar{
   width:42px;height:42px;
-  background:linear-gradient(135deg,var(--accent),#6030c0);
+  background:linear-gradient(135deg,#e8835a,#c05a30);
   border-radius:14px;
   display:flex;align-items:center;justify-content:center;
   font-family:'Outfit',sans-serif;font-weight:900;font-size:.82rem;
   color:#fff;flex-shrink:0;
-  box-shadow:0 4px 18px rgba(160,122,232,.38);
+  box-shadow:0 4px 18px rgba(232,131,90,.35);
 }
 .profile-info{flex:1;min-width:0}
 .profile-name{
@@ -144,18 +147,18 @@ body{
 }
 .logo-compass{
   width:38px;height:38px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--accent) 0%,#6030c0 100%);
+  background:linear-gradient(135deg,#e8835a 0%,#c05a30 100%);
   border-radius:12px;
   display:flex;align-items:center;justify-content:center;
   font-size:1.15rem;
-  box-shadow:0 4px 18px rgba(160,122,232,.38);
+  box-shadow:0 4px 18px rgba(232,131,90,.38);
 }
 .logo-name{
   font-family:'Outfit',sans-serif;
   font-size:1.08rem;font-weight:900;
   color:var(--text);letter-spacing:-.025em;line-height:1;
 }
-.logo-x{color:var(--accent);text-shadow:0 0 18px rgba(160,122,232,.55)}
+.logo-x{color:var(--accent);text-shadow:0 0 18px rgba(232,131,90,.45)}
 .logo-tagline{
   font-size:.6rem;color:var(--muted);
   margin-top:3px;letter-spacing:.03em;font-weight:500;
@@ -188,7 +191,7 @@ body{
   color:var(--accent);font-weight:700;
   border-left:3px solid var(--accent);
   padding-left:9px;
-  box-shadow:inset 0 0 20px var(--accent-dim), 0 4px 14px rgba(160,122,232,.15);
+  box-shadow:inset 0 0 20px var(--accent-dim), 0 4px 14px rgba(232,131,90,.15);
 }
 .nav-icon{font-size:.88rem;width:20px;text-align:center;flex-shrink:0}
 .nav-badge{
@@ -259,7 +262,7 @@ body{
 .gp-track{flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden}
 .gp-fill{
   height:100%;
-  background:linear-gradient(90deg,var(--accent),#6030c0);
+  background:linear-gradient(90deg,var(--accent),#c05a30);
   border-radius:99px;
   transition:width .7s cubic-bezier(.4,0,.2,1);
 }
@@ -468,8 +471,8 @@ body{
 .c-equipe{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)}
 .c-outros{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
 .b-date{background:rgba(61,255,238,.07);color:#3dffee;border:1px solid rgba(61,255,238,.22);font-size:.57rem}
-input[type="date"]{color-scheme:dark}
-:root[data-theme="light"] input[type="date"]{color-scheme:light}
+input[type="date"]{color-scheme:light}
+[data-theme="dark"] input[type="date"]{color-scheme:dark}
 
 /* ══════════════════════════════════════
    KANBAN BOARD
@@ -1200,7 +1203,7 @@ label.form-label{
   font-size:4.5rem;font-weight:900;
   color:var(--accent);line-height:1;
   letter-spacing:-.04em;
-  text-shadow:0 0 40px rgba(160,122,232,.30);
+  text-shadow:0 0 40px rgba(232,131,90,.30);
 }
 .bento-big-label{font-size:.7rem;color:var(--muted);margin-top:4px;text-align:center;line-height:1.4}
 
@@ -1530,7 +1533,7 @@ label.form-label{
   font-family:'Outfit',sans-serif;
   font-size:1.1rem;font-weight:900;
   color:var(--accent);
-  text-shadow:0 2px 12px rgba(160,122,232,.55);
+  text-shadow:0 2px 12px rgba(232,131,90,.55);
   animation:xpFloat 1.4s ease forwards;
 }
 @keyframes xpFloat{
@@ -1560,7 +1563,7 @@ label.form-label{
 .xp-bar-wrap{height:5px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:6px}
 .xp-bar-fill{
   height:100%;
-  background:linear-gradient(90deg,var(--accent),#6030c0);
+  background:linear-gradient(90deg,var(--accent),#c05a30);
   border-radius:99px;
   transition:width .6s cubic-bezier(.4,0,.2,1);
 }
@@ -1879,7 +1882,7 @@ label.form-label{
 }
 .comment-avatar{
   width:24px;height:24px;border-radius:7px;
-  background:linear-gradient(135deg,var(--accent),#6030c0);
+  background:linear-gradient(135deg,#e8835a,#c05a30);
   display:flex;align-items:center;justify-content:center;
   font-family:'Outfit',sans-serif;font-size:.58rem;font-weight:900;
   color:#fff;flex-shrink:0;
@@ -2316,7 +2319,7 @@ label.form-label{
 .xp-bar-wrap{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:7px}
 .xp-bar-fill{
   height:100%;
-  background:linear-gradient(90deg,var(--accent),#6030c0);
+  background:linear-gradient(90deg,var(--accent),#c05a30);
   border-radius:99px;
   transition:width .6s cubic-bezier(.4,0,.2,1);
 }
@@ -3298,7 +3301,7 @@ label.form-label{
         <div style="font-size:.8rem;color:var(--dim);margin-top:6px" id="gh-next">Próximo nível em <strong style="color:var(--accent)" id="gh-xp-next">500</strong> XP</div>
         <div style="margin-top:14px">
           <div style="height:10px;background:var(--border);border-radius:99px;overflow:hidden;width:300px;max-width:100%">
-            <div id="gh-bar" style="height:100%;background:linear-gradient(90deg,var(--accent),#6030c0);border-radius:99px;width:0%;transition:width .8s cubic-bezier(.4,0,.2,1)"></div>
+            <div id="gh-bar" style="height:100%;background:linear-gradient(90deg,var(--accent),#c05a30);border-radius:99px;width:0%;transition:width .8s cubic-bezier(.4,0,.2,1)"></div>
           </div>
         </div>
       </div>
@@ -8988,20 +8991,20 @@ const renderBars  = renderColChart;
 // ══════════════════════════════════════
 
 function toggleTheme(){
-  const current = document.documentElement.getAttribute("data-theme") || "dark";
+  const current = document.documentElement.getAttribute("data-theme") || "light";
   const next = current === "dark" ? "light" : "dark";
   setTheme(next);
 }
 
 function setTheme(theme){
-  if(theme === "light"){
-    document.documentElement.setAttribute("data-theme", "light");
+  if(theme === "dark"){
+    document.documentElement.setAttribute("data-theme", "dark");
     const btn = document.getElementById("theme-toggle-btn");
-    if(btn) btn.textContent = "☀️";
+    if(btn) btn.textContent = "🌙";
   } else {
     document.documentElement.removeAttribute("data-theme");
     const btn = document.getElementById("theme-toggle-btn");
-    if(btn) btn.textContent = "🌙";
+    if(btn) btn.textContent = "☀️";
   }
   try{ localStorage.setItem("central_acao_theme", theme); }catch(e){}
 }
