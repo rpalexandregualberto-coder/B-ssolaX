@@ -8670,34 +8670,96 @@ function renderFinanceiro(){
   const cartoesList = document.getElementById("fin-cartoes-list");
   if(cartoesList){
     if(!FIN_CARTOES.length){
-      cartoesList.innerHTML = `<div style="text-align:center;padding:18px;color:var(--muted);font-size:.78rem">Nenhum cartão cadastrado. Clique em <strong style="color:var(--accent)">+ Novo Cartão</strong>.</div>`;
+      cartoesList.innerHTML = `<div style="text-align:center;padding:28px 16px;color:var(--muted);font-size:.78rem">
+        <div style="font-size:2.5rem;margin-bottom:10px">💳</div>
+        <div style="font-weight:700;margin-bottom:4px">Nenhum cartão cadastrado</div>
+        <div style="font-size:.72rem">Clique em <strong style="color:var(--accent)">+ Novo Cartão</strong> para adicionar</div>
+      </div>`;
     } else {
-      cartoesList.innerHTML = FIN_CARTOES.map(c=>{
-        const fatura = faturaAberta(c.id);
-        const pct = pctLimiteCartao(c.id);
-        const corBarra = pct < 70 ? 'var(--green)' : pct < 90 ? 'var(--orange)' : 'var(--red)';
-        return `<div style="padding:9px 11px;border-radius:9px;background:var(--card);border:1px solid var(--border);border-left:3px solid ${c.cor||'var(--accent)'};margin-bottom:6px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-            <div style="flex:1;min-width:0">
-              <div style="font-weight:700;font-size:.84rem;color:var(--text)">${c.nome}</div>
-              <div style="font-size:.62rem;color:var(--muted)">${c.banco||'-'} · Fecha dia ${c.dia_fechamento} · Vence dia ${c.dia_vencimento}</div>
+      cartoesList.innerHTML = `<div style="display:flex;gap:14px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent">
+        ${FIN_CARTOES.map(c=>{
+          const fatura = faturaAberta(c.id);
+          const pct = pctLimiteCartao(c.id);
+          const pctNum = Math.min(pct, 100);
+          const pctCor = pct < 70 ? 'rgba(52,197,122,.9)' : pct < 90 ? 'rgba(245,166,35,.9)' : 'rgba(255,77,109,.9)';
+          const pctCorVar = pct < 70 ? 'var(--green)' : pct < 90 ? 'var(--orange)' : 'var(--red)';
+          const banco = (c.banco||'').toLowerCase();
+          // Detect bank gradient from name
+          const bk = banco.includes('nubank')||banco.includes('nu ')?{g:'#7B00CC,#C24BF0',emoji:'💜',flag:'NU'}:
+            banco.includes('itaú')||banco.includes('itau')?{g:'#CC5500,#FF9A40',emoji:'🟠',flag:'ITAÚ'}:
+            banco.includes('bradesco')?{g:'#AA0020,#FF2D55',emoji:'🔴',flag:'BRAD'}:
+            banco.includes('santander')?{g:'#990000,#DD0000',emoji:'🔴',flag:'SANT'}:
+            banco.includes('banco do brasil')||banco.includes('bb ')||banco==='bb'?{g:'#AA8800,#F0CC20',emoji:'🟡',flag:'BB'}:
+            banco.includes('caixa')?{g:'#004488,#0080D0',emoji:'🔵',flag:'CEF'}:
+            banco.includes('inter')||banco.includes('banco inter')?{g:'#C04400,#FF7100',emoji:'🟠',flag:'INTER'}:
+            banco.includes('c6')||banco.includes('c6bank')?{g:'#111122,#2E2E4E',emoji:'⚫',flag:'C6'}:
+            banco.includes('xp')?{g:'#080808,#222222',emoji:'⚫',flag:'XP'}:
+            banco.includes('neon')?{g:'#007A6A,#00C2A8',emoji:'🟢',flag:'NEON'}:
+            banco.includes('picpay')?{g:'#147830,#21C25E',emoji:'🟢',flag:'PIC'}:
+            banco.includes('sicoob')?{g:'#004A20,#00823B',emoji:'🟢',flag:'SCOB'}:
+            banco.includes('mastercard')||banco.includes('visa')||banco.includes('elo')?{g:'#2E1A6E,#6B3FAA',emoji:'💳',flag:banco.includes('visa')?'VISA':banco.includes('elo')?'ELO':'MC'}:
+            {g:`${c.cor||'#5b4fb5'},${c.cor||'#7c5fe6'}`,emoji:'💳',flag:'CARD'};
+
+          const textoColor = ['bb ','bb','#aa8800','#f0cc20','#d4aa00'].some(x=>banco.includes(x))||banco.includes('banco do brasil')?'#111':'#fff';
+
+          return `<div style="
+            width:260px;min-width:260px;height:158px;border-radius:18px;
+            background:linear-gradient(135deg,${bk.g});
+            color:${textoColor};padding:18px 20px;position:relative;
+            overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.32);
+            box-sizing:border-box;flex-shrink:0;
+            display:flex;flex-direction:column;justify-content:space-between;
+            transition:transform .2s,box-shadow .2s;cursor:default"
+            onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 48px rgba(0,0,0,.42)'"
+            onmouseout="this.style.transform='';this.style.boxShadow='0 8px 28px rgba(0,0,0,.32)'">
+            <!-- decorative circles -->
+            <div style="position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.07);right:-50px;top:-50px;pointer-events:none"></div>
+            <div style="position:absolute;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05);left:-30px;bottom:-50px;pointer-events:none"></div>
+            <!-- top row: chip + bank flag -->
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative">
+              <div style="width:30px;height:22px;border-radius:4px;background:rgba(255,255,255,.28);position:relative;overflow:hidden">
+                <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.4)"></div>
+                <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,.4)"></div>
+              </div>
+              <div style="font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:900;letter-spacing:.08em;opacity:.85;background:rgba(0,0,0,.15);padding:2px 8px;border-radius:5px">${bk.flag}</div>
             </div>
-            <div style="text-align:right">
-              <div style="font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:800;color:${corBarra}">${fmtBRL(fatura)}</div>
-              <div style="font-size:.6rem;color:var(--muted)">de ${fmtBRL(c.limite||0)}</div>
+            <!-- card name -->
+            <div style="position:relative">
+              <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,.2)">${c.nome}</div>
+              <div style="font-size:.58rem;opacity:.72">Fecha dia ${c.dia_fechamento||'?'} · Vence dia ${c.dia_vencimento||'?'}</div>
             </div>
-            <button onclick="editCartao(${c.id})" style="background:none;border:1px solid var(--border);border-radius:5px;padding:3px 7px;cursor:pointer;color:var(--muted);font-size:.65rem">✏️</button>
-            <button onclick="deleteCartao(${c.id})" style="background:none;border:1px solid var(--border);border-radius:5px;padding:3px 7px;cursor:pointer;color:var(--muted);font-size:.65rem">🗑</button>
-          </div>
-          <div style="height:5px;background:var(--surface);border-radius:99px;overflow:hidden">
-            <div style="height:100%;width:${Math.min(pct,100)}%;background:${corBarra};border-radius:99px;transition:width .4s"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);margin-top:3px">
-            <span>${pct}% usado</span>
-            <span>${pct>=90?'⚠️ Próximo do limite':(pct>=70?'Atenção':'OK')}</span>
-          </div>
-        </div>`;
-      }).join('');
+            <!-- bottom: fatura + limit bar -->
+            <div style="position:relative">
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">
+                <div>
+                  <div style="font-size:.52rem;opacity:.65;text-transform:uppercase;letter-spacing:.08em">Fatura atual</div>
+                  <div style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:900">${fmtBRL(fatura)}</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-size:.52rem;opacity:.65">Limite</div>
+                  <div style="font-size:.72rem;font-weight:700;opacity:.85">${fmtBRL(c.limite||0)}</div>
+                </div>
+              </div>
+              <div style="height:4px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden">
+                <div style="height:100%;width:${pctNum}%;background:${pctCor};border-radius:99px;transition:width .6s ease"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.55rem;opacity:.7;margin-top:3px">
+                <span>${pct}% usado</span>
+                <span>${pct>=90?'⚠️ Próximo do limite':pct>=70?'Atenção':'✓ Saudável'}</span>
+              </div>
+            </div>
+            <!-- edit/delete overlay buttons -->
+            <div style="position:absolute;top:10px;right:10px;display:flex;gap:4px">
+              <button onclick="event.stopPropagation();editCartao(${c.id})" title="Editar"
+                style="background:rgba(0,0,0,.25);border:none;border-radius:6px;width:24px;height:24px;cursor:pointer;color:rgba(255,255,255,.8);font-size:.7rem;display:flex;align-items:center;justify-content:center;transition:background .15s"
+                onmouseover="this.style.background='rgba(0,0,0,.45)'" onmouseout="this.style.background='rgba(0,0,0,.25)'">✏️</button>
+              <button onclick="event.stopPropagation();deleteCartao(${c.id})" title="Excluir"
+                style="background:rgba(0,0,0,.25);border:none;border-radius:6px;width:24px;height:24px;cursor:pointer;color:rgba(255,255,255,.8);font-size:.7rem;display:flex;align-items:center;justify-content:center;transition:background .15s"
+                onmouseover="this.style.background='rgba(200,0,0,.5)'" onmouseout="this.style.background='rgba(0,0,0,.25)'">🗑</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
     }
   }
 
