@@ -9337,6 +9337,12 @@ async function processFinFile(event, tipo){
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },4000);
     event.target.value=""; return;
   }
+  // Sanitize: remove null bytes, control chars, keep only printable + newlines
+  const textClean = text
+    .replace(/\0/g,"")
+    .replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ")
+    .replace(/ {4,}/g,"   ")
+    .slice(0,15000);
   if(statusText) statusText.textContent=`🧠 Motor financeiro inteligente processando...`;
 
   const mesLabel = FIN_MONTHS[finMonth]+" "+finYear;
@@ -9424,7 +9430,7 @@ Detecte e informe no resumo:
 ════════════════════
 TEXTO DO DOCUMENTO
 ════════════════════
-${text.slice(0,15000)}
+${textClean}
 
 ════════════════════
 RESPONDA APENAS COM JSON VÁLIDO (sem markdown):
@@ -9523,8 +9529,11 @@ RESPONDA APENAS COM JSON VÁLIDO (sem markdown):
     try{ saveData(); }catch(e){}
     setTimeout(()=>showImportReview(importedIds, result.resumo), 600);
   }catch(e){
-    if(statusText) statusText.textContent="❌ "+e.message;
-    setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },4000);
+    console.error("processFinFile error:", e);
+    const msg = e.message||"Erro desconhecido";
+    if(statusText) statusText.innerHTML=`❌ <span title="${msg.replace(/"/g,"'")}">${msg.length>80?msg.slice(0,80)+"…":msg}</span>`;
+    if(statusEl) statusEl.style.background="rgba(255,77,109,.08)";
+    setTimeout(()=>{ if(statusEl){ statusEl.style.display="none"; statusEl.style.background=""; } },6000);
   }
   event.target.value="";
 }
