@@ -9497,7 +9497,11 @@ JSON SOMENTE:
         valor:Math.abs(tx.valor),
         tipo: tx.estorno ? "cartao" : (tipo==="fatura"?"cartao":(tx.valor<0?"despesa_extra":"receita")),
         categoria:catMap[i]||"Outros",
-        data:tx.data, origem:"ia",
+        // Fatura de cartão: força data pro mês da importação (ciclo pode cruzar meses)
+        data: tipo==="fatura" ? `${dataDefault.slice(0,7)}-${tx.data.slice(8)}` : tx.data,
+        data_real: tx.data,
+        mes_fatura: dataDefault.slice(0,7),
+        origem:"ia",
         estorno: tx.estorno||false
       };
       if(tx.estorno) newTx.valor=-Math.abs(tx.valor); // estorno reduz o total
