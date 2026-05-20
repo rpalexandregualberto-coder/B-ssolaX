@@ -6622,7 +6622,7 @@ async function aiProxyCall(prompt, maxTokens=8192, model="claude-sonnet-4-5"){
 // ── Direto no browser com API key do usuário (financeiro — sem timeout) ──
 async function aiDirectCall(prompt, maxTokens=4096){
   const key = localStorage.getItem("central_acao_apikey")||"";
-  if(!key||!key.startsWith("sk-ant-"))
+  if(!key||!key.startsWith("sk-"))
     throw new Error("Configure sua API key da Anthropic em ⚙️ Configurações antes de usar a IA financeira.");
   const resp = await fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
@@ -9299,10 +9299,12 @@ async function processFinFile(event, tipo){
   const statusText=document.getElementById("fin-ai-status-text");
 
   // Verifica API key — upload usa chamada direta (sem proxy) pra evitar timeout
-  const _apiKey = localStorage.getItem("central_acao_apikey")||"";
-  if(!_apiKey || !_apiKey.startsWith("sk-ant-")){
-    alert("⚠️ Para importar via IA, configure sua API key da Anthropic em ⚙️ Configurações.\n\nÉ gratuito criar: platform.anthropic.com");
-    event.target.value=""; return;
+  const _apiKey = (localStorage.getItem("central_acao_apikey")||"").trim();
+  if(!_apiKey || !_apiKey.startsWith("sk-")){
+    showToast("⚙️ Configure sua API key da Anthropic em Configurações para usar a IA financeira.");
+    event.target.value="";
+    gotoView("config", document.querySelector('[title="Configurações"]'));
+    return;
   }
 
   // Pergunta a qual conta/cartao a importacao se refere
@@ -10453,9 +10455,11 @@ async function uploadCardFatura(cardId, input){
   if(!file) return;
   const statusEl=document.getElementById(`cc-upload-status-${cardId}`);
   const userApiKey=localStorage.getItem("central_acao_apikey")||"";
-  if(!userApiKey||!userApiKey.startsWith("sk-ant-")){
-    alert("⚠️ Para analisar a fatura com IA, configure sua API key da Anthropic em ⚙️ Configurações.\n\nÉ gratuito criar: platform.anthropic.com");
-    input.value=""; return;
+  if(!userApiKey||!userApiKey.startsWith("sk-")){
+    showToast("⚙️ Configure sua API key da Anthropic em Configurações para usar a IA de cartões.");
+    input.value="";
+    gotoView("config", document.querySelector('[title="Configurações"]'));
+    return;
   }
 
   const mesAno=_selectedCardMes||monthKey();
