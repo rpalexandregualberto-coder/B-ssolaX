@@ -9345,6 +9345,31 @@ function renderComissoes(){
     </div>`).join("");
 }
 
+// ── Parser direto para CSV Nubank (date,title,amount) ─────────
+function _parseNubankCSV(text, tipo, dataDefault){
+  const lines = text.replace(/\r/g,"").trim().split("\n");
+  const header = (lines[0]||"").toLowerCase().trim();
+  if(!header.includes("date")||!header.includes("title")||!header.includes("amount")) return null;
+
+  const IGNORAR = ["pagamento recebido","iof de volta","pagamento efetuado","pagamento da fatura"];
+  const txs=[];
+  for(let i=1;i<lines.length;i++){
+    const line=lines[i].trim(); if(!line) continue;
+    // Suporta títulos com aspas e vírgulas: 2026-04-06,"Título, com vírgula",123.45
+    const m=line.match(/^(\d{4}-\d{2}-\d{2}),(\".*?\"|[^,]+),(-?[\d.]+)\s*$/);
+    if(!m) continue;
+    const date=m[1];
+    const nome=m[2].replace(/^\"|\"$/g,"").replace(/""/g,'"').trim();
+    const valor=parseFloat(m[3]);
+    // Ignora pagamentos e IOF de volta (cancelam com IOF cobrado)
+    if(IGNORAR.some(ig=>nome.toLowerCase().includes(ig))) continue;
+    // IOF de "X" e IOF de volta → ignora ambos (net zero)
+    if(nome.toLowerCase().startsWith("iof de ")) continue;
+    txs.push({ nome, valor, data:date||dataDefault, estorno: valor<0 });
+  }
+  return txs.length>0 ? txs : null;
+}
+
 // ── IMPORT IA ────────────────────────────────────
 async function processFinFile(event, tipo){
   const file=event.target.files[0]; if(!file) return;
@@ -9413,58 +9438,100 @@ async function processFinFile(event, tipo){
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },4000);
     event.target.value=""; return;
   }
-  // Sanitize e envia TUDO — streaming não tem limite de tempo
-  const textClean = text
-    .replace(/\0/g,"")
-    .replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ")
-    .replace(/ {4,}/g,"   ")
-    .slice(0,15000); // até 15k chars — streaming aguenta
-  if(statusText) statusText.textContent=`🧠 Analisando ${tipo==="fatura"?"fatura":"extrato"} completo...`;
 
   const mesLabel = FIN_MONTHS[finMonth]+" "+finYear;
-  const catsFatura = FIN_CATS.cartao.join(", ");
-  const catsExtrato = [...FIN_CATS.receita,...FIN_CATS.despesa_extra,...(FIN_CATS.despesa_fixa||[]),...FIN_CATS.investimento].join(", ");
-  const catsList = tipo==="fatura" ? catsFatura : catsExtrato;
-
-  // Histórico de categorias para autoaprendizado contextual
-  const histCats = {};
-  FIN_TRANSACTIONS.slice(-200).forEach(t=>{
-    const k = (t.nome||"").toLowerCase().slice(0,20);
-    if(k) histCats[k] = t.categoria;
-  });
-  const histStr = Object.entries(histCats).slice(0,30).map(([k,v])=>`"${k}"→${v}`).join("; ");
-
   const dataDefault = `${finYear}-${String(finMonth+1).padStart(2,"0")}-15`;
 
-  const aiPrompt=`Você é um especialista em finanças pessoais brasileiras. Extraia TODAS as transações do documento abaixo sem deixar nenhuma de fora.
+  // ── Detecta CSV Nubank (date,title,amount) e faz parse direto ──
+  const nubankTxsRaw = _parseNubankCSV(text, tipo, dataDefault);
+  if(nubankTxsRaw){
+    if(statusText) statusText.textContent=`🧠 Categorizando ${nubankTxsRaw.length} transações com IA...`;
+    // Histórico para contextualizar
+    const histCats={};
+    FIN_TRANSACTIONS.slice(-200).forEach(t=>{ const k=(t.nome||"").toLowerCase().slice(0,20); if(k) histCats[k]=t.categoria; });
+    const histStr=Object.entries(histCats).slice(0,30).map(([k,v])=>`"${k}"→${v}`).join("; ");
+    const catsList = tipo==="fatura" ? FIN_CATS.cartao.join(", ") : [...FIN_CATS.receita,...FIN_CATS.despesa_extra,...(FIN_CATS.despesa_fixa||[]),...FIN_CATS.investimento].join(", ");
+    const nomes = nubankTxsRaw.map((t,i)=>`${i}|${t.nome}`).join("\n");
+    const catPrompt=`Categorize cada transação abaixo. Retorne JSON com array "cats" onde cada item tem o índice e a categoria.
 
-REGRAS ABSOLUTAS:
-1. Extraia TODAS as transações — não pule nenhuma
-2. Não duplique lançamentos
-3. VALORES: float puro em reais — R$24.039,55 → 24039.55 (NUNCA 24.03955)
-4. Remova pontos de milhar, converta vírgula decimal em ponto
-5. Estornos/créditos em fatura = tipo "receita", valor positivo
+CATEGORIAS: ${catsList}
 
-TIPO DO DOCUMENTO: ${tipo==="fatura"?"FATURA DE CARTÃO DE CRÉDITO":"EXTRATO BANCÁRIO / PIX"}
-PERÍODO: ${mesLabel} | DATA PADRÃO QUANDO NÃO INFORMADA: ${dataDefault}
+REGRAS:
+iFood/IFOOD→iFood | Uber/99Food→Uber/Transporte | Netflix/Spotify/Prime/Canva→Assinatura/Streaming
+Mercado/Atacado/Supermercado/Gbarbosa/Hortifruti/Petz→Mercado | Farmácia/Drogasil/Raia/Droga→Farmácia/Saúde
+Padaria/Restaurante/Bistro/Lanchonete/Brasa/Bar/Delivery/Food→Restaurante | Posto/Combustível/Shell→Combustível
+Shopee/MercadoLivre/Amazon/Lojas/Renner/Kalunga→Compras Online | Hotel/Pousada/Hostel→Viagem
+Uber/Localiza/Latam/Aero→Viagem/Transporte | Academia/Esporte/Laser→Saúde/Esporte
+Allure/Gestao/Intermediacao/Credito/Financeiro/Limite convertido→Financeiro/Crédito
+IOF→Juros/IOF | Anthropic/SaaS/Software/Jusbrasil→SaaS/Software | Borale/Espacolaser/Barbearia→Beleza/Estética
+Condominio→Moradia | Jim.Com/Distribuidora/Bvista→Outros
+${histStr?`\nHistórico: ${histStr}`:""}
 
-CATEGORIAS DISPONÍVEIS:
-${catsList}
+TRANSAÇÕES (índice|nome):
+${nomes}
 
-REGRAS DE CATEGORIZAÇÃO:
-iFood/IFOOD → iFood | Uber/99/Cabify → Uber/Transporte | Netflix/Spotify/YouTube Premium → Assinatura/Streaming
-Mercado/Assaí/Atacadão/Supermercado → Mercado | FACEBK/Meta Ads/Google Ads → Tráfego Pago
-Farmácia/Drogasil/Droga Raia → Farmácia/Saúde | PIX recebido → PIX Recebido
-Salário/comissão → Salário/Comissão | Nubank/fatura/Daycoval/financeira → despesa_fixa
-Padaria/Restaurante/Bistro/Lanchonete → Restaurante | Posto/Combustível/Shell/BR → Combustível
-Amazon/Shopee/Mercado Livre → Compras Online | Escola/Faculdade/Curso → Educação
-${histStr ? `\nHistórico do usuário: ${histStr}` : ""}
+JSON SOMENTE:
+{"cats":[{"i":0,"cat":"categoria"},{"i":1,"cat":"categoria"}]}`;
+
+    const catResult = await aiProxyCallStream(catPrompt, 4096);
+    const catMap={};
+    (catResult.cats||[]).forEach(c=>{ catMap[c.i]=c.cat; });
+
+    const importedIds=[];
+    nubankTxsRaw.forEach((tx,i)=>{
+      const newId=nextFinId++;
+      const newTx={
+        id:newId, nome:tx.nome, nome_original:tx.nome,
+        valor:Math.abs(tx.valor),
+        tipo: tx.estorno ? "cartao" : (tipo==="fatura"?"cartao":(tx.valor<0?"despesa_extra":"receita")),
+        categoria:catMap[i]||"Outros",
+        data:tx.data, origem:"ia",
+        estorno: tx.estorno||false
+      };
+      if(tx.estorno) newTx.valor=-Math.abs(tx.valor); // estorno reduz o total
+      const _vId=(typeof vinculoId!=="undefined")?vinculoId:window._finImportVinculoId;
+      const _vTipo=(typeof tipo!=="undefined")?tipo:window._finImportTipo;
+      if(_vId!=null){ if(_vTipo==="fatura") newTx.cartao_id=_vId; else newTx.conta_id=_vId; }
+      FIN_TRANSACTIONS.push(newTx);
+      importedIds.push(newId);
+    });
+    matchFixasFromTransactions();
+    if(statusText) statusText.textContent=`✅ ${importedIds.length} transações importadas do CSV!`;
+    setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },2500);
+    renderFinanceiro(); try{ saveData(); }catch(e){}
+    const totalLiq=nubankTxsRaw.reduce((s,t)=>s+t.valor,0);
+    const resumoCSV={total_transacoes:importedIds.length,total_saidas:nubankTxsRaw.filter(t=>t.valor>0).reduce((s,t)=>s+t.valor,0),saldo_periodo:totalLiq,periodo:mesLabel,observacoes:`CSV Nubank processado diretamente. Total líquido: R$ ${totalLiq.toFixed(2)}`};
+    setTimeout(()=>showImportReview(importedIds,resumoCSV),600);
+    event.target.value=""; return;
+  }
+
+  // ── Fallback: IA extrai as transações (PDF/OFX/TXT) ──
+  const textClean = text.replace(/\0/g,"").replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ").replace(/ {4,}/g,"   ").slice(0,15000);
+  if(statusText) statusText.textContent=`🧠 Analisando ${tipo==="fatura"?"fatura":"extrato"} completo...`;
+
+  const catsFatura = FIN_CATS.cartao.join(", ");
+  const catsExtrato = [...FIN_CATS.receita,...FIN_CATS.despesa_extra,...(FIN_CATS.despesa_fixa||[]),...FIN_CATS.investimento].join(", ");
+  const catsList2 = tipo==="fatura" ? catsFatura : catsExtrato;
+  const histCats2={};
+  FIN_TRANSACTIONS.slice(-200).forEach(t=>{ const k=(t.nome||"").toLowerCase().slice(0,20); if(k) histCats2[k]=t.categoria; });
+  const histStr2=Object.entries(histCats2).slice(0,30).map(([k,v])=>`"${k}"→${v}`).join("; ");
+
+  const aiPrompt=`Você é um especialista em finanças pessoais brasileiras. Extraia TODAS as transações do documento abaixo.
+
+TIPO: ${tipo==="fatura"?"FATURA DE CARTÃO (todas saídas = tipo cartao, estornos = cartao com valor negativo, IGNORE pagamentos da fatura)":"EXTRATO BANCÁRIO"}
+PERÍODO: ${mesLabel} | DATA PADRÃO: ${dataDefault}
+VALORES: float — R$24.039,55 → 24039.55
+
+CATEGORIAS: ${catsList2}
+iFood→iFood | Uber/99→Uber/Transporte | Netflix/Spotify→Assinatura | Mercado/Atacado→Mercado
+Farmácia/Drogasil/Raia→Farmácia/Saúde | Posto/Shell→Combustível | Hotel/Pousada→Viagem
+${histStr2?`Histórico: ${histStr2}`:""}
 
 DOCUMENTO:
 ${textClean}
 
-RESPONDA SOMENTE COM JSON VÁLIDO (sem markdown, sem texto fora do JSON):
-{"transacoes":[{"nome":"nome limpo","valor":0.00,"tipo":"${tipo==="fatura"?"cartao":"receita|despesa_extra|despesa_fixa|investimento"}","categoria":"categoria","data":"YYYY-MM-DD"}]}`;
+JSON SOMENTE:
+{"transacoes":[{"nome":"nome","valor":0.00,"tipo":"cartao","categoria":"cat","data":"YYYY-MM-DD"}]}`;
 
   try{
     if(statusText) statusText.textContent="🔍 Classificando todas as transações...";
