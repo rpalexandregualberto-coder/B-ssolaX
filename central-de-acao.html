@@ -9298,14 +9298,7 @@ async function processFinFile(event, tipo){
   const statusEl=document.getElementById("fin-ai-status");
   const statusText=document.getElementById("fin-ai-status-text");
 
-  // Verifica API key — upload usa chamada direta (sem proxy) pra evitar timeout
-  const _apiKey = (localStorage.getItem("central_acao_apikey")||"").trim();
-  if(!_apiKey || !_apiKey.startsWith("sk-")){
-    showToast("⚙️ Configure sua API key da Anthropic em Configurações para usar a IA financeira.");
-    event.target.value="";
-    gotoView("config", document.querySelector('[title="Configurações"]'));
-    return;
-  }
+  // Upload usa proxy do servidor (Edge Function, sem timeout curto)
 
   // Pergunta a qual conta/cartao a importacao se refere
   let vinculoId = null;
@@ -9413,7 +9406,7 @@ RESPONDA SÓ COM JSON (sem markdown):
 
   try{
     if(statusText) statusText.textContent="🔍 Classificando transações com IA...";
-    const result = await aiDirectCall(prompt, 2000);
+    const result = await aiProxyCall(prompt, 1000, "claude-3-haiku-20240307");
     let count=0;
     const importedIds = [];
     (result.transacoes||[]).forEach(tx=>{
@@ -10454,14 +10447,6 @@ async function uploadCardFatura(cardId, input){
   const file=input.files[0];
   if(!file) return;
   const statusEl=document.getElementById(`cc-upload-status-${cardId}`);
-  const userApiKey=localStorage.getItem("central_acao_apikey")||"";
-  if(!userApiKey||!userApiKey.startsWith("sk-")){
-    showToast("⚙️ Configure sua API key da Anthropic em Configurações para usar a IA de cartões.");
-    input.value="";
-    gotoView("config", document.querySelector('[title="Configurações"]'));
-    return;
-  }
-
   const mesAno=_selectedCardMes||monthKey();
   if(statusEl) statusEl.textContent="📄 Lendo arquivo...";
 
@@ -10579,7 +10564,7 @@ RESPONDA APENAS COM JSON VÁLIDO:
 
   try{
     if(statusEl) statusEl.textContent="🔍 Classificando transações com IA...";
-    const result = await aiDirectCall(prompt, 2000);
+    const result = await aiProxyCall(prompt, 1000, "claude-3-haiku-20240307");
 
     // Import transactions
     const txIds=[];

@@ -1,9 +1,5 @@
 {
   "functions": {
-    "api/ai-proxy.js": {
-      "memory": 512,
-      "maxDuration": 60
-    },
     "api/assembly-token.js": {
       "memory": 128,
       "maxDuration": 10
