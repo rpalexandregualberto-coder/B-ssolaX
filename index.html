@@ -6598,20 +6598,25 @@ function _parseAIResponse(raw){
   }
   try{ return JSON.parse(clean); }
   catch(e){
-    // JSON truncado: tenta recuperar transações completas
-    const items=[];
-    const txStart = clean.indexOf('"transacoes"');
-    if(txStart >= 0){
-      const after = clean.slice(txStart);
+    // JSON truncado: recupera objetos completos de qualquer array principal
+    const arrayKeys = ['"transacoes"', '"cats"', '"transactions"'];
+    for(const key of arrayKeys){
+      const keyIdx = clean.indexOf(key);
+      if(keyIdx < 0) continue;
+      const items=[];
       const objRe = /\{[^{}]*?\}/g;
       let m;
-      while((m = objRe.exec(after)) !== null){
+      while((m = objRe.exec(clean.slice(keyIdx))) !== null){
         try{ items.push(JSON.parse(m[0])); }catch(_){}
       }
-    }
-    if(items.length > 0){
-      console.warn(`JSON truncado — ${items.length} transações recuperadas`);
-      return { transacoes: items, resumo: { total_transacoes: items.length, observacoes: "Resposta foi truncada — algumas transações podem ter sido perdidas." } };
+      if(items.length > 0){
+        const keyName = key.replace(/"/g,'');
+        console.warn(`JSON truncado — ${items.length} itens recuperados de "${keyName}"`);
+        const result = {};
+        result[keyName] = items;
+        if(keyName === 'transacoes') result.resumo = { total_transacoes: items.length, observacoes: "Resposta truncada — verifique se todas as transações foram importadas." };
+        return result;
+      }
     }
     throw new Error("Resposta da IA inválida: " + e.message.slice(0,80));
   }
@@ -9528,14 +9533,25 @@ JSON SOMENTE:
       FIN_TRANSACTIONS.push(newTx);
       importedIds.push(newId);
     });
-    if(duplicados.length) console.log(`[Import] ${duplicados.length} duplicatas ignoradas:`, duplicados);
+    const catsOk = importedIds.length > 0 ? Object.keys(catMap).length : 0;
+    const semCat = importedIds.length - catsOk;
+    console.log(`[Import] ${nubankTxsRaw.length} no CSV → ${importedIds.length} importadas | ${duplicados.length} duplicatas | ${catsOk} categorizadas pela IA | ${semCat} em "Outros"`);
+    if(duplicados.length) console.log('[Import] Duplicatas ignoradas:', duplicados);
     matchFixasFromTransactions();
     const _fut2=isFuturo||!!window._finImportFuturo;
-    if(statusText) statusText.textContent=`✅ ${importedIds.length} transações importadas${_fut2?" (pendentes — fatura em aberto)":""}!`;
-    setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },2500);
+    const msgExtra = duplicados.length>0 ? ` (${duplicados.length} duplicata${duplicados.length>1?"s":""} ignorada${duplicados.length>1?"s":""})` : "";
+    if(statusText) statusText.textContent=`✅ ${importedIds.length}/${nubankTxsRaw.length} transações importadas${_fut2?" · pendentes":""}${msgExtra}`;
+    setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },3500);
     renderFinanceiro(); try{ saveData(); }catch(e){}
     const totalLiq=nubankTxsRaw.reduce((s,t)=>s+t.valor,0);
-    const resumoCSV={total_transacoes:importedIds.length,total_saidas:nubankTxsRaw.filter(t=>t.valor>0).reduce((s,t)=>s+t.valor,0),saldo_periodo:totalLiq,periodo:mesLabel,observacoes:`CSV Nubank processado diretamente. Total líquido: R$ ${totalLiq.toFixed(2)}`};
+    const resumoCSV={
+      total_transacoes:importedIds.length,
+      total_entradas:nubankTxsRaw.filter(t=>t.valor<0&&!t.estorno).reduce((s,t)=>s+Math.abs(t.valor),0),
+      total_saidas:nubankTxsRaw.filter(t=>t.valor>0).reduce((s,t)=>s+t.valor,0),
+      saldo_periodo:totalLiq,
+      periodo:mesLabel,
+      observacoes:`CSV Nubank: ${nubankTxsRaw.length} lidas, ${importedIds.length} importadas, ${duplicados.length} duplicatas ignoradas. Total líquido: R$ ${totalLiq.toFixed(2)}`
+    };
     setTimeout(()=>showImportReview(importedIds,resumoCSV),600);
     event.target.value=""; return;
   }
