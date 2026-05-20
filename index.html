@@ -3678,12 +3678,12 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div class="fin-hero-item">
         <div class="fin-hero-label">🔴 Total Despesas</div>
         <div class="fin-hero-val negative" id="fin-total-despesas">R$ 0,00</div>
-        <div class="fin-hero-sub">fixas + extras</div>
+        <div class="fin-hero-sub" id="fin-despesas-sub">fixas + extras + cartão</div>
       </div>
       <div class="fin-hero-item">
-        <div class="fin-hero-label">📅 Lançamentos Futuros</div>
+        <div class="fin-hero-label">⏳ Fatura em Aberto</div>
         <div class="fin-hero-val" style="color:var(--orange)" id="fin-total-cartao">R$ 0,00</div>
-        <div class="fin-hero-sub">fatura do cartão</div>
+        <div class="fin-hero-sub">pendente — pagar no próximo mês</div>
       </div>
       <div class="fin-hero-item">
         <div class="fin-hero-label">📊 Saldo Líquido</div>
@@ -8521,19 +8521,25 @@ function renderFinanceiro(){
   const chartType=document.getElementById("fin-chart-type")?.value||"conta";
 
   // Aggregate by tipo
-  const entradas   = tx.filter(t=>t.tipo==="receita");
-  const despExtras = tx.filter(t=>t.tipo==="despesa_extra");
-  const despFixasTx= tx.filter(t=>t.tipo==="despesa_fixa");
-  const cartaoTx   = tx.filter(t=>t.tipo==="cartao");
-  const investTx   = tx.filter(t=>t.tipo==="investimento");
+  const entradas    = tx.filter(t=>t.tipo==="receita");
+  const despExtras  = tx.filter(t=>t.tipo==="despesa_extra");
+  const despFixasTx = tx.filter(t=>t.tipo==="despesa_fixa");
+  const cartaoTx    = tx.filter(t=>t.tipo==="cartao");
+  const investTx    = tx.filter(t=>t.tipo==="investimento");
+
+  // Cartão pago (futuro=false) entra no total de despesas; futuro fica separado
+  const cartaoPago   = cartaoTx.filter(t=>!t.futuro);
+  const cartaoFuturo = cartaoTx.filter(t=>t.futuro);
 
   const totalEntradas  = entradas.reduce((s,t)=>s+t.valor,0);
   const totalExtras    = despExtras.reduce((s,t)=>s+t.valor,0);
   const totalFixasTx   = despFixasTx.reduce((s,t)=>s+t.valor,0);
   const fixasMes       = getFixas();
   const totalFixasCad  = fixasMes.reduce((s,f)=>s+f.valor,0);
-  const totalDespesas  = totalExtras + totalFixasCad + totalFixasTx;
+  const totalCartaoPago= cartaoPago.reduce((s,t)=>s+t.valor,0);
+  const totalDespesas  = totalExtras + totalFixasCad + totalFixasTx + totalCartaoPago;
   const totalCartao    = cartaoTx.reduce((s,t)=>s+t.valor,0);
+  const totalFuturo    = cartaoFuturo.reduce((s,t)=>s+Math.abs(t.valor),0);
   const totalInvest    = investTx.reduce((s,t)=>s+t.valor,0);
   const saldo          = totalEntradas - totalDespesas;
   const fixasPagas     = fixasMes.filter(f=>f.paga).length;
@@ -8543,8 +8549,11 @@ function renderFinanceiro(){
   const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   setEl("fin-total-receitas",fmtBRL(totalEntradas));
   setEl("fin-total-despesas",fmtBRL(totalDespesas));
-  setEl("fin-total-cartao",fmtBRL(totalCartao));
-  setEl("fin-cartao-total-label",fmtBRL(totalCartao));
+  setEl("fin-despesas-sub", totalCartaoPago>0
+    ? `fixas + extras + cartão (R$ ${fmtBRL(totalCartaoPago)} cartão)`
+    : "fixas + extras + cartão");
+  setEl("fin-total-cartao", fmtBRL(totalFuturo)); // só fatura em aberto/pendente
+  setEl("fin-cartao-total-label",fmtBRL(totalCartaoPago)); // cartão pago (na seção cartão)
   setEl("fin-saldo",fmtBRL(saldo));
   setEl("fin-saldo-status",saldo>=0?"✅ Positivo":"⚠️ Déficit");
   setEl("fin-month-label",FIN_MONTHS[finMonth]+" "+finYear);
@@ -9489,22 +9498,28 @@ JSON SOMENTE:
     const catMap={};
     (catResult.cats||[]).forEach(c=>{ catMap[c.i]=c.cat; });
 
-    const importedIds=[];
+    const importedIds=[], duplicados=[];
     nubankTxsRaw.forEach((tx,i)=>{
+      // Deduplicação: pula se já existe tx com mesmo nome+valor+data
+      const jaExiste = FIN_TRANSACTIONS.some(e=>
+        e.nome===tx.nome &&
+        Math.abs(e.valor)===Math.abs(tx.valor) &&
+        e.data===tx.data &&
+        e.tipo==="cartao"
+      );
+      if(jaExiste){ duplicados.push(tx.nome); return; }
+
       const newId=nextFinId++;
       const newTx={
         id:newId, nome:tx.nome, nome_original:tx.nome,
         valor:Math.abs(tx.valor),
         tipo: tx.estorno ? "cartao" : (tipo==="fatura"?"cartao":(tx.valor<0?"despesa_extra":"receita")),
         categoria:catMap[i]||"Outros",
-        // Fatura de cartão: força data pro mês da importação (ciclo pode cruzar meses)
-        data: tipo==="fatura" ? `${dataDefault.slice(0,7)}-${tx.data.slice(8)}` : tx.data,
-        data_real: tx.data,
-        mes_fatura: dataDefault.slice(0,7),
+        data: tx.data,
         origem:"ia",
         estorno: tx.estorno||false
       };
-      if(tx.estorno) newTx.valor=-Math.abs(tx.valor); // estorno reduz o total
+      if(tx.estorno) newTx.valor=-Math.abs(tx.valor);
       const _futuro=(typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
       if(_futuro) newTx.futuro=true;
       const _vId=(typeof vinculoId!=="undefined")?vinculoId:window._finImportVinculoId;
@@ -9513,6 +9528,7 @@ JSON SOMENTE:
       FIN_TRANSACTIONS.push(newTx);
       importedIds.push(newId);
     });
+    if(duplicados.length) console.log(`[Import] ${duplicados.length} duplicatas ignoradas:`, duplicados);
     matchFixasFromTransactions();
     const _fut2=isFuturo||!!window._finImportFuturo;
     if(statusText) statusText.textContent=`✅ ${importedIds.length} transações importadas${_fut2?" (pendentes — fatura em aberto)":""}!`;
