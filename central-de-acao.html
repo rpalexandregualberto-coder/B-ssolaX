@@ -6596,7 +6596,25 @@ function _parseAIResponse(raw){
     if(m) clean = m[0];
     else throw new Error("IA não retornou JSON. Recebido: "+raw.slice(0,120));
   }
-  return JSON.parse(clean);
+  try{ return JSON.parse(clean); }
+  catch(e){
+    // JSON truncado: tenta recuperar transações completas
+    const items=[];
+    const txStart = clean.indexOf('"transacoes"');
+    if(txStart >= 0){
+      const after = clean.slice(txStart);
+      const objRe = /\{[^{}]*?\}/g;
+      let m;
+      while((m = objRe.exec(after)) !== null){
+        try{ items.push(JSON.parse(m[0])); }catch(_){}
+      }
+    }
+    if(items.length > 0){
+      console.warn(`JSON truncado — ${items.length} transações recuperadas`);
+      return { transacoes: items, resumo: { total_transacoes: items.length, observacoes: "Resposta foi truncada — algumas transações podem ter sido perdidas." } };
+    }
+    throw new Error("Resposta da IA inválida: " + e.message.slice(0,80));
+  }
 }
 
 // ── Via Proxy Vercel (reuniões, relatórios — prompts menores) ──
@@ -9401,12 +9419,12 @@ Histórico: ${histStr||"nenhum"}
 TEXTO:
 ${textClean}
 
-RESPONDA SÓ COM JSON (sem markdown):
-{"resumo":{"total_transacoes":0,"total_entradas":0.00,"total_saidas":0.00,"saldo_periodo":0.00,"periodo":"${mesLabel}","saude_financeira":"boa","alertas":[],"assinaturas_detectadas":[],"insight_comportamental":"","observacoes":""},"transacoes":[{"nome":"nome limpo","nome_original":"original","valor":0.00,"tipo":"receita|despesa_extra|despesa_fixa|investimento|cartao","categoria":"categoria","data":"YYYY-MM-DD","confianca":90,"padrao":"único|recorrente|assinatura|parcelado|suspeito","needsReview":false,"motivo_review":""}]}`;
+RESPONDA SÓ COM JSON COMPACTO (sem markdown, sem espaços extras):
+{"transacoes":[{"nome":"texto","valor":0.00,"tipo":"receita|despesa_extra|despesa_fixa|investimento|cartao","categoria":"cat","data":"YYYY-MM-DD"}]}`;
 
   try{
     if(statusText) statusText.textContent="🔍 Classificando transações com IA...";
-    const result = await aiProxyCall(aiPrompt, 1000, "claude-sonnet-4-5");
+    const result = await aiProxyCall(aiPrompt, 3000, "claude-sonnet-4-5");
     let count=0;
     const importedIds = [];
     (result.transacoes||[]).forEach(tx=>{
@@ -10522,49 +10540,13 @@ TEXTO DA FATURA
 ${text.replace(/\0/g,"").replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ").replace(/ {4,}/g,"   ").slice(0,4500)}
 
 ════════════════════
-RESPONDA APENAS COM JSON VÁLIDO:
+RESPONDA APENAS COM JSON COMPACTO (sem markdown):
 ════════════════════
-{
-  "resumo": {
-    "total_fatura": 0.00,
-    "total_compras": 0.00,
-    "total_parcelamentos": 0.00,
-    "total_assinaturas": 0.00,
-    "qtd_transacoes": 0,
-    "periodo": "${mesLabel}",
-    "saude_financeira": "boa|regular|atenção|crítica",
-    "alertas": ["alerta 1"],
-    "assinaturas_detectadas": ["Netflix", "Spotify"],
-    "insight_comportamental": "análise profunda do comportamento de consumo",
-    "diagnostico": "diagnóstico honesto como analista financeiro senior"
-  },
-  "scores": {
-    "saude_cartao": 75,
-    "comprometimento": 45,
-    "risco_endividamento": 30,
-    "projecao_prox_fatura": 0
-  },
-  "parcelamentos_ativos": [
-    {"nome":"iPhone 15","parcela_atual":2,"parcela_total":12,"valor_parcela":489.00,"impacto_futuro":4890.00}
-  ],
-  "transacoes": [
-    {
-      "nome": "nome limpo e legível",
-      "nome_original": "como aparece na fatura",
-      "valor": 99.90,
-      "categoria": "categoria da lista",
-      "data": "YYYY-MM-DD",
-      "parcela_atual": 1,
-      "parcela_total": 1,
-      "confianca": 95,
-      "padrao": "único|recorrente|assinatura|parcelado|suspeito"
-    }
-  ]
-}`;
+{"transacoes":[{"nome":"texto","valor":0.00,"categoria":"cat","data":"YYYY-MM-DD","parcela_atual":1,"parcela_total":1}]}`;
 
   try{
     if(statusEl) statusEl.textContent="🔍 Classificando transações com IA...";
-    const result = await aiProxyCall(prompt, 1000, "claude-sonnet-4-5");
+    const result = await aiProxyCall(prompt, 3000, "claude-sonnet-4-5");
 
     // Import transactions
     const txIds=[];
