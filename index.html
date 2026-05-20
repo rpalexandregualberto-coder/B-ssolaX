@@ -9406,7 +9406,7 @@ RESPONDA SÓ COM JSON (sem markdown):
 
   try{
     if(statusText) statusText.textContent="🔍 Classificando transações com IA...";
-    const result = await aiProxyCall(aiPrompt, 1000, "claude-haiku-4-5");
+    const result = await aiProxyCall(aiPrompt, 1000, "claude-sonnet-4-5");
     let count=0;
     const importedIds = [];
     (result.transacoes||[]).forEach(tx=>{
@@ -10564,7 +10564,7 @@ RESPONDA APENAS COM JSON VÁLIDO:
 
   try{
     if(statusEl) statusEl.textContent="🔍 Classificando transações com IA...";
-    const result = await aiProxyCall(prompt, 1000, "claude-haiku-4-5");
+    const result = await aiProxyCall(prompt, 1000, "claude-sonnet-4-5");
 
     // Import transactions
     const txIds=[];
