@@ -9413,53 +9413,62 @@ async function processFinFile(event, tipo){
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },4000);
     event.target.value=""; return;
   }
-  // Sanitize: remove null bytes, control chars, keep only printable + newlines
+  // Sanitize e envia TUDO — streaming não tem limite de tempo
   const textClean = text
     .replace(/\0/g,"")
     .replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ")
     .replace(/ {4,}/g,"   ")
-    .slice(0,4500); // 4.5k chars → Haiku processa em ~3s dentro do limite Vercel
-  if(statusText) statusText.textContent=`🧠 Motor financeiro inteligente processando...`;
+    .slice(0,15000); // até 15k chars — streaming aguenta
+  if(statusText) statusText.textContent=`🧠 Analisando ${tipo==="fatura"?"fatura":"extrato"} completo...`;
 
   const mesLabel = FIN_MONTHS[finMonth]+" "+finYear;
-  const catsList  = tipo==="fatura"
-    ? FIN_CATS.cartao.join(", ")
-    : [...FIN_CATS.receita,...FIN_CATS.despesa_extra,...FIN_CATS.investimento].join(", ");
+  const catsFatura = FIN_CATS.cartao.join(", ");
+  const catsExtrato = [...FIN_CATS.receita,...FIN_CATS.despesa_extra,...(FIN_CATS.despesa_fixa||[]),...FIN_CATS.investimento].join(", ");
+  const catsList = tipo==="fatura" ? catsFatura : catsExtrato;
 
   // Histórico de categorias para autoaprendizado contextual
   const histCats = {};
-  FIN_TRANSACTIONS.slice(-100).forEach(t=>{
-    const k = (t.nome||"").toLowerCase().slice(0,15);
+  FIN_TRANSACTIONS.slice(-200).forEach(t=>{
+    const k = (t.nome||"").toLowerCase().slice(0,20);
     if(k) histCats[k] = t.categoria;
   });
-  const histStr = Object.entries(histCats).slice(0,20).map(([k,v])=>`"${k}" → ${v}`).join("; ");
+  const histStr = Object.entries(histCats).slice(0,30).map(([k,v])=>`"${k}"→${v}`).join("; ");
 
   const dataDefault = `${finYear}-${String(finMonth+1).padStart(2,"0")}-15`;
 
-  const aiPrompt=`Extraia transações financeiras do texto abaixo e retorne JSON.
+  const aiPrompt=`Você é um especialista em finanças pessoais brasileiras. Extraia TODAS as transações do documento abaixo sem deixar nenhuma de fora.
 
-TIPO: ${tipo==="fatura"?"FATURA DE CARTÃO (compras=cartao, estornos=receita)":"EXTRATO BANCÁRIO (PIX/salário recebido=receita, PIX enviado/compras=despesa_extra, fixas recorrentes=despesa_fixa, CDB/RDB=investimento)"}
-PERÍODO: ${mesLabel} | DATA PADRÃO: ${dataDefault}
-VALORES: float puro em reais — R$24.039,55 → 24039.55 (NUNCA 24.03955)
+REGRAS ABSOLUTAS:
+1. Extraia TODAS as transações — não pule nenhuma
+2. Não duplique lançamentos
+3. VALORES: float puro em reais — R$24.039,55 → 24039.55 (NUNCA 24.03955)
+4. Remova pontos de milhar, converta vírgula decimal em ponto
+5. Estornos/créditos em fatura = tipo "receita", valor positivo
 
-CATEGORIAS: ${catsList}
+TIPO DO DOCUMENTO: ${tipo==="fatura"?"FATURA DE CARTÃO DE CRÉDITO":"EXTRATO BANCÁRIO / PIX"}
+PERÍODO: ${mesLabel} | DATA PADRÃO QUANDO NÃO INFORMADA: ${dataDefault}
 
-REGRAS RÁPIDAS:
-iFood/Ifood*→iFood | Uber/99/Cabify→Uber/Transporte | Netflix/Spotify/Amazon→Assinatura
-Mercado/Assaí/Atacadão→Mercado | FACEBK/Meta Ads→Tráfego Pago | RDB/CDB→RDB/CDB
-Farmácia/Drogasil→Farmácia/Saúde | PIX recebido→PIX Recebido | Salário/comissão→Salário/Comissão
-Nubank/Daycoval/EVOY/MIDWAY/Escola=despesa_fixa | padaria/restaurante/bistro→Restaurante
-Histórico: ${histStr||"nenhum"}
+CATEGORIAS DISPONÍVEIS:
+${catsList}
 
-TEXTO:
+REGRAS DE CATEGORIZAÇÃO:
+iFood/IFOOD → iFood | Uber/99/Cabify → Uber/Transporte | Netflix/Spotify/YouTube Premium → Assinatura/Streaming
+Mercado/Assaí/Atacadão/Supermercado → Mercado | FACEBK/Meta Ads/Google Ads → Tráfego Pago
+Farmácia/Drogasil/Droga Raia → Farmácia/Saúde | PIX recebido → PIX Recebido
+Salário/comissão → Salário/Comissão | Nubank/fatura/Daycoval/financeira → despesa_fixa
+Padaria/Restaurante/Bistro/Lanchonete → Restaurante | Posto/Combustível/Shell/BR → Combustível
+Amazon/Shopee/Mercado Livre → Compras Online | Escola/Faculdade/Curso → Educação
+${histStr ? `\nHistórico do usuário: ${histStr}` : ""}
+
+DOCUMENTO:
 ${textClean}
 
-RESPONDA SÓ COM JSON COMPACTO (sem markdown, sem espaços extras):
-{"transacoes":[{"nome":"texto","valor":0.00,"tipo":"receita|despesa_extra|despesa_fixa|investimento|cartao","categoria":"cat","data":"YYYY-MM-DD"}]}`;
+RESPONDA SOMENTE COM JSON VÁLIDO (sem markdown, sem texto fora do JSON):
+{"transacoes":[{"nome":"nome limpo","valor":0.00,"tipo":"${tipo==="fatura"?"cartao":"receita|despesa_extra|despesa_fixa|investimento"}","categoria":"categoria","data":"YYYY-MM-DD"}]}`;
 
   try{
-    if(statusText) statusText.textContent="🔍 Classificando transações com IA...";
-    const result = await aiProxyCallStream(aiPrompt, 3000);
+    if(statusText) statusText.textContent="🔍 Classificando todas as transações...";
+    const result = await aiProxyCallStream(aiPrompt, 8192);
     let count=0;
     const importedIds = [];
     (result.transacoes||[]).forEach(tx=>{
@@ -10572,16 +10581,16 @@ crescimento anormal, compras duplicadas, gastos noturnos, dependência de crédi
 ════════════════════
 TEXTO DA FATURA
 ════════════════════
-${text.replace(/\0/g,"").replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ").replace(/ {4,}/g,"   ").slice(0,4500)}
+${text.replace(/\0/g,"").replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ").replace(/ {4,}/g,"   ").slice(0,15000)}
 
 ════════════════════
-RESPONDA APENAS COM JSON COMPACTO (sem markdown):
+RESPONDA APENAS COM JSON VÁLIDO (sem markdown, sem texto fora do JSON):
 ════════════════════
-{"transacoes":[{"nome":"texto","valor":0.00,"categoria":"cat","data":"YYYY-MM-DD","parcela_atual":1,"parcela_total":1}]}`;
+{"transacoes":[{"nome":"nome limpo","valor":0.00,"categoria":"categoria","data":"YYYY-MM-DD","parcela_atual":1,"parcela_total":1}]}`;
 
   try{
-    if(statusEl) statusEl.textContent="🔍 Classificando transações com IA...";
-    const result = await aiProxyCallStream(prompt, 3000);
+    if(statusEl) statusEl.textContent="🔍 Classificando todas as transações...";
+    const result = await aiProxyCallStream(prompt, 8192);
 
     // Import transactions
     const txIds=[];
