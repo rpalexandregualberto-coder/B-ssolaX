@@ -2542,6 +2542,38 @@ textarea.form-input{border-radius:16px;resize:vertical}
 .dash-mais-val{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--green)}
 .dash-mais-sub{font-size:.7rem;color:var(--dim);margin-top:3px}
 
+/* ══ DESPESAS FIXAS — redesign ══ */
+.fixas-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.fixas-progress-wrap{margin-bottom:14px}
+.fixas-progress-track{height:8px;background:var(--border);border-radius:99px;overflow:hidden;margin:6px 0 4px}
+.fixas-progress-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.fixas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fixa-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;transition:all .18s;position:relative;overflow:hidden}
+.fixa-card.paga{opacity:.62;border-color:var(--green-border);background:var(--green-dim)}
+.fixa-card.vencida{border-color:rgba(255,77,109,.35);background:rgba(255,77,109,.04)}
+.fixa-card-top{display:flex;align-items:flex-start;gap:9px;margin-bottom:8px}
+.fixa-cat-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.fixa-card-info{flex:1;min-width:0}
+.fixa-card-nome{font-size:.78rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fixa-card-sub{font-size:.62rem;color:var(--muted);margin-top:1px}
+.fixa-card-valor{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;color:var(--red);text-align:right;white-space:nowrap}
+.fixa-card-valor.paga{color:var(--green)}
+.fixa-card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.fixa-venc-badge{font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:6px}
+.fixa-venc-hoje{background:rgba(255,77,109,.15);color:var(--red)}
+.fixa-venc-semana{background:rgba(245,166,35,.15);color:var(--orange)}
+.fixa-venc-ok{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.fixa-venc-paga{background:var(--green-dim);color:var(--green)}
+.fixa-check-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .2s;flex-shrink:0}
+.fixa-check-btn.done{border-color:var(--green);background:var(--green);color:#fff}
+
+/* ══ PROJEÇÃO DE CAIXA ══ */
+.proj-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 22px;margin-bottom:14px;box-shadow:var(--card-shadow)}
+.proj-bars{display:flex;align-items:flex-end;gap:3px;height:70px;margin-top:10px;overflow:hidden}
+.proj-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;cursor:default}
+.proj-bar{width:100%;border-radius:3px 3px 0 0;min-height:2px;transition:height .4s}
+.proj-bar-lbl{font-size:.44rem;color:var(--muted);text-align:center;white-space:nowrap}
+
 /* ══ META FINANCEIRA ══ */
 .fin-meta-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 22px;margin-bottom:14px;box-shadow:var(--card-shadow)}
 .fin-meta-bar-track{height:10px;background:var(--border);border-radius:99px;overflow:hidden;margin:10px 0 6px}
@@ -3625,6 +3657,29 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div id="fin-orcamento-list" style="margin-top:10px"></div>
     </div>
 
+    <!-- PROJEÇÃO DE CAIXA + RESUMO CATEGORIAS POR DIA -->
+    <div class="proj-card">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--blue)">📈 Projeção de Saldo — Próximos 30 Dias</div>
+          <div style="font-size:.65rem;color:var(--muted);margin-top:2px">Baseado nas contas fixas cadastradas · saldo atual das contas</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--text)" id="proj-saldo-atual">R$ 0</div>
+          <div style="font-size:.6rem;color:var(--muted)">saldo hoje</div>
+        </div>
+      </div>
+      <div class="proj-bars" id="proj-bars">
+        <div style="color:var(--muted);font-size:.72rem;padding:16px">Cadastre contas e despesas fixas para ver a projeção.</div>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:6px;font-size:.62rem;color:var(--muted)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--green);display:inline-block"></span>Saldo positivo</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--orange);display:inline-block"></span>Alerta</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--red);display:inline-block"></span>Negativo</span>
+        <span id="proj-critico-msg" style="margin-left:auto;font-weight:700;color:var(--orange)"></span>
+      </div>
+    </div>
+
     <!-- Main grid -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
 
@@ -3703,9 +3758,22 @@ textarea.form-input{border-radius:16px;resize:vertical}
           <button class="btn btn-primary" style="padding:4px 10px;font-size:.68rem" onclick="toggleFixaForm()">+ Nova</button>
         </div>
         <div id="fin-fixa-form" style="display:none;padding:12px 18px;border-bottom:1px solid var(--border)">
-          <div style="display:grid;grid-template-columns:1fr 100px 80px;gap:8px">
+          <div style="display:grid;grid-template-columns:1fr 100px;gap:8px;margin-bottom:8px">
             <input class="fin-input" id="fixa-nome" placeholder="Nome (ex: Aluguel, Nubank...)">
             <input class="fin-input" id="fixa-val" type="number" placeholder="Valor R$">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <select class="fin-input" id="fixa-cat">
+              <option value="habitacao">🏠 Habitação</option>
+              <option value="transporte">🚗 Transporte</option>
+              <option value="assinaturas">📱 Assinaturas</option>
+              <option value="saude">💊 Saúde</option>
+              <option value="educacao">📚 Educação</option>
+              <option value="alimentacao">🍽️ Alimentação</option>
+              <option value="financiamento">🏦 Financiamento</option>
+              <option value="seguro">🛡️ Seguro</option>
+              <option value="outros">📋 Outros</option>
+            </select>
             <select class="fin-input" id="fixa-dia">
               <option value="1">Dia 1</option><option value="2">Dia 2</option>
               <option value="3">Dia 3</option><option value="4">Dia 4</option>
@@ -3723,7 +3791,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
               <option value="27">Dia 27</option><option value="28">Dia 28</option>
             </select>
           </div>
-          <button class="btn btn-primary" onclick="addContaFixa()" style="margin-top:9px;font-size:.73rem">Salvar</button>
+          <button class="btn btn-primary" onclick="addContaFixa()" style="font-size:.73rem">Salvar Conta Fixa</button>
         </div>
         <div class="fin-card-body" style="padding:12px 18px">
           <div id="fin-fixas-list"></div>
@@ -7004,8 +7072,9 @@ function addContaFixa(){
   const nome=(document.getElementById("fixa-nome")?.value||"").trim();
   const val=parseFloat(document.getElementById("fixa-val")?.value)||0;
   const dia=parseInt(document.getElementById("fixa-dia")?.value)||1;
+  const cat=document.getElementById("fixa-cat")?.value||"outros";
   if(!nome){alert("Informe o nome da conta.");return;}
-  getFixas().push({id:nextFixaId++,nome,valor:val,dia,paga:false});
+  getFixas().push({id:nextFixaId++,nome,valor:val,dia,paga:false,cat});
   document.getElementById("fixa-nome").value="";
   document.getElementById("fixa-val").value="";
   toggleFixaForm();
@@ -7367,7 +7436,7 @@ function renderFinanceiro(){
   renderMetaFinanceira();
   renderTopCategoria();
 
-  // Despesas Fixas (snapshot mensal independente)
+  // Despesas Fixas — redesign estilo Mobills/Organizze
   const fixasList=document.getElementById("fin-fixas-list");
   if(fixasList){
     const fixasAtual = getFixas();
@@ -7382,28 +7451,171 @@ function renderFinanceiro(){
       }
       fixasList.innerHTML=`<div style="text-align:center;padding:14px;color:var(--muted);font-size:.75rem">Sem contas fixas pra <strong style="color:var(--accent)">${FIN_MONTHS[finMonth]}/${finYear}</strong>.${copyBtn}</div>`;
     } else {
-      const fixTotal=fixasAtual.reduce((s,f)=>s+f.valor,0);
-      fixasList.innerHTML=`
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:.7rem;color:var(--muted)">
-          <span>Total ${FIN_MONTHS[finMonth]}/${finYear}</span>
-          <span style="font-family:'Outfit',sans-serif;font-weight:800;color:var(--orange)">${fmtBRL(fixTotal)}</span>
-        </div>`+
-      fixasAtual.map(f=>`
-        <div class="fin-fixed-item">
-          <div style="flex:1">
-            <div class="fin-fixed-name">${f.nome}</div>
-            <div style="font-size:.62rem;color:var(--muted)">Dia ${f.dia} de cada mês</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <input type="number" value="${f.valor||''}" placeholder="R$"
-              onchange="updateFixaValor(${f.id},this.value)"
-              style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 8px;width:100px;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:${f.valor>0?'var(--red)':'var(--muted)'};text-align:right;outline:none">
-            <button class="fin-fixed-status ${f.paga?"paga":"pendente"}" onclick="toggleContaPaga(${f.id})" style="cursor:pointer;border:none;font-family:'Inter',sans-serif">${f.paga?"✓ Paga":"Pendente"}</button>
-            <button onclick="deleteContaFixa(${f.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.72rem">✕</button>
-          </div>
-        </div>`).join("");
+      renderFixasCards(fixasAtual);
     }
   }
+
+  // Projeção de Caixa
+  renderProjecaoCaixa(totalEntradas, totalDespesas);
+}
+
+// ── MAPA DE CATEGORIAS FIXAS ────────────────────────────
+const FIXA_CAT_MAP = {
+  habitacao:     {icon:"🏠", label:"Habitação",     bg:"rgba(91,143,238,.15)",  color:"var(--blue)"},
+  transporte:    {icon:"🚗", label:"Transporte",     bg:"rgba(52,197,122,.12)",  color:"var(--green)"},
+  assinaturas:   {icon:"📱", label:"Assinaturas",    bg:"rgba(160,122,232,.15)", color:"var(--purple)"},
+  saude:         {icon:"💊", label:"Saúde",          bg:"rgba(255,59,48,.1)",    color:"var(--red)"},
+  educacao:      {icon:"📚", label:"Educação",       bg:"rgba(245,166,35,.12)",  color:"var(--orange)"},
+  alimentacao:   {icon:"🍽️", label:"Alimentação",    bg:"rgba(255,149,0,.12)",   color:"#ff9500"},
+  financiamento: {icon:"🏦", label:"Financiamento",  bg:"rgba(91,143,238,.12)",  color:"var(--blue)"},
+  seguro:        {icon:"🛡️", label:"Seguro",         bg:"rgba(52,197,122,.1)",   color:"var(--green)"},
+  outros:        {icon:"📋", label:"Outros",          bg:"var(--surface)",        color:"var(--dim)"},
+};
+
+function renderFixasCards(fixas){
+  const el = document.getElementById("fin-fixas-list");
+  if(!el) return;
+  const today = new Date();
+  const todayDay = today.getDate();
+  const fixTotal = fixas.reduce((s,f)=>s+f.valor,0);
+  const fixPagas = fixas.filter(f=>f.paga).length;
+  const fixPagasVal = fixas.filter(f=>f.paga).reduce((s,f)=>s+f.valor,0);
+  const pct = fixTotal > 0 ? Math.round(fixPagasVal/fixTotal*100) : 0;
+  const corBarra = pct >= 80 ? "var(--green)" : pct >= 50 ? "var(--orange)" : "var(--red)";
+
+  // Header com progresso
+  const header = `
+    <div class="fixas-header">
+      <div>
+        <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700">Total do Mês</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:900;color:var(--text)">${fmtBRL(fixTotal)}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700">Pagas</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:900;color:var(--green)">${fixPagas}/${fixas.length}</div>
+      </div>
+    </div>
+    <div class="fixas-progress-wrap">
+      <div style="display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted)">
+        <span>Pago: ${fmtBRL(fixPagasVal)}</span>
+        <span style="color:${corBarra};font-weight:700">${pct}%</span>
+      </div>
+      <div class="fixas-progress-track">
+        <div class="fixas-progress-fill" style="width:${pct}%;background:${corBarra}"></div>
+      </div>
+    </div>`;
+
+  // Ordenar: vencidas/hoje primeiro, depois por dia, pagas por último
+  const sorted = [...fixas].sort((a,b)=>{
+    if(a.paga && !b.paga) return 1;
+    if(!a.paga && b.paga) return -1;
+    return a.dia - b.dia;
+  });
+
+  const cards = sorted.map(f=>{
+    const cat = FIXA_CAT_MAP[f.cat||"outros"] || FIXA_CAT_MAP.outros;
+    const diasRestantes = f.dia - todayDay;
+    let vencBadge, vencClass;
+    if(f.paga){
+      vencBadge="✓ Paga"; vencClass="fixa-venc-paga";
+    } else if(diasRestantes < 0){
+      vencBadge=`Venceu dia ${f.dia}`; vencClass="fixa-venc-hoje";
+    } else if(diasRestantes === 0){
+      vencBadge="Vence HOJE"; vencClass="fixa-venc-hoje";
+    } else if(diasRestantes <= 5){
+      vencBadge=`${diasRestantes}d`; vencClass="fixa-venc-semana";
+    } else {
+      vencBadge=`Dia ${f.dia}`; vencClass="fixa-venc-ok";
+    }
+    const cardClass = f.paga ? "paga" : (diasRestantes < 0 ? "vencida" : "");
+    return `<div class="fixa-card ${cardClass}">
+      <div class="fixa-card-top">
+        <div class="fixa-cat-icon" style="background:${cat.bg}">${cat.icon}</div>
+        <div class="fixa-card-info">
+          <div class="fixa-card-nome" title="${escHtml(f.nome)}">${escHtml(f.nome)}</div>
+          <div class="fixa-card-sub">${cat.label}</div>
+        </div>
+        <div>
+          <div class="fixa-card-valor ${f.paga?'paga':''}">${fmtBRL(f.valor||0)}</div>
+        </div>
+      </div>
+      <div class="fixa-card-foot">
+        <span class="fixa-venc-badge ${vencClass}">${vencBadge}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="fixa-check-btn ${f.paga?'done':''}" onclick="toggleContaPaga(${f.id})" title="${f.paga?'Marcar como pendente':'Marcar como paga'}">${f.paga?"✓":"○"}</button>
+          <button onclick="deleteContaFixa(${f.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.72rem;padding:2px 4px" title="Remover">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
+  el.innerHTML = header + `<div class="fixas-grid">${cards}</div>`;
+}
+
+// ── PROJEÇÃO DE CAIXA 30 DIAS ────────────────────────────
+function renderProjecaoCaixa(totalEntradas, totalDespesas){
+  const barsEl = document.getElementById("proj-bars");
+  const saldoEl = document.getElementById("proj-saldo-atual");
+  const criticoEl = document.getElementById("proj-critico-msg");
+  if(!barsEl) return;
+
+  // Saldo atual = soma saldos das contas
+  const saldoAtual = typeof saldoConta==="function"
+    ? FIN_CONTAS.reduce((s,c)=>s+saldoConta(c.id),0)
+    : 0;
+
+  if(saldoEl) saldoEl.textContent = fmtBRL(saldoAtual);
+
+  const fixas = getFixas().filter(f=>!f.paga);
+  if(!fixas.length && saldoAtual === 0){
+    barsEl.innerHTML = '<div style="color:var(--muted);font-size:.72rem;padding:16px">Cadastre contas e despesas fixas para ver a projeção.</div>';
+    return;
+  }
+
+  // Projetar 30 dias
+  const today = new Date();
+  const todayDay = today.getDate();
+  const daysInMonth = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
+
+  const dias = [];
+  let saldoProj = saldoAtual;
+  for(let i=0; i<30; i++){
+    const d = new Date(today);
+    d.setDate(d.getDate()+i);
+    const dayOfMonth = d.getDate();
+    // Deduzir fixas que vencem neste dia (ainda não pagas)
+    const saidas = fixas.filter(f=>f.dia===dayOfMonth).reduce((s,f)=>s+f.valor,0);
+    saldoProj -= saidas;
+    dias.push({d:i+1, dia:dayOfMonth, saldo:saldoProj, saida:saidas});
+  }
+
+  const minSaldo = Math.min(...dias.map(d=>d.saldo), 0);
+  const maxSaldo = Math.max(...dias.map(d=>d.saldo), 1);
+  const range = maxSaldo - minSaldo || 1;
+
+  // Contar dias críticos
+  const diasNegativos = dias.filter(d=>d.saldo<0).length;
+  if(criticoEl){
+    if(diasNegativos > 0){
+      criticoEl.textContent = `⚠️ ${diasNegativos} dia${diasNegativos>1?"s":""} com saldo negativo projetado`;
+      criticoEl.style.color = "var(--red)";
+    } else {
+      criticoEl.textContent = "✓ Saldo positivo em todos os dias";
+      criticoEl.style.color = "var(--green)";
+    }
+  }
+
+  // Exibir apenas a cada 2 dias para caber melhor
+  const filtered = dias.filter((_,i)=>i%2===0||dias[i].saida>0);
+  barsEl.innerHTML = filtered.map(d=>{
+    const pct = Math.max(2, Math.round((d.saldo - minSaldo) / range * 100));
+    const cor = d.saldo < 0 ? "var(--red)" : d.saldo < maxSaldo * 0.2 ? "var(--orange)" : "var(--green)";
+    const hasEvent = d.saida > 0;
+    return `<div class="proj-bar-col" title="Dia ${d.dia}: ${fmtBRL(d.saldo)}${hasEvent?" (vence conta)":""}">
+      <div class="proj-bar" style="height:${pct}%;background:${cor};${hasEvent?"outline:2px solid rgba(255,255,255,.3)":""}"></div>
+      <div class="proj-bar-lbl">${d.dia}</div>
+    </div>`;
+  }).join("");
 }
 
 // ── SAÚDE FINANCEIRA ─────────────────────────────
