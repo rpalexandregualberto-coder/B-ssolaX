@@ -6600,11 +6600,11 @@ function _parseAIResponse(raw){
 }
 
 // ── Via Proxy Vercel (reuniões, relatórios — prompts menores) ──
-async function aiProxyCall(prompt, maxTokens=8192){
+async function aiProxyCall(prompt, maxTokens=8192, model="claude-sonnet-4-5"){
   const resp = await fetch("/api/ai-proxy",{
     method:"POST",
     headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
-    body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:maxTokens,messages:[{role:"user",content:prompt}]})
+    body:JSON.stringify({model,max_tokens:maxTokens,messages:[{role:"user",content:prompt}]})
   });
   const respText = await resp.text();
   if(!resp.ok){
@@ -9381,115 +9381,30 @@ async function processFinFile(event, tipo){
 
   const dataDefault = `${finYear}-${String(finMonth+1).padStart(2,"0")}-15`;
 
-  const prompt=`Você é uma IA especialista em Open Finance, engenharia financeira, conciliação bancária, classificação semântica de transações e análise comportamental financeira. Atua como motor financeiro inteligente de altíssima precisão.
+  const prompt=`Extraia transações financeiras do texto abaixo e retorne JSON.
 
-════════════════════
-REGRAS ABSOLUTAS
-════════════════════
-1. NUNCA ignore uma transação — se tiver 80 linhas, retorne 80 transações
-2. NUNCA descarte linhas incompletas — processe semanticamente
-3. NUNCA invente transações — só extraia o que está no texto
-4. NUNCA deixe transação sem categoria — use "Outros" se incerto
-5. NUNCA duplique lançamentos
-6. NUNCA altere valores originais
-7. SEMPRE categorize com nível de confiança
-8. SEMPRE valide o total — saldo_periodo = total_entradas − total_saidas
+TIPO: ${tipo==="fatura"?"FATURA DE CARTÃO (compras=cartao, estornos=receita)":"EXTRATO BANCÁRIO (PIX/salário recebido=receita, PIX enviado/compras=despesa_extra, fixas recorrentes=despesa_fixa, CDB/RDB=investimento)"}
+PERÍODO: ${mesLabel} | DATA PADRÃO: ${dataDefault}
+VALORES: float puro em reais — R$24.039,55 → 24039.55 (NUNCA 24.03955)
 
-════════════════════
-TIPO DE DOCUMENTO
-════════════════════
-${tipo==="fatura"
-  ? "FATURA DE CARTÃO DE CRÉDITO\n- Todas as compras = tipo 'cartao'\n- Créditos, estornos, pagamentos = tipo 'receita'\n- Parcelamentos: detectar e indicar 'parcelado' no padrão"
-  : "EXTRATO BANCÁRIO\n- PIX recebido, salário, comissão, transferências recebidas = tipo 'receita'\n- PIX enviado, compras, débito = tipo 'despesa_extra'\n- Contas fixas (Nubank, Aluguel, TERANET, Daycoval, EVOY, MIDWAY, Escola) = tipo 'despesa_fixa'\n- Aplicações, CDB, RDB, investimentos = tipo 'investimento'"}
+CATEGORIAS: ${catsList}
 
-Período de referência: ${mesLabel}
-Data padrão (quando não identificada): ${dataDefault}
+REGRAS RÁPIDAS:
+iFood/Ifood*→iFood | Uber/99/Cabify→Uber/Transporte | Netflix/Spotify/Amazon→Assinatura
+Mercado/Assaí/Atacadão→Mercado | FACEBK/Meta Ads→Tráfego Pago | RDB/CDB→RDB/CDB
+Farmácia/Drogasil→Farmácia/Saúde | PIX recebido→PIX Recebido | Salário/comissão→Salário/Comissão
+Nubank/Daycoval/EVOY/MIDWAY/Escola=despesa_fixa | padaria/restaurante/bistro→Restaurante
+Histórico: ${histStr||"nenhum"}
 
-════════════════════
-CATEGORIAS DISPONÍVEIS
-════════════════════
-${catsList}
-
-Regras específicas do usuário:
-- iFood, Ifood* → 🍔 iFood
-- Pão e Vinho, Doce Pão, padaria → 🥖 Padaria
-- Bistro19, Rancho do Cupim, restaurante, lanchonete → 🍽️ Restaurante
-- Uber, 99taxi, Cabify, INDRIVER → 🚗 Uber / Transporte
-- Mega, Mercadão, Assaí, Atacadão, Extra, supermercado → 🛒 Mercado
-- Conveniência, posto combustível, BR café → 🏪 Conveniência
-- RDB, CDB, Tesouro, aplicação automática → 📈 RDB / CDB
-- PIX recebido, transferência recebida → 📨 PIX Recebido
-- Salário, comissão, gratificação → 💼 Salário / Comissão
-- Netflix, Spotify, Amazon, Apple, Google, Globoplay → 📱 Assinatura
-- FACEBK, Meta Ads, Google Ads → 📣 Tráfego Pago
-- Farmácia, Drogasil, Droga Raia → 💊 Farmácia / Saúde
-
-Nomes abreviados bancários comuns:
-- IFOOD*PEDIDO → iFood
-- UBER TRIP → Uber / Transporte
-- GOOGLE TEMP → Assinatura
-- FACEBK ADS → Tráfego Pago
-- MERCPAGO → Marketplace / Transferência
-- PAG*NOME → PIX / Transferência pessoal
-- *APPLE.COM → Assinatura
-- NETFLIX → Assinatura
-
-Histórico de categorizações anteriores (use para aprendizado contextual):
-${histStr||"(sem histórico ainda)"}
-
-════════════════════
-ANÁLISE COMPORTAMENTAL
-════════════════════
-Detecte e informe no resumo:
-- gastos emocionais / impulsivos (muitas microtransações, horários noturnos)
-- assinaturas recorrentes esquecidas
-- cobranças anormais ou duplicadas
-- concentração de gastos em categorias específicas
-- inconsistências no saldo
-- padrões incomuns
-
-════════════════════
-TEXTO DO DOCUMENTO
-════════════════════
+TEXTO:
 ${textClean}
 
-════════════════════
-RESPONDA APENAS COM JSON VÁLIDO (sem markdown):
-════════════════════
-{
-  "resumo": {
-    "total_transacoes": 0,
-    "total_entradas": 0.00,
-    "total_saidas": 0.00,
-    "saldo_periodo": 0.00,
-    "periodo": "${mesLabel}",
-    "saude_financeira": "boa|regular|atenção|crítica",
-    "alertas": ["alerta detectado 1", "alerta 2"],
-    "inconsistencias": ["inconsistência 1"],
-    "padroes_detectados": ["padrão recorrente 1"],
-    "assinaturas_detectadas": ["Netflix", "Spotify"],
-    "insight_comportamental": "análise do comportamento financeiro detectado",
-    "observacoes": "observação geral relevante"
-  },
-  "transacoes": [
-    {
-      "nome": "nome limpo e legível",
-      "nome_original": "como aparece no extrato",
-      "valor": 99.90,
-      "tipo": "receita|despesa_extra|despesa_fixa|investimento|cartao",
-      "categoria": "categoria exata da lista",
-      "data": "YYYY-MM-DD",
-      "confianca": 97,
-      "padrao": "único|recorrente|assinatura|parcelado|suspeito",
-      "needsReview": false,
-      "motivo_review": "motivo se needsReview=true"
-    }
-  ]
-}`;
+RESPONDA SÓ COM JSON (sem markdown):
+{"resumo":{"total_transacoes":0,"total_entradas":0.00,"total_saidas":0.00,"saldo_periodo":0.00,"periodo":"${mesLabel}","saude_financeira":"boa","alertas":[],"assinaturas_detectadas":[],"insight_comportamental":"","observacoes":""},"transacoes":[{"nome":"nome limpo","nome_original":"original","valor":0.00,"tipo":"receita|despesa_extra|despesa_fixa|investimento|cartao","categoria":"categoria","data":"YYYY-MM-DD","confianca":90,"padrao":"único|recorrente|assinatura|parcelado|suspeito","needsReview":false,"motivo_review":""}]}`;
 
   try{
     if(statusText) statusText.textContent="🔍 Identificando e classificando transações...";
-    const result = await aiDirectCall(prompt, 4096);
+    const result = await aiProxyCall(prompt, 2048, "claude-3-haiku-20240307");
     let count=0;
     const importedIds = [];
     (result.transacoes||[]).forEach(tx=>{
@@ -10649,7 +10564,7 @@ RESPONDA APENAS COM JSON VÁLIDO:
 }`;
 
   try{
-    const result = await aiDirectCall(prompt, 4096);
+    const result = await aiProxyCall(prompt, 2048, "claude-3-haiku-20240307");
 
     // Import transactions
     const txIds=[];
