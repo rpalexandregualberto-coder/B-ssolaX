@@ -9463,16 +9463,21 @@ async function processFinFile(event, tipo){
 
 CATEGORIAS: ${catsList}
 
-REGRAS:
-iFood/IFOOD→iFood | Uber/99Food→Uber/Transporte | Netflix/Spotify/Prime/Canva→Assinatura/Streaming
-Mercado/Atacado/Supermercado/Gbarbosa/Hortifruti/Petz→Mercado | Farmácia/Drogasil/Raia/Droga→Farmácia/Saúde
-Padaria/Restaurante/Bistro/Lanchonete/Brasa/Bar/Delivery/Food→Restaurante | Posto/Combustível/Shell→Combustível
-Shopee/MercadoLivre/Amazon/Lojas/Renner/Kalunga→Compras Online | Hotel/Pousada/Hostel→Viagem
-Uber/Localiza/Latam/Aero→Viagem/Transporte | Academia/Esporte/Laser→Saúde/Esporte
-Allure/Gestao/Intermediacao/Credito/Financeiro/Limite convertido→Financeiro/Crédito
-IOF→Juros/IOF | Anthropic/SaaS/Software/Jusbrasil→SaaS/Software | Borale/Espacolaser/Barbearia→Beleza/Estética
-Condominio→Moradia | Jim.Com/Distribuidora/Bvista→Outros
-${histStr?`\nHistórico: ${histStr}`:""}
+REGRAS (use o conhecimento geral de marcas brasileiras além destas):
+iFood/IFOOD→iFood | Uber/99Food/99 Food→Uber/Transporte | Netflix/Spotify/Prime/Canva/Apple/Google→Assinatura/Streaming
+Mercado/Atacado/Supermercado/Gbarbosa/Hortifruti/Petz/Mix Litoral/Total Alameda/Total Atacado/Mixbahia/Conveniencias/Conveniencia→Mercado
+Farmácia/Drogasil/Raia/Raia60/Drogaria/Droga/Farma/Vitta→Farmácia/Saúde
+Madero/Padaria/Restaurante/Bistro/Lanchonete/Brasa/Bar /Delivery/Food/Bistro/Bemgelada/Buffalos/Bruttus/Espetto/Malagueta/Fogao/Gaucho/Barracadamore/Cappta/Broadway/Tunait/Beira Rio/Casa dos Paes/Anchos/Grill/Sal e Brasa/Mp *Bistro→Restaurante
+Posto/Auto Posto/Combustivel/Shell/Petrobras/Bom Samaritano/Ralpha/Jurema→Combustível
+Hotel/Pousada/Hostel/Sol Alphaville/Espelho D Agua/Hospedaria→Viagem/Hospedagem
+Localiza/Latam/Aero/Asa*→Viagem/Transporte
+Riachuelo/Renner/Kalunga/Shopee/MercadoLivre/Amazon/Lojas/Wepink/Hav Shopping/Ri Happy/1001 Coisas/Bel Cosmeticos/Mundo Magico/Distribuidora→Compras/Lazer
+Academia/Esporte/Arena/Skyfit→Saúde/Esporte
+Allure/Gestao.*Credito/Intermediacao.*Credito/Limite convertido/Velmond/Cairo Brendo/Raimundo Alves→Financeiro/Crédito
+Anthropic/Jusbrasil→SaaS/Software | Espacolaser/Barbearia/Bestbarbe/Helix/Borale/Sarahlealpere→Beleza/Estética
+Condominio/Alphaville→Moradia | NuTag→Pedágio/Mobilidade
+Zig*/Zigpay/Ingressodigital/Eda Shows/Mp *Marileide/Gabrielaribeiroda/Gestao Compartilhada/Jim.Com/Bvista/Natividade/Multmais/Eliascopos/Jetshr→Lazer/Outros
+${histStr?`\nHistórico do usuário (prioridade máxima): ${histStr}`:""}
 
 TRANSAÇÕES (índice|nome):
 ${nomes}
