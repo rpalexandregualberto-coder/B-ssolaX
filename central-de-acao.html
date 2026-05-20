@@ -9363,7 +9363,7 @@ async function processFinFile(event, tipo){
     .replace(/\0/g,"")
     .replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ")
     .replace(/ {4,}/g,"   ")
-    .slice(0,9000); // 9k chars = ~2k tokens, evita timeout 504
+    .slice(0,4500); // 4.5k chars → Haiku processa em ~3s dentro do limite Vercel
   if(statusText) statusText.textContent=`🧠 Motor financeiro inteligente processando...`;
 
   const mesLabel = FIN_MONTHS[finMonth]+" "+finYear;
@@ -9404,7 +9404,14 @@ RESPONDA SÓ COM JSON (sem markdown):
 
   try{
     if(statusText) statusText.textContent="🔍 Identificando e classificando transações...";
-    const result = await aiProxyCall(prompt, 2048, "claude-3-haiku-20240307");
+    let result;
+    try{
+      result = await aiProxyCall(prompt, 1500, "claude-3-haiku-20240307");
+    } catch(proxyErr){
+      // Fallback: chama Anthropic direto do browser se proxy falhar (504/timeout)
+      if(statusText) statusText.textContent="🔄 Processando diretamente...";
+      result = await aiDirectCall(prompt, 1500);
+    }
     let count=0;
     const importedIds = [];
     (result.transacoes||[]).forEach(tx=>{
@@ -10520,7 +10527,7 @@ crescimento anormal, compras duplicadas, gastos noturnos, dependência de crédi
 ════════════════════
 TEXTO DA FATURA
 ════════════════════
-${text.replace(/\0/g,"").replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ").replace(/ {4,}/g,"   ").slice(0,9000)}
+${text.replace(/\0/g,"").replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ").replace(/ {4,}/g,"   ").slice(0,4500)}
 
 ════════════════════
 RESPONDA APENAS COM JSON VÁLIDO:
@@ -10564,7 +10571,13 @@ RESPONDA APENAS COM JSON VÁLIDO:
 }`;
 
   try{
-    const result = await aiProxyCall(prompt, 2048, "claude-3-haiku-20240307");
+    let result;
+    try{
+      result = await aiProxyCall(prompt, 1500, "claude-3-haiku-20240307");
+    } catch(proxyErr){
+      if(statusEl) statusEl.textContent="🔄 Processando diretamente...";
+      result = await aiDirectCall(prompt, 1500);
+    }
 
     // Import transactions
     const txIds=[];
