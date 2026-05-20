@@ -6229,8 +6229,8 @@ Responda APENAS com o JSON. Seja brutalmente honesto, estratégico e profundamen
 
     const raw=(data.content||[]).map(b=>b.text||"").join("").trim();
     if(!raw) throw new Error("Resposta vazia da API");
-
-    const clean=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    let clean=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    if(!clean.startsWith("{")){const m2=clean.match(/\{[\s\S]*\}/);if(m2)clean=m2[0];else throw new Error("JSON inválido: "+raw.slice(0,80));}
     const parsed=JSON.parse(clean);
 
     m.analyzed=true; m.aiData=parsed;
@@ -7376,11 +7376,17 @@ Responda APENAS com o JSON.`;
         messages:[{role:"user",content:prompt}]
       })
     });
+    if(!resp.ok){
+      let em="Erro API "+resp.status;
+      try{const ed=await resp.json();em=ed?.error?.message||em;}catch(_){}
+      throw new Error(em);
+    }
     const data = await resp.json();
-    if(!resp.ok) throw new Error(data?.error?.message||"Erro na API");
     const raw=(data.content||[]).map(b=>b.text||"").join("").trim();
-    const clean=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
-    const r = JSON.parse(clean);
+    if(!raw) throw new Error("Resposta vazia da IA");
+    let cleanR=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    if(!cleanR.startsWith("{")){const mR=cleanR.match(/\{[\s\S]*\}/);if(mR)cleanR=mR[0];else throw new Error("JSON inválido: "+raw.slice(0,80));}
+    const r = JSON.parse(cleanR);
 
     const weekStr = new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"long",year:"numeric"});
     const esc = s => (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -9313,11 +9319,24 @@ async function processFinFile(event, tipo){
 
   const text=await new Promise((res,rej)=>{
     const r=new FileReader();
-    r.onload=e=>res(e.target.result);
+    r.onload=e=>{
+      const content=e.target.result;
+      // Detect binary PDF (não copiável): começa com %PDF mas é ilegível
+      if(content.startsWith("%PDF") && content.length > 100 && !content.includes("BT\n") && !/[a-zA-ZÀ-ú]{4,}/.test(content.slice(0,500))){
+        rej("PDF protegido ou sem texto copiável. Exporte como CSV/OFX ou copie o texto da fatura e cole num arquivo .txt");
+      } else {
+        res(content);
+      }
+    };
     r.onerror=()=>rej("Erro ao ler arquivo");
     r.readAsText(file,"UTF-8");
   });
 
+  if(!text||text.trim().length<20){
+    if(statusText) statusText.textContent="❌ Arquivo sem conteúdo legível. Use .txt, .csv ou .ofx";
+    setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },4000);
+    event.target.value=""; return;
+  }
   if(statusText) statusText.textContent=`🧠 Motor financeiro inteligente processando...`;
 
   const mesLabel = FIN_MONTHS[finMonth]+" "+finYear;
@@ -9448,10 +9467,21 @@ RESPONDA APENAS COM JSON VÁLIDO (sem markdown):
       headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
       body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:8192,messages:[{role:"user",content:prompt}]})
     });
+    if(!resp.ok){
+      let errMsg="Erro API "+resp.status;
+      try{ const errData=await resp.json(); errMsg=errData?.error?.message||errMsg; }catch(_){}
+      throw new Error(errMsg);
+    }
     const data=await resp.json();
-    if(!resp.ok) throw new Error(data?.error?.message||"Erro API");
     const raw=(data.content||[]).map(b=>b.text||"").join("").trim();
-    const clean=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    if(!raw) throw new Error("Resposta vazia da IA. Verifique sua API key.");
+    // Robust JSON extraction: try clean markdown fences, then extract first {...} block
+    let clean=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    if(!clean.startsWith("{")){
+      const m=clean.match(/\{[\s\S]*\}/);
+      if(m) clean=m[0];
+      else throw new Error("IA não retornou JSON válido. Resposta: "+raw.slice(0,120));
+    }
     const result=JSON.parse(clean);
     let count=0;
     const importedIds = [];
@@ -10614,10 +10644,20 @@ RESPONDA APENAS COM JSON VÁLIDO:
       headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
       body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:8192,messages:[{role:"user",content:prompt}]})
     });
+    if(!resp.ok){
+      let errMsg="Erro API "+resp.status;
+      try{ const errData=await resp.json(); errMsg=errData?.error?.message||errMsg; }catch(_){}
+      throw new Error(errMsg);
+    }
     const data=await resp.json();
-    if(!resp.ok) throw new Error(data?.error?.message||"Erro API");
     const raw=(data.content||[]).map(b=>b.text||"").join("").trim();
-    const clean=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    if(!raw) throw new Error("Resposta vazia da IA. Verifique sua API key.");
+    let clean=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    if(!clean.startsWith("{")){
+      const m=clean.match(/\{[\s\S]*\}/);
+      if(m) clean=m[0];
+      else throw new Error("IA não retornou JSON. Resposta: "+raw.slice(0,120));
+    }
     const result=JSON.parse(clean);
 
     // Import transactions
