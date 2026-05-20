@@ -9298,6 +9298,13 @@ async function processFinFile(event, tipo){
   const statusEl=document.getElementById("fin-ai-status");
   const statusText=document.getElementById("fin-ai-status-text");
 
+  // Verifica API key — upload usa chamada direta (sem proxy) pra evitar timeout
+  const _apiKey = localStorage.getItem("central_acao_apikey")||"";
+  if(!_apiKey || !_apiKey.startsWith("sk-ant-")){
+    alert("⚠️ Para importar via IA, configure sua API key da Anthropic em ⚙️ Configurações.\n\nÉ gratuito criar: platform.anthropic.com");
+    event.target.value=""; return;
+  }
+
   // Pergunta a qual conta/cartao a importacao se refere
   let vinculoId = null;
   if(tipo === "fatura"){
@@ -9403,15 +9410,8 @@ RESPONDA SÓ COM JSON (sem markdown):
 {"resumo":{"total_transacoes":0,"total_entradas":0.00,"total_saidas":0.00,"saldo_periodo":0.00,"periodo":"${mesLabel}","saude_financeira":"boa","alertas":[],"assinaturas_detectadas":[],"insight_comportamental":"","observacoes":""},"transacoes":[{"nome":"nome limpo","nome_original":"original","valor":0.00,"tipo":"receita|despesa_extra|despesa_fixa|investimento|cartao","categoria":"categoria","data":"YYYY-MM-DD","confianca":90,"padrao":"único|recorrente|assinatura|parcelado|suspeito","needsReview":false,"motivo_review":""}]}`;
 
   try{
-    if(statusText) statusText.textContent="🔍 Identificando e classificando transações...";
-    let result;
-    try{
-      result = await aiProxyCall(prompt, 1500, "claude-3-haiku-20240307");
-    } catch(proxyErr){
-      // Fallback: chama Anthropic direto do browser se proxy falhar (504/timeout)
-      if(statusText) statusText.textContent="🔄 Processando diretamente...";
-      result = await aiDirectCall(prompt, 1500);
-    }
+    if(statusText) statusText.textContent="🔍 Classificando transações com IA...";
+    const result = await aiDirectCall(prompt, 2000);
     let count=0;
     const importedIds = [];
     (result.transacoes||[]).forEach(tx=>{
@@ -10453,7 +10453,10 @@ async function uploadCardFatura(cardId, input){
   if(!file) return;
   const statusEl=document.getElementById(`cc-upload-status-${cardId}`);
   const userApiKey=localStorage.getItem("central_acao_apikey")||"";
-  if(!userApiKey){ alert("Configure sua API key da Anthropic em Configurações."); return; }
+  if(!userApiKey||!userApiKey.startsWith("sk-ant-")){
+    alert("⚠️ Para analisar a fatura com IA, configure sua API key da Anthropic em ⚙️ Configurações.\n\nÉ gratuito criar: platform.anthropic.com");
+    input.value=""; return;
+  }
 
   const mesAno=_selectedCardMes||monthKey();
   if(statusEl) statusEl.textContent="📄 Lendo arquivo...";
@@ -10571,13 +10574,8 @@ RESPONDA APENAS COM JSON VÁLIDO:
 }`;
 
   try{
-    let result;
-    try{
-      result = await aiProxyCall(prompt, 1500, "claude-3-haiku-20240307");
-    } catch(proxyErr){
-      if(statusEl) statusEl.textContent="🔄 Processando diretamente...";
-      result = await aiDirectCall(prompt, 1500);
-    }
+    if(statusEl) statusEl.textContent="🔍 Classificando transações com IA...";
+    const result = await aiDirectCall(prompt, 2000);
 
     // Import transactions
     const txIds=[];
