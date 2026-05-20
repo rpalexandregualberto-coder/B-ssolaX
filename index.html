@@ -792,6 +792,55 @@ input[type="date"]{color-scheme:light}
 .ai-dialog-line{display:flex;flex-direction:column;gap:2px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.03)}
 .ai-dialog-speaker{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 .ai-dialog-text{font-size:.81rem;line-height:1.6;color:var(--text)}
+/* ══ AI MEETING INTELLIGENCE ══ */
+.ai-score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:4px}
+.ai-score-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;text-align:center;position:relative;overflow:hidden}
+.ai-score-val{font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:900;line-height:1}
+.ai-score-lbl{font-size:.58rem;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.ai-score-bar{height:3px;border-radius:99px;margin-top:6px;background:var(--border);overflow:hidden}
+.ai-score-bar-fill{height:100%;border-radius:99px;transition:width 1s ease}
+.ai-prob-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ai-prob-label{font-size:.72rem;font-weight:700;flex:1;color:var(--text)}
+.ai-prob-track{flex:2;height:10px;background:var(--border);border-radius:99px;overflow:hidden}
+.ai-prob-fill{height:100%;border-radius:99px;transition:width 1s ease}
+.ai-prob-num{font-size:.75rem;font-weight:800;min-width:36px;text-align:right}
+.ai-risk-badge{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:6px}
+.ai-risk-alto{background:rgba(255,77,109,.15);color:var(--red);border:1px solid rgba(255,77,109,.3)}
+.ai-risk-medio{background:rgba(245,166,35,.12);color:var(--orange);border:1px solid rgba(245,166,35,.3)}
+.ai-risk-baixo{background:rgba(52,197,122,.1);color:var(--green);border:1px solid rgba(52,197,122,.3)}
+.ai-risk-row{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-radius:10px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border)}
+.ai-risk-desc{font-size:.79rem;line-height:1.55;color:var(--text);flex:1}
+.ai-participant-card{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--border);margin-bottom:6px}
+.ai-p-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.8rem;flex-shrink:0;color:#fff}
+.ai-p-name{font-weight:700;font-size:.8rem;color:var(--text)}
+.ai-p-role{font-size:.68rem;color:var(--dim);margin-top:1px}
+.ai-p-bar-track{height:5px;background:var(--border);border-radius:99px;margin-top:6px;overflow:hidden;width:100%}
+.ai-p-bar-fill{height:100%;border-radius:99px}
+.ai-emotion-chip{display:inline-flex;align-items:center;gap:4px;font-size:.67rem;font-weight:700;padding:3px 9px;border-radius:6px;background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent)}
+.ai-lang-chip{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:5px}
+.ai-lang-alta{background:rgba(52,197,122,.12);color:var(--green)}
+.ai-lang-media{background:rgba(245,166,35,.1);color:var(--orange)}
+.ai-lang-baixa{background:rgba(255,77,109,.12);color:var(--red)}
+.ai-insight-item{font-size:.8rem;line-height:1.65;padding:8px 12px 8px 14px;border-left:3px solid var(--accent);background:var(--accent-dim);border-radius:0 10px 10px 0;margin-bottom:5px;color:var(--text)}
+.ai-plan-row{padding:10px 14px;border-radius:11px;background:var(--surface);border:1px solid var(--border);margin-bottom:6px}
+.ai-plan-problem{font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.ai-plan-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:5px}
+.ai-plan-solution{font-size:.75rem;color:var(--dim);line-height:1.55}
+.ai-prio-alta{background:rgba(255,77,109,.15);color:var(--red);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:5px}
+.ai-prio-media{background:rgba(245,166,35,.12);color:var(--orange);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:5px}
+.ai-prio-baixa{background:rgba(52,197,122,.1);color:var(--green);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:5px}
+.ai-task-new{background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px;padding:8px 12px;margin-bottom:4px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:opacity .15s}
+.ai-task-new:hover{opacity:.8}
+.ai-task-new.added{opacity:.4;text-decoration:line-through;cursor:default}
+.ai-task-urg{font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:5px;flex-shrink:0}
+.ai-geral-score{display:flex;align-items:center;gap:20px;padding:16px 20px;border-radius:14px;margin-bottom:14px}
+.ai-geral-num{font-family:'Outfit',sans-serif;font-size:3.2rem;font-weight:900;line-height:1}
+.ai-diag-box{font-size:.82rem;line-height:1.72;padding:14px 16px;border-radius:12px;background:rgba(160,122,232,.07);border:1px solid var(--accent-border);color:var(--text);font-style:italic}
+.ai-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ai-col-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.ai-col-title{font-size:.63rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.ai-col-item{font-size:.77rem;line-height:1.55;color:var(--text);padding:3px 0;border-bottom:1px solid var(--border)}
+.ai-col-item:last-child{border-bottom:none}
 
 /* ══════════════════════════════════════
    FORMS
@@ -5805,42 +5854,19 @@ async function analyzeMeeting(id){
   const card=document.getElementById(`mc-${id}`);
   if(card&&!card.classList.contains("open")) card.classList.add("open");
 
-  const _uName=(typeof USER_PROFILE!=="undefined"&&USER_PROFILE.name)?USER_PROFILE.name:"o usuário";
-  const _uRole=(typeof USER_PROFILE!=="undefined"&&USER_PROFILE.role)?USER_PROFILE.role:"profissional";
-  const _uCity=(typeof USER_PROFILE!=="undefined"&&USER_PROFILE.city)?USER_PROFILE.city:"";
-  const prompt=`Você é o assistente pessoal de ${_uName}, ${_uRole}${_uCity?" em "+_uCity:""}, que usa este sistema para organizar sua rotina.
+  const prompt=`Você é uma IA especialista em análise estratégica de reuniões corporativas, comportamento humano, semântica conversacional, gestão comercial, liderança, produtividade e inteligência operacional.
 
-Analise a seguinte reunião e retorne APENAS um JSON válido (sem markdown, sem explicações) no formato abaixo:
+Sua função NÃO é apenas resumir a reunião. Sua função é interpretar profundamente tudo que foi dito, identificar padrões ocultos, emoções, falhas operacionais, desalinhamentos, oportunidades estratégicas e produzir um relatório executivo extremamente inteligente.
 
-{
-  "resumo": "string — resumo executivo da reunião em 2-3 frases",
-  "participantes_identificados": [
-    {
-      "id": "Falante 1",
-      "perfil": "breve descrição do perfil/papel percebido na conversa (ex: tomador de decisão, cliente, técnico)",
-      "nome_provavel": "nome se mencionado na transcrição, ou null"
-    }
-  ],
-  "dialogo_reconstruido": [
-    { "falante": "Falante 1", "fala": "trecho resumido do que disse" }
-  ],
-  "alertas": ["lista de pontos críticos/riscos/urgências identificados (máx 4)"],
-  "tarefas": ["lista de tarefas geradas pela reunião, com responsável se mencionado (máx 6)"],
-  "plano_de_acao": ["lista de próximos passos concretos em ordem de prioridade (máx 5)"]
-}
+A reunião pode ter sido transcrita automaticamente. Considere possíveis erros de transcrição, frases incompletas, interrupções e vícios de linguagem. Interprete semanticamente o contexto real.
 
-INSTRUÇÕES PARA IDENTIFICAÇÃO DE FALANTES:
-- A transcrição é texto corrido capturado por microfone (sem etiquetas de quem falou)
-- Linhas separadas por "--- [pausa] ---" indicam provável troca de falante ou pausa longa
-- Identifique os falantes pela análise do conteúdo: mudanças de assunto, perguntas vs respostas, tom (autoritário/técnico/consultivo), uso de primeira pessoa ("eu quero", "meu cliente")
-- Se nomes forem mencionados na fala, use-os como identificadores
-- Se há apenas 1 falante claro, indique isso no resumo
-- No "dialogo_reconstruido", agrupe falas consecutivas do mesmo falante
-
-REUNIÃO: ${m.title}
-DATA: ${m.date}
-EQUIPE/CONTEXTO: ${m.team}
-PARTICIPANTES LISTADOS: ${m.pic}
+════════════════════
+DADOS DA REUNIÃO
+════════════════════
+Título: ${m.title}
+Data: ${m.date}
+Equipe/Contexto: ${m.team}
+Participantes listados: ${m.pic}
 
 PAUTAS:
 ${m.agenda}
@@ -5848,15 +5874,68 @@ ${m.agenda}
 TRANSCRIÇÃO BRUTA:
 ${m.transcript}
 
-Responda APENAS com o JSON. Nada mais.`;
+════════════════════
+INSTRUÇÕES DE ANÁLISE
+════════════════════
+
+Analise com profundidade máxima:
+
+PARTICIPANTES: Identifique quem fala em cada momento, grau de participação (%), lideranças dominantes, pessoas inseguras/retraídas/defensivas, conflitos implícitos. Use nomes reais da transcrição ou "Falante 1/2/3".
+
+SEMÂNTICA: Analise o significado real por trás das falas — contradições, falas evasivas, insegurança verbal, justificativas excessivas, resistência a mudanças, falta de ownership, linguagem de alta/baixa performance.
+
+EMOCIONAL: Identifique estado emocional de cada participante (Confiança / Pressão / Ansiedade / Motivação / Frustração / Medo / Empolgação / Cansaço / Agressividade / Passividade / Insegurança / Autoridade / Convicção). Quem elevou a energia, quem gerou tensão, quem estabilizou.
+
+LÍDER: Analise performance do líder — clareza, controle da reunião, capacidade de decisão, engajamento, inteligência emocional, gestão de conflitos, autoridade percebida, se falou demais/ouviu pouco, se deixou pautas soltas.
+
+OPERACIONAL: Gargalos comerciais, falhas de gestão, falta de processo, falta de acompanhamento, riscos operacionais/financeiros/comerciais/de equipe.
+
+NOTAS 0-10: lideranca, clareza, organizacao, produtividade, int_estrategica, gestao_emocional, engajamento, objetividade, eficiencia, qualidade_decisoes, execucao_provavel, geral.
+
+PROBABILIDADES: Probabilidade de execução do plano discutido (0-100%), probabilidade de sucesso operacional (0-100%), risco de a reunião não gerar resultado prático (0-100%).
+
+PLANO DE AÇÃO: Para cada problema encontrado: nível de prioridade, responsável provável, impacto, solução sugerida, prazo ideal.
+
+DIAGNÓSTICO BRUTAL: Resumo executivo + diagnóstico honesto + maior problema + maior acerto + o que ninguém percebeu.
+
+════════════════════
+RETORNE APENAS JSON VÁLIDO (sem markdown, sem explicações) neste formato exato:
+════════════════════
+{
+  "resumo_executivo": "string 2-4 frases",
+  "participantes": [
+    {"id":"Falante 1","nome":null,"papel":"string","participacao_pct":35,"estado_emocional":"Confiança","comportamento":"string","linguagem":"alta"}
+  ],
+  "scores": {"lideranca":7,"clareza":6,"organizacao":8,"produtividade":5,"int_estrategica":7,"gestao_emocional":6,"engajamento":7,"objetividade":8,"eficiencia":6,"qualidade_decisoes":7,"execucao_provavel":5,"geral":6.5},
+  "probabilidades": {"execucao_plano":65,"sucesso_operacional":58,"risco_sem_resultado":35},
+  "analise_semantica": ["insight profundo 1","insight 2","insight 3"],
+  "analise_emocional": {"clima_predominante":"string","quem_elevou":"string","quem_gerou_tensao":"string","quem_estabilizou":"string","mudancas":"string"},
+  "analise_lider": {"identificado":"string","pontos_fortes":["string"],"pontos_fracos":["string"],"avaliacao":"string"},
+  "gargalos": ["string"],
+  "problemas_ocultos": ["string"],
+  "riscos": [{"descricao":"string","tipo":"operacional","nivel":"alto"}],
+  "tarefas": [{"acao":"string","responsavel":null,"urgencia":"alta","prazo":"string"}],
+  "plano_de_acao": [{"problema":"string","prioridade":"alta","responsavel":"string","impacto":"string","solucao":"string","prazo":"string"}],
+  "diagnostico_honesto": "string",
+  "maior_problema": "string",
+  "maior_acerto": "string",
+  "o_que_ninguem_percebeu": "string",
+  "o_que_manter": ["string"],
+  "o_que_eliminar": ["string"],
+  "estrategicos": ["nomes/IDs mais estratégicos"],
+  "operacionais": ["nomes/IDs mais operacionais"],
+  "proximo_encontro": ["temas que precisam voltar na próxima reunião"]
+}
+
+Responda APENAS com o JSON. Seja brutalmente honesto, estratégico e profundamente analítico. Faça inteligência corporativa, não apenas resumo.`;
 
   try{
     const resp=await fetch("/api/ai-proxy",{
       method:"POST",
       headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
       body:JSON.stringify({
-        model:"claude-haiku-4-5-20251001",
-        max_tokens:4096,
+        model:"claude-sonnet-4-5",
+        max_tokens:8192,
         messages:[{role:"user",content:prompt}]
       })
     });
@@ -5901,47 +5980,196 @@ const SPEAKER_COLORS = ["#5b9fff","#3dffa0","#ffaa3c","#a07ae8","#ff6fd8","#ff4d
 function renderAIResult(data,meetingId){
   if(!data)return"";
 
-  // Falantes identificados
-  const participantes = data.participantes_identificados || [];
-  const speakerMap = {};
-  participantes.forEach((p,i)=>{ speakerMap[p.id] = SPEAKER_COLORS[i % SPEAKER_COLORS.length]; });
+  const esc=escHtml;
+  const COLORS=SPEAKER_COLORS||["#a07ae8","#5b9fff","#34c57a","#f5a623","#ff4d6d","#00d2ff"];
 
-  const participantesHtml = participantes.length > 0
-    ? participantes.map((p,i)=>{
-        const cor = SPEAKER_COLORS[i % SPEAKER_COLORS.length];
-        const nome = p.nome_provavel ? ` — <strong>${escHtml(p.nome_provavel)}</strong>` : "";
-        return `<div class="ai-item speaker-item" style="border-left:3px solid ${cor};padding-left:10px">
-          <span style="color:${cor};font-weight:700">${escHtml(p.id)}</span>${nome}
-          <span style="color:var(--dim);font-size:.72rem;margin-left:6px">· ${escHtml(p.perfil||"")}</span>
-        </div>`;
-      }).join("")
-    : "";
+  // ── NOTA GERAL ──
+  const geral = data.scores?.geral||0;
+  const geralColor = geral>=8?"var(--green)":geral>=6?"var(--accent)":geral>=4?"var(--orange)":"var(--red)";
+  const geralLabel = geral>=8?"Reunião de Alto Nível":geral>=6?"Boa Reunião":geral>=4?"Reunião Regular":"Reunião Crítica";
 
-  // Diálogo reconstruído
-  const dialogo = data.dialogo_reconstruido || [];
-  const dialogoHtml = dialogo.length > 1
-    ? dialogo.map(d=>{
-        const cor = speakerMap[d.falante] || "var(--dim)";
-        return `<div class="ai-dialog-line">
-          <span class="ai-dialog-speaker" style="color:${cor}">${escHtml(d.falante)}:</span>
-          <span class="ai-dialog-text">${escHtml(d.fala)}</span>
-        </div>`;
-      }).join("")
-    : "";
+  // ── SCORES GRID ──
+  const scoreItems=[
+    {k:"lideranca",       lbl:"Liderança"},
+    {k:"clareza",         lbl:"Clareza"},
+    {k:"organizacao",     lbl:"Organização"},
+    {k:"produtividade",   lbl:"Produtividade"},
+    {k:"int_estrategica", lbl:"Estratégia"},
+    {k:"gestao_emocional",lbl:"Emocional"},
+    {k:"engajamento",     lbl:"Engajamento"},
+    {k:"qualidade_decisoes",lbl:"Decisões"},
+  ];
+  const scoresHtml=scoreItems.map(s=>{
+    const v=data.scores?.[s.k]||0;
+    const c=v>=8?"var(--green)":v>=6?"var(--accent)":v>=4?"var(--orange)":"var(--red)";
+    return `<div class="ai-score-card">
+      <div class="ai-score-val" style="color:${c}">${v}</div>
+      <div class="ai-score-lbl">${s.lbl}</div>
+      <div class="ai-score-bar"><div class="ai-score-bar-fill" style="width:${v*10}%;background:${c}"></div></div>
+    </div>`;
+  }).join("");
 
-  const alertsHtml=(data.alertas||[]).map(a=>`<div class="ai-item alert-item">🚨 ${a}</div>`).join("");
-  const tasksHtml=(data.tarefas||[]).map((t,i)=>`<div class="ai-item task-item" id="ai-task-${meetingId}-${i}" onclick="addAITask(this,'${t.replace(/'/g,"\\'")}')">✅ ${t} <span style="font-size:.6rem;color:var(--dim);margin-left:6px">(clique para adicionar)</span></div>`).join("");
-  const planHtml=(data.plano_de_acao||[]).map((p,i)=>`<div class="ai-item plan-item">📌 ${i+1}. ${p}</div>`).join("");
+  // ── PROBABILIDADES ──
+  const prob=data.probabilidades||{};
+  const probHtml=`
+    <div class="ai-prob-row">
+      <span class="ai-prob-label">✅ Execução do plano</span>
+      <div class="ai-prob-track"><div class="ai-prob-fill" style="width:${prob.execucao_plano||0}%;background:var(--green)"></div></div>
+      <span class="ai-prob-num" style="color:var(--green)">${prob.execucao_plano||0}%</span>
+    </div>
+    <div class="ai-prob-row">
+      <span class="ai-prob-label">🚀 Sucesso operacional</span>
+      <div class="ai-prob-track"><div class="ai-prob-fill" style="width:${prob.sucesso_operacional||0}%;background:var(--blue)"></div></div>
+      <span class="ai-prob-num" style="color:var(--blue)">${prob.sucesso_operacional||0}%</span>
+    </div>
+    <div class="ai-prob-row">
+      <span class="ai-prob-label">⚠️ Risco sem resultado</span>
+      <div class="ai-prob-track"><div class="ai-prob-fill" style="width:${prob.risco_sem_resultado||0}%;background:var(--red)"></div></div>
+      <span class="ai-prob-num" style="color:var(--red)">${prob.risco_sem_resultado||0}%</span>
+    </div>`;
+
+  // ── PARTICIPANTES ──
+  const parts=data.participantes||[];
+  const partHtml=parts.map((p,i)=>{
+    const cor=COLORS[i%COLORS.length];
+    const langCls=`ai-lang-${p.linguagem==="alta"?"alta":p.linguagem==="baixa"?"baixa":"media"}`;
+    const langLbl=p.linguagem==="alta"?"Alta Performance":p.linguagem==="baixa"?"Baixa Performance":"Performance Média";
+    const nome=p.nome?` <strong>${esc(p.nome)}</strong>`:"";
+    return `<div class="ai-participant-card">
+      <div class="ai-p-avatar" style="background:${cor}">${(p.nome||p.id||"?").charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div class="ai-p-name">${esc(p.id)}${nome}</div>
+        <div class="ai-p-role">${esc(p.papel||"")} · <span class="ai-emotion-chip">${esc(p.estado_emocional||"")}</span> <span class="ai-lang-chip ${langCls}">${langLbl}</span></div>
+        <div class="ai-p-bar-track"><div class="ai-p-bar-fill" style="width:${p.participacao_pct||0}%;background:${cor}"></div></div>
+        <div style="font-size:.62rem;color:var(--dim);margin-top:2px">${p.participacao_pct||0}% de participação</div>
+        ${p.comportamento?`<div style="font-size:.74rem;color:var(--dim);margin-top:4px;line-height:1.5">${esc(p.comportamento)}</div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+
+  // ── ANÁLISE SEMÂNTICA ──
+  const semanticaHtml=(data.analise_semantica||[]).map(s=>`<div class="ai-insight-item">💡 ${esc(s)}</div>`).join("");
+
+  // ── ANÁLISE EMOCIONAL ──
+  const emo=data.analise_emocional||{};
+  const emoHtml=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.79rem">
+      ${emo.clima_predominante?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--accent)">Clima Geral</div><div style="color:var(--text)">${esc(emo.clima_predominante)}</div></div>`:""}
+      ${emo.quem_elevou?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--green)">⬆ Elevou energia</div><div style="color:var(--text)">${esc(emo.quem_elevou)}</div></div>`:""}
+      ${emo.quem_gerou_tensao?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--red)">⚡ Gerou tensão</div><div style="color:var(--text)">${esc(emo.quem_gerou_tensao)}</div></div>`:""}
+      ${emo.quem_estabilizou?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--blue)">🌊 Estabilizou</div><div style="color:var(--text)">${esc(emo.quem_estabilizou)}</div></div>`:""}
+    </div>
+    ${emo.mudancas?`<div style="font-size:.79rem;color:var(--dim);margin-top:8px;line-height:1.6;padding:8px 12px;background:var(--surface);border-radius:9px;border:1px solid var(--border)">${esc(emo.mudancas)}</div>`:""}`;
+
+  // ── ANÁLISE DO LÍDER ──
+  const lider=data.analise_lider||{};
+  const liderHtml=lider.identificado?`
+    <div style="margin-bottom:8px"><span style="font-weight:700;color:var(--accent)">${esc(lider.identificado)}</span>
+    <span style="font-size:.72rem;color:var(--dim);margin-left:8px">Líder identificado</span></div>
+    <div class="ai-two-col" style="margin-bottom:8px">
+      <div class="ai-col-card">${(lider.pontos_fortes||[]).map(f=>`<div class="ai-col-item">✅ ${esc(f)}</div>`).join("")}</div>
+      <div class="ai-col-card">${(lider.pontos_fracos||[]).map(f=>`<div class="ai-col-item">⚠️ ${esc(f)}</div>`).join("")}</div>
+    </div>
+    ${lider.avaliacao?`<div class="ai-diag-box" style="margin-top:0">${esc(lider.avaliacao)}</div>`:""}`:
+    `<div style="color:var(--dim);font-size:.8rem">Líder não identificado claramente</div>`;
+
+  // ── RISCOS ──
+  const riscosHtml=(data.riscos||[]).map(r=>{
+    const cls=`ai-risk-${r.nivel==="alto"?"alto":r.nivel==="medio"?"medio":"baixo"}`;
+    const icon=r.nivel==="alto"?"🔴":r.nivel==="medio"?"🟡":"🟢";
+    const tipoLbl={operacional:"Operacional",financeiro:"Financeiro",comercial:"Comercial",equipe:"Equipe"}[r.tipo]||r.tipo||"";
+    return `<div class="ai-risk-row">
+      <div>
+        <span class="ai-risk-badge ${cls}">${icon} ${r.nivel?.toUpperCase()||""}</span>
+        ${tipoLbl?`<span style="font-size:.62rem;color:var(--dim);margin-left:6px">${tipoLbl}</span>`:""}
+      </div>
+      <div class="ai-risk-desc">${esc(r.descricao)}</div>
+    </div>`;
+  }).join("");
+
+  // ── TAREFAS ──
+  const tarefasHtml=(data.tarefas||[]).map((t,i)=>{
+    const urgCls=t.urgencia==="alta"?"ai-prio-alta":t.urgencia==="baixa"?"ai-prio-baixa":"ai-prio-media";
+    const urgLbl=(t.urgencia||"média").charAt(0).toUpperCase()+(t.urgencia||"média").slice(1);
+    const acao=t.acao||t;
+    const acaoStr=typeof acao==="string"?acao:JSON.stringify(acao);
+    return `<div class="ai-task-new" id="ai-task-${meetingId}-${i}" onclick="addAITask(this,'${acaoStr.replace(/'/g,"\\'").replace(/"/g,"&quot;")}')">
+      <span class="ai-task-urg ${urgCls}">${urgLbl}</span>
+      <span style="font-size:.8rem;flex:1;color:var(--text)">✅ ${esc(acaoStr)}</span>
+      ${t.responsavel?`<span style="font-size:.65rem;color:var(--dim)">→ ${esc(t.responsavel)}</span>`:""}
+      ${t.prazo?`<span style="font-size:.62rem;color:var(--dim);flex-shrink:0">${esc(t.prazo)}</span>`:""}
+    </div>`;
+  }).join("");
+
+  // ── PLANO DE AÇÃO ──
+  const planoHtml=(data.plano_de_acao||[]).map((p,i)=>{
+    const prioCls=p.prioridade==="alta"?"ai-prio-alta":p.prioridade==="baixa"?"ai-prio-baixa":"ai-prio-media";
+    return `<div class="ai-plan-row">
+      <div class="ai-plan-problem">${i+1}. ${esc(p.problema)}</div>
+      <div class="ai-plan-meta">
+        <span class="${prioCls}">${(p.prioridade||"").toUpperCase()}</span>
+        ${p.responsavel?`<span style="font-size:.63rem;background:var(--surface);padding:2px 8px;border-radius:5px;border:1px solid var(--border);color:var(--dim)">👤 ${esc(p.responsavel)}</span>`:""}
+        ${p.prazo?`<span style="font-size:.63rem;background:var(--surface);padding:2px 8px;border-radius:5px;border:1px solid var(--border);color:var(--dim)">📅 ${esc(p.prazo)}</span>`:""}
+      </div>
+      ${p.impacto?`<div style="font-size:.72rem;color:var(--orange);margin-bottom:4px">Impacto: ${esc(p.impacto)}</div>`:""}
+      ${p.solucao?`<div class="ai-plan-solution">💡 ${esc(p.solucao)}</div>`:""}
+    </div>`;
+  }).join("");
+
+  // ── ANÁLISE EXECUTIVA FINAL ──
+  const execHtml=`
+    ${data.maior_problema?`<div class="ai-col-card" style="margin-bottom:8px;border-color:rgba(255,77,109,.3)"><div class="ai-col-title" style="color:var(--red)">🔴 Maior Problema</div><div style="font-size:.8rem;color:var(--text)">${esc(data.maior_problema)}</div></div>`:""}
+    ${data.maior_acerto?`<div class="ai-col-card" style="margin-bottom:8px;border-color:rgba(52,197,122,.3)"><div class="ai-col-title" style="color:var(--green)">✅ Maior Acerto</div><div style="font-size:.8rem;color:var(--text)">${esc(data.maior_acerto)}</div></div>`:""}
+    ${data.o_que_ninguem_percebeu?`<div class="ai-col-card" style="margin-bottom:8px;border-color:var(--accent-border);background:var(--accent-dim)"><div class="ai-col-title" style="color:var(--accent)">🔮 O que ninguém percebeu</div><div style="font-size:.8rem;color:var(--text)">${esc(data.o_que_ninguem_percebeu)}</div></div>`:""}
+    <div class="ai-two-col" style="margin-bottom:8px">
+      ${(data.o_que_manter||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--green)">✅ Manter</div>${data.o_que_manter.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(data.o_que_eliminar||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--red)">❌ Eliminar</div>${data.o_que_eliminar.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+    </div>
+    <div class="ai-two-col" style="margin-bottom:8px">
+      ${(data.estrategicos||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--blue)">♟ Mais Estratégicos</div>${data.estrategicos.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(data.operacionais||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--dim)">⚙ Mais Operacionais</div>${data.operacionais.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+    </div>
+    ${(data.proximo_encontro||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--accent)">📅 Próxima Reunião — Temas pendentes</div>${data.proximo_encontro.map(x=>`<div class="ai-col-item">↩ ${esc(x)}</div>`).join("")}</div>`:""}`;
+
+  const sec=(title,content,color="var(--accent)")=>`
+    <div class="ai-section">
+      <div class="ai-section-title" style="color:${color}">${title}</div>
+      ${content}
+    </div>`;
 
   return `<div class="ai-box">
-    <div class="ai-box-head"><div class="ai-box-title">✨ Análise da IA</div></div>
+    <div class="ai-box-head">
+      <div class="ai-box-title">🧠 Inteligência Corporativa · Análise Completa</div>
+    </div>
     <div class="ai-box-body">
-      ${data.resumo?`<div class="ai-section"><div class="ai-section-title summary">📋 Resumo Executivo</div><div class="ai-summary">${data.resumo}</div></div>`:""}
-      ${participantesHtml?`<div class="ai-section"><div class="ai-section-title" style="color:#5b9fff">🗣️ Falantes Identificados</div>${participantesHtml}</div>`:""}
-      ${dialogoHtml?`<div class="ai-section"><div class="ai-section-title" style="color:var(--accent)">💬 Diálogo Reconstruído</div><div class="ai-dialog-box">${dialogoHtml}</div></div>`:""}
-      ${alertsHtml?`<div class="ai-section"><div class="ai-section-title alerts">🚨 Alertas & Pontos Críticos</div>${alertsHtml}</div>`:""}
-      ${tasksHtml?`<div class="ai-section"><div class="ai-section-title tasks">✅ Tarefas Geradas</div>${tasksHtml}<div class="ai-add-hint">Clique em uma tarefa para adicioná-la ao seu quadro</div></div>`:""}
-      ${planHtml?`<div class="ai-section"><div class="ai-section-title plan">📌 Plano de Ação</div>${planHtml}</div>`:""}
+
+      ${sec("📋 Resumo Executivo",`<div class="ai-summary">${esc(data.resumo_executivo||"")}</div>`)}
+
+      <div class="ai-geral-score" style="background:linear-gradient(135deg,${geralColor}18,${geralColor}08);border:1px solid ${geralColor}40">
+        <div>
+          <div class="ai-geral-num" style="color:${geralColor}">${geral}</div>
+          <div style="font-size:.6rem;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Nota Geral</div>
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:.9rem;color:${geralColor}">${geralLabel}</div>
+          <div style="font-size:.72rem;color:var(--dim);margin-top:2px">Execução provável: <strong style="color:var(--text)">${data.scores?.execucao_provavel||0}/10</strong></div>
+        </div>
+      </div>
+
+      ${sec("📊 Scores da Reunião",`<div class="ai-score-grid">${scoresHtml}</div>`)}
+      ${sec("🎯 Probabilidades de Resultado",probHtml,"var(--blue)")}
+      ${parts.length?sec("🗣️ Participantes & Perfis Comportamentais",partHtml,"#5b9fff"):""}
+      ${semanticaHtml?sec("🔍 Análise Semântica & Insights Ocultos",semanticaHtml,"var(--accent)"):""}
+      ${sec("💭 Análise Emocional",emoHtml,"var(--orange)")}
+      ${lider.identificado?sec("👑 Performance do Líder",liderHtml,"#f5a623"):""}
+      ${(data.gargalos||[]).length?sec("⛔ Gargalos Identificados",`${data.gargalos.map(g=>`<div class="ai-item alert-item">⛔ ${esc(g)}</div>`).join("")}`,"var(--orange)"):""}
+      ${(data.problemas_ocultos||[]).length?sec("🕵️ Problemas Ocultos (não mencionados diretamente)",`${data.problemas_ocultos.map(p=>`<div class="ai-item" style="background:rgba(160,122,232,.08);border-left:2px solid var(--accent)">🕵️ ${esc(p)}</div>`).join("")}`,"var(--accent)"):""}
+      ${riscosHtml?sec("⚠️ Riscos Detectados",riscosHtml,"var(--red)"):""}
+      ${tarefasHtml?sec("✅ Tarefas & Responsáveis",tarefasHtml+"<div class='ai-add-hint'>Clique em uma tarefa para adicioná-la ao seu quadro</div>","var(--green)"):""}
+      ${planoHtml?sec("📌 Plano de Ação Estratégico",planoHtml,"var(--blue)"):""}
+      ${data.diagnostico_honesto?sec("🔬 Diagnóstico Brutalmente Honesto",`<div class="ai-diag-box">${esc(data.diagnostico_honesto)}</div>`):""}
+      ${sec("🏁 Análise Executiva Final",execHtml)}
+
     </div>
   </div>`;
 }
