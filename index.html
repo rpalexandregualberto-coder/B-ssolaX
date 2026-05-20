@@ -2542,6 +2542,44 @@ textarea.form-input{border-radius:16px;resize:vertical}
 .dash-mais-val{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--green)}
 .dash-mais-sub{font-size:.7rem;color:var(--dim);margin-top:3px}
 
+/* ══ FIN MODE TOGGLE ══ */
+.fin-mode-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;width:fit-content}
+.fin-mode-btn{padding:7px 20px;border-radius:8px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:800;color:var(--muted);background:transparent;transition:all .2s;display:flex;align-items:center;gap:6px}
+.fin-mode-btn.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(160,122,232,.35)}
+/* ══ FINANCIAL DASHBOARD ══ */
+.fdash-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.fdash-kpi{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:18px 20px;box-shadow:var(--card-shadow);transition:all .18s}
+.fdash-kpi:hover{transform:translateY(-2px);box-shadow:var(--card-shadow-hover)}
+.fdash-kpi-icon{font-size:1.4rem;margin-bottom:8px}
+.fdash-kpi-val{font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:900;line-height:1;letter-spacing:-.02em}
+.fdash-kpi-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:800;margin-top:5px}
+.fdash-kpi-delta{font-size:.65rem;margin-top:4px;font-weight:700}
+.fdash-row{display:grid;gap:14px;margin-bottom:16px}
+.fdash-card{background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:18px;padding:20px 22px;box-shadow:var(--card-shadow)}
+.fdash-title{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+/* Gauge circular */
+.fdash-gauge-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fdash-gauge-svg{transform:rotate(-90deg)}
+.fdash-gauge-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-top:6px}
+/* Barras horizontais */
+.fdash-hbar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.fdash-hbar-icon{font-size:1rem;flex-shrink:0;width:22px;text-align:center}
+.fdash-hbar-label{font-size:.7rem;font-weight:600;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fdash-hbar-track{flex:2;height:8px;background:var(--border);border-radius:99px;overflow:hidden}
+.fdash-hbar-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.fdash-hbar-val{font-size:.68rem;font-weight:700;color:var(--text);white-space:nowrap;min-width:64px;text-align:right}
+/* Fluxo grande */
+.fdash-fluxo-bars{display:flex;align-items:flex-end;gap:6px;height:110px;margin-top:10px}
+.fdash-fluxo-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.fdash-fluxo-bar-wrap{flex:1;display:flex;flex-direction:column;justify-content:flex-end;width:100%;gap:2px}
+.fdash-fluxo-bar{border-radius:5px 5px 0 0;width:100%;min-height:2px}
+.fdash-fluxo-lbl{font-size:.6rem;color:var(--muted);font-weight:600}
+/* Projeção grande */
+.fdash-proj-bars{display:flex;align-items:flex-end;gap:3px;height:120px;margin-top:10px}
+.fdash-proj-bar{flex:1;border-radius:3px 3px 0 0;min-height:2px;transition:height .4s;cursor:default}
+.fdash-proj-lbl{font-size:.44rem;color:var(--muted);margin-top:2px;text-align:center}
+/* Score ring */
+.fdash-score-ring{font-family:'Outfit',sans-serif;font-size:2.2rem;font-weight:900;text-align:center;line-height:1}
 /* ══ DESPESAS FIXAS — redesign ══ */
 .fixas-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .fixas-progress-wrap{margin-bottom:14px}
@@ -3417,7 +3455,19 @@ textarea.form-input{border-radius:16px;resize:vertical}
   <!-- ═══════════════ FINANCEIRO ═══════════════ -->
   <div class="view" id="view-financeiro">
 
-    <!-- HERO: Resumo Executivo + Navegação -->
+    <!-- MODE TOGGLE -->
+    <div class="fin-mode-bar">
+      <button class="fin-mode-btn active" id="fin-btn-detail" onclick="switchFinMode('detail')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Detalhes
+      </button>
+      <button class="fin-mode-btn" id="fin-btn-dash" onclick="switchFinMode('dashboard')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+    </div>
+
+    <!-- HERO: Resumo Executivo + Navegação (compartilhado pelos dois modos) -->
     <div class="fin-hero-card" id="fin-hero" style="grid-template-columns:1fr 1fr 1fr 1fr auto">
       <div class="fin-hero-item">
         <div class="fin-hero-label">🟢 Total Entradas</div>
@@ -3445,6 +3495,151 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <button class="fin-nav-btn" onclick="finNextMonth()">→</button>
       </div>
     </div>
+
+    <!-- ════ PAINEL DASHBOARD (modo visual) ════ -->
+    <div id="fin-dash-panel" style="display:none">
+
+      <!-- KPIs grandes -->
+      <div class="fdash-kpi-grid">
+        <div class="fdash-kpi">
+          <div class="fdash-kpi-icon">🟢</div>
+          <div class="fdash-kpi-val" id="fd-entradas" style="color:var(--green)">R$ 0</div>
+          <div class="fdash-kpi-lbl">Entradas</div>
+          <div class="fdash-kpi-delta" id="fd-entradas-delta"></div>
+        </div>
+        <div class="fdash-kpi">
+          <div class="fdash-kpi-icon">🔴</div>
+          <div class="fdash-kpi-val" id="fd-despesas" style="color:var(--red)">R$ 0</div>
+          <div class="fdash-kpi-lbl">Despesas</div>
+          <div class="fdash-kpi-delta" id="fd-despesas-delta"></div>
+        </div>
+        <div class="fdash-kpi">
+          <div class="fdash-kpi-icon">📊</div>
+          <div class="fdash-kpi-val" id="fd-saldo" style="color:var(--accent)">R$ 0</div>
+          <div class="fdash-kpi-lbl">Saldo Líquido</div>
+          <div class="fdash-kpi-delta" id="fd-saldo-delta"></div>
+        </div>
+        <div class="fdash-kpi">
+          <div class="fdash-kpi-icon">📈</div>
+          <div class="fdash-kpi-val" id="fd-invest" style="color:var(--blue)">R$ 0</div>
+          <div class="fdash-kpi-lbl">Investimentos</div>
+          <div class="fdash-kpi-delta" id="fd-invest-delta"></div>
+        </div>
+      </div>
+
+      <!-- Saúde + Donut (2 col) -->
+      <div class="fdash-row" style="grid-template-columns:260px 1fr">
+        <!-- Gauge de Saúde -->
+        <div class="fdash-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+          <div class="fdash-title">💚 Saúde Financeira</div>
+          <div style="position:relative;margin:6px 0">
+            <svg class="fdash-gauge-svg" width="140" height="140" viewBox="0 0 140 140" id="fd-gauge-svg">
+              <circle cx="70" cy="70" r="56" fill="none" stroke="var(--border)" stroke-width="12"/>
+              <circle cx="70" cy="70" r="56" fill="none" stroke="var(--green)" stroke-width="12"
+                stroke-dasharray="351.86" stroke-dashoffset="351.86" stroke-linecap="round"
+                id="fd-gauge-circle" style="transition:stroke-dashoffset 1s ease"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div class="fdash-score-ring" id="fd-score-num" style="color:var(--green)">—</div>
+              <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">/100</div>
+            </div>
+          </div>
+          <div style="font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:800;margin-top:4px" id="fd-score-label">aguardando</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;width:100%">
+            <div style="text-align:center;padding:8px;background:var(--surface);border-radius:10px;border:1px solid var(--border)">
+              <div style="font-size:.62rem;color:var(--muted);font-weight:700">Comprometimento</div>
+              <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:900;color:var(--text);margin-top:2px" id="fd-s-comp">—</div>
+            </div>
+            <div style="text-align:center;padding:8px;background:var(--surface);border-radius:10px;border:1px solid var(--border)">
+              <div style="font-size:.62rem;color:var(--muted);font-weight:700">Poupança</div>
+              <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:900;color:var(--text);margin-top:2px" id="fd-s-poup">—</div>
+            </div>
+            <div style="text-align:center;padding:8px;background:var(--surface);border-radius:10px;border:1px solid var(--border)">
+              <div style="font-size:.62rem;color:var(--muted);font-weight:700">Fixas/Renda</div>
+              <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:900;color:var(--text);margin-top:2px" id="fd-s-fixas">—</div>
+            </div>
+          </div>
+        </div>
+        <!-- Donut ampliado -->
+        <div class="fdash-card">
+          <div class="fdash-title">🍩 Despesas por Categoria</div>
+          <div style="display:flex;align-items:center;gap:24px">
+            <div style="position:relative;flex-shrink:0">
+              <svg id="fd-donut-svg" width="130" height="130" viewBox="0 0 100 100" style="transform:rotate(-90deg)"></svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+                <div style="font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:900;color:var(--text);line-height:1" id="fd-donut-total">—</div>
+                <div style="font-size:.52rem;color:var(--muted);margin-top:2px" id="fd-donut-cats">0 cat.</div>
+              </div>
+            </div>
+            <div style="flex:1" id="fd-donut-legend"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparativo + Fluxo Semanal + Comissões (3 col) -->
+      <div class="fdash-row" style="grid-template-columns:1fr 1fr 1fr">
+        <!-- Comparativo mensal -->
+        <div class="fdash-card">
+          <div class="fdash-title">📅 Este Mês vs Anterior</div>
+          <div id="fd-comp-content"></div>
+        </div>
+        <!-- Fluxo semanal ampliado -->
+        <div class="fdash-card">
+          <div class="fdash-title">📊 Fluxo Semanal</div>
+          <div style="display:flex;gap:12px;font-size:.62rem;margin-bottom:4px">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--green);display:inline-block"></span>Entradas</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--red);display:inline-block"></span>Despesas</span>
+          </div>
+          <div class="fdash-fluxo-bars" id="fd-fluxo-bars">
+            <div style="color:var(--muted);font-size:.72rem;padding:8px">Sem dados</div>
+          </div>
+        </div>
+        <!-- Comissões -->
+        <div class="fdash-card">
+          <div class="fdash-title">💼 Comissões do Mês</div>
+          <div id="fd-comiss-content"></div>
+        </div>
+      </div>
+
+      <!-- Fixas por categoria (barras horizontais) -->
+      <div class="fdash-row" style="grid-template-columns:1fr 1fr">
+        <div class="fdash-card">
+          <div class="fdash-title">🏠 Fixas por Categoria</div>
+          <div id="fd-fixas-cat"></div>
+        </div>
+        <!-- Meta + Top categorias -->
+        <div class="fdash-card">
+          <div class="fdash-title">🎯 Meta de Gastos</div>
+          <div id="fd-meta-content"></div>
+          <div class="fdash-title" style="margin-top:16px">📊 Top Despesas</div>
+          <div id="fd-top-cat"></div>
+        </div>
+      </div>
+
+      <!-- Projeção de caixa ampliada -->
+      <div class="fdash-card" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="fdash-title" style="margin-bottom:0">📈 Projeção de Saldo — 30 Dias</div>
+          <div style="text-align:right">
+            <span style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--text)" id="fd-proj-saldo">—</span>
+            <span style="font-size:.6rem;color:var(--muted);margin-left:5px">hoje</span>
+          </div>
+        </div>
+        <div id="fd-proj-bars" style="display:flex;align-items:flex-end;gap:3px;height:120px;margin-top:12px">
+          <div style="color:var(--muted);font-size:.72rem;padding:16px">Cadastre contas e fixas para ver.</div>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:6px;font-size:.62rem;color:var(--muted);flex-wrap:wrap">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--green);display:inline-block"></span>Positivo</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--orange);display:inline-block"></span>Alerta</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--red);display:inline-block"></span>Negativo</span>
+          <span id="fd-proj-msg" style="margin-left:auto;font-weight:700"></span>
+        </div>
+      </div>
+
+    </div><!-- /fin-dash-panel -->
+
+    <!-- ════ PAINEL DETALHES (modo lista) ════ -->
+    <div id="fin-detail-panel">
 
     <!-- ── GRID: Saúde + Comparativo + Fluxo Semanal ── -->
     <div style="display:grid;grid-template-columns:180px 1fr 1fr;gap:14px;margin-bottom:14px">
@@ -3812,7 +4007,8 @@ textarea.form-input{border-radius:16px;resize:vertical}
       </div>
 
     </div>
-  </div>
+    </div><!-- /fin-detail-panel -->
+  </div><!-- /view-financeiro -->
 
   <!-- ═══════════════ NOTAS ═══════════════ -->
   <!-- ═══════════════ RELATÓRIO SEMANAL IA ═══════════════ -->
@@ -7007,6 +7203,316 @@ function parseBRL(s){
 
 function finPrevMonth(){ finMonth--; if(finMonth<0){finMonth=11;finYear--;} renderFinanceiro(); }
 function finNextMonth(){ finMonth++; if(finMonth>11){finMonth=0;finYear++;} renderFinanceiro(); }
+
+// ══════════════════════════════════════
+//  FIN MODE TOGGLE
+// ══════════════════════════════════════
+let finMode = "detail"; // "detail" | "dashboard"
+
+function switchFinMode(mode){
+  finMode = mode;
+  const detBtn = document.getElementById("fin-btn-detail");
+  const dasBtn = document.getElementById("fin-btn-dash");
+  const detPanel = document.getElementById("fin-detail-panel");
+  const dasPanel = document.getElementById("fin-dash-panel");
+  if(mode === "dashboard"){
+    if(detBtn) detBtn.classList.remove("active");
+    if(dasBtn) dasBtn.classList.add("active");
+    if(detPanel) detPanel.style.display = "none";
+    if(dasPanel) dasPanel.style.display = "";
+    renderFinDashboard();
+  } else {
+    if(detBtn) detBtn.classList.add("active");
+    if(dasBtn) dasBtn.classList.remove("active");
+    if(detPanel) detPanel.style.display = "";
+    if(dasPanel) dasPanel.style.display = "none";
+  }
+}
+
+function renderFinDashboard(){
+  const tx = getMonthTx();
+  const mk = monthKey(finYear, finMonth);
+  const prevM = finMonth === 0 ? 11 : finMonth - 1;
+  const prevY = finMonth === 0 ? finYear - 1 : finYear;
+  const prevMk = monthKey(prevY, prevM);
+  const prevTx = FIN_TRANSACTIONS.filter(t => t.data && t.data.startsWith(prevMk));
+
+  const entradas  = tx.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0);
+  const despExtra = tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").reduce((s,t)=>s+t.valor,0);
+  const fixasCad  = getFixas().reduce((s,f)=>s+f.valor,0);
+  const despesas  = despExtra + fixasCad;
+  const invest    = tx.filter(t=>t.tipo==="investimento").reduce((s,t)=>s+t.valor,0);
+  const saldo     = entradas - despesas;
+
+  const prevEnt   = prevTx.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0);
+  const prevDesp  = prevTx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").reduce((s,t)=>s+t.valor,0);
+  const prevSaldo = prevEnt - prevDesp;
+
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+
+  // ── KPIs ──
+  setEl("fd-entradas", fmtBRL(entradas));
+  setEl("fd-despesas", fmtBRL(despesas));
+  setEl("fd-saldo", fmtBRL(saldo));
+  setEl("fd-invest", fmtBRL(invest));
+  document.getElementById("fd-saldo").style.color = saldo >= 0 ? "var(--green)" : "var(--red)";
+
+  const delta = (cur, prev, invertColors) => {
+    if(!prev) return "";
+    const d = cur - prev;
+    const pct = Math.abs(Math.round(d/prev*100));
+    const up = d >= 0;
+    const good = invertColors ? !up : up;
+    const cor = good ? "var(--green)" : "var(--red)";
+    return `<span style="color:${cor}">${up?"▲":"▼"} ${pct}% vs mês anterior</span>`;
+  };
+  const d1 = document.getElementById("fd-entradas-delta"); if(d1) d1.innerHTML = delta(entradas, prevEnt, false);
+  const d2 = document.getElementById("fd-despesas-delta"); if(d2) d2.innerHTML = delta(despesas, prevDesp, true);
+  const d3 = document.getElementById("fd-saldo-delta");   if(d3) d3.innerHTML = delta(saldo, prevSaldo, false);
+
+  // ── Gauge de Saúde ──
+  const scoreEl = document.getElementById("fd-score-num");
+  const gaugeEl = document.getElementById("fd-gauge-circle");
+  const scoreLbl = document.getElementById("fd-score-label");
+  if(scoreEl && entradas > 0){
+    const comprometimento = (despesas / entradas) * 100;
+    const poupanca = (invest / entradas) * 100;
+    const fixasPct = (fixasCad / entradas) * 100;
+    let score = 0;
+    if(comprometimento<=50) score+=50; else if(comprometimento<=70) score+=35; else if(comprometimento<=90) score+=15;
+    if(poupanca>=20) score+=30; else if(poupanca>=10) score+=20; else if(poupanca>=5) score+=10;
+    if(fixasPct<=40) score+=20; else if(fixasPct<=55) score+=12; else if(fixasPct<=70) score+=5;
+    scoreEl.textContent = score;
+    const circumference = 2 * Math.PI * 56; // 351.86
+    const offset = circumference - (score/100) * circumference;
+    const cor = score>=80?"var(--green)":score>=60?"var(--blue)":score>=40?"var(--orange)":"var(--red)";
+    scoreEl.style.color = cor;
+    if(gaugeEl){ gaugeEl.style.stroke = cor; gaugeEl.style.strokeDashoffset = offset; }
+    if(scoreLbl){
+      scoreLbl.textContent = score>=80?"Excelente 🌟":score>=60?"Boa 👍":score>=40?"Atenção ⚠️":"Crítica 🚨";
+      scoreLbl.style.color = cor;
+    }
+    setEl("fd-s-comp", Math.round(comprometimento)+"%");
+    setEl("fd-s-poup",  Math.round(poupanca)+"%");
+    setEl("fd-s-fixas", Math.round(fixasPct)+"%");
+  } else if(scoreEl) {
+    scoreEl.textContent = "—";
+    if(scoreLbl) scoreLbl.textContent = "lance entradas";
+  }
+
+  // ── Donut de categorias ──
+  const donutSvg = document.getElementById("fd-donut-svg");
+  const donutLeg = document.getElementById("fd-donut-legend");
+  const donutTotal = document.getElementById("fd-donut-total");
+  const donutCats  = document.getElementById("fd-donut-cats");
+  if(donutSvg){
+    const despTx = tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa");
+    const catMap = {};
+    despTx.forEach(t=>{ const c=t.categoria||t.category||"Outros"; catMap[c]=(catMap[c]||0)+t.valor; });
+    const catEntries = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+    const totalCat = catEntries.reduce((s,[,v])=>s+v,0) || 1;
+    const DONUT_COLORS = ["#a07ae8","#5b8fee","#34c57a","#f5a623","#ff6b6b","#00d2d3","#feca57","#ff9ff3","#54a0ff","#48dbfb"];
+    let offset = 0;
+    const circumf = 2*Math.PI*38;
+    donutSvg.innerHTML = catEntries.map(([cat,val],i)=>{
+      const pct = val/totalCat;
+      const dash = pct * circumf;
+      const el = `<circle cx="50" cy="50" r="38" fill="none" stroke="${DONUT_COLORS[i%DONUT_COLORS.length]}" stroke-width="10"
+        stroke-dasharray="${dash} ${circumf-dash}" stroke-dashoffset="${-offset}" stroke-linecap="butt"/>`;
+      offset += dash;
+      return el;
+    }).join("") + `<circle cx="50" cy="50" r="33" fill="var(--card)"/>`;
+    if(donutTotal) donutTotal.textContent = fmtBRL(totalCat);
+    if(donutCats)  donutCats.textContent  = catEntries.length+" cat.";
+    if(donutLeg){
+      donutLeg.innerHTML = catEntries.slice(0,6).map(([cat,val],i)=>`
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
+          <span style="width:10px;height:10px;border-radius:3px;background:${DONUT_COLORS[i%DONUT_COLORS.length]};flex-shrink:0;display:inline-block"></span>
+          <span style="flex:1;font-size:.72rem;color:var(--text);font-weight:600">${cat}</span>
+          <span style="font-size:.68rem;color:var(--muted)">${fmtBRL(val)}</span>
+          <span style="font-size:.6rem;color:var(--muted)">${Math.round(val/totalCat*100)}%</span>
+        </div>`).join("")||'<div style="font-size:.72rem;color:var(--muted)">Lance despesas para ver</div>';
+    }
+  }
+
+  // ── Comparativo mensal ──
+  const compEl = document.getElementById("fd-comp-content");
+  if(compEl){
+    const items = [
+      {lbl:"Entradas",cur:entradas,prev:prevEnt,cor:"var(--green)"},
+      {lbl:"Despesas",cur:despesas,prev:prevDesp,cor:"var(--red)"},
+      {lbl:"Saldo",  cur:saldo,   prev:prevSaldo,cor:"var(--accent)"},
+    ];
+    compEl.innerHTML = items.map(({lbl,cur,prev,cor})=>{
+      const d = cur - prev;
+      const pct = prev>0 ? Math.round(Math.abs(d)/prev*100) : 0;
+      const arrow = d>=0?"▲":"▼";
+      const arrowCor = (lbl==="Despesas"?(d<0?"var(--green)":"var(--red)"):(d>=0?"var(--green)":"var(--red)"));
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:.72rem;font-weight:700;color:var(--dim)">${lbl}</span>
+        <span style="font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:900;color:${cor}">${fmtBRL(cur)}</span>
+        <span style="font-size:.65rem;font-weight:700;color:${arrowCor}">${arrow} ${pct}%</span>
+      </div>`;
+    }).join("");
+    const prevMonthName = FIN_MONTHS[prevM]+" "+prevY;
+    compEl.innerHTML += `<div style="font-size:.6rem;color:var(--muted);margin-top:6px;text-align:center">vs ${prevMonthName}</div>`;
+  }
+
+  // ── Fluxo semanal ──
+  const fluxoEl = document.getElementById("fd-fluxo-bars");
+  if(fluxoEl){
+    const weeks = ["S1","S2","S3","S4"];
+    const weekData = weeks.map((_,wi)=>{
+      const s=(wi*7)+1, e=Math.min((wi+1)*7, 31);
+      const wTx = tx.filter(t=>{ if(!t.data)return false; const d=parseInt(t.data.split("-")[2]); return d>=s&&d<=e; });
+      return {
+        lbl:weeks[wi],
+        ent:wTx.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0),
+        desp:wTx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").reduce((s,t)=>s+t.valor,0),
+      };
+    });
+    const maxVal = Math.max(...weekData.flatMap(w=>[w.ent,w.desp]),1);
+    fluxoEl.innerHTML = weekData.map(w=>`
+      <div class="fdash-fluxo-col">
+        <div class="fdash-fluxo-bar-wrap">
+          <div class="fdash-fluxo-bar" style="height:${Math.max(2,Math.round(w.ent/maxVal*100))}%;background:var(--green)"></div>
+          <div class="fdash-fluxo-bar" style="height:${Math.max(2,Math.round(w.desp/maxVal*100))}%;background:var(--red)"></div>
+        </div>
+        <div class="fdash-fluxo-lbl">${w.lbl}</div>
+      </div>`).join("");
+  }
+
+  // ── Comissões ──
+  const comissEl = document.getElementById("fd-comiss-content");
+  if(comissEl){
+    const comMes = FIN_COMISSOES.filter(c=>c.mes===mk);
+    const rec = comMes.filter(c=>c.status==="recebida").reduce((s,c)=>s+c.valor,0);
+    const pend = comMes.filter(c=>c.status==="pendente").reduce((s,c)=>s+c.valor,0);
+    comissEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div style="background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-family:'Outfit',sans-serif;font-size:.98rem;font-weight:900;color:var(--green)">${fmtBRL(rec)}</div>
+          <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-top:3px">Recebidas</div>
+        </div>
+        <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-family:'Outfit',sans-serif;font-size:.98rem;font-weight:900;color:var(--orange)">${fmtBRL(pend)}</div>
+          <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-top:3px">Pendentes</div>
+        </div>
+      </div>
+      ${comMes.length ? comMes.slice(-4).reverse().map(c=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:.72rem">
+          <span style="color:var(--dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(c.nome)}</span>
+          <span style="font-weight:700;color:${c.status==="recebida"?"var(--green)":"var(--orange)"};margin-left:8px">${fmtBRL(c.valor)}</span>
+        </div>`).join("") : '<div style="font-size:.72rem;color:var(--muted);text-align:center;padding:8px">Nenhuma comissão</div>'}`;
+  }
+
+  // ── Fixas por categoria ──
+  const fixasCatEl = document.getElementById("fd-fixas-cat");
+  if(fixasCatEl){
+    const fixas = getFixas();
+    const catTotals = {};
+    fixas.forEach(f=>{ const c=f.cat||"outros"; catTotals[c]=(catTotals[c]||{total:0,pago:0}); catTotals[c].total+=f.valor; if(f.paga)catTotals[c].pago+=f.valor; });
+    const sorted = Object.entries(catTotals).sort((a,b)=>b[1].total-a[1].total);
+    const maxVal2 = sorted[0]?.[1]?.total || 1;
+    if(!sorted.length){ fixasCatEl.innerHTML='<div style="font-size:.72rem;color:var(--muted)">Nenhuma conta fixa</div>'; }
+    else fixasCatEl.innerHTML = sorted.map(([cat,d])=>{
+      const info = FIXA_CAT_MAP[cat]||FIXA_CAT_MAP.outros;
+      const pct = Math.round(d.total/maxVal2*100);
+      const pctPago = d.total>0?Math.round(d.pago/d.total*100):0;
+      return `<div class="fdash-hbar-row">
+        <div class="fdash-hbar-icon">${info.icon}</div>
+        <div class="fdash-hbar-label">${info.label}</div>
+        <div style="flex:2">
+          <div class="fdash-hbar-track">
+            <div class="fdash-hbar-fill" style="width:${pct}%;background:${info.color}"></div>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:99px;margin-top:2px;overflow:hidden">
+            <div style="height:100%;width:${pctPago}%;background:var(--green);border-radius:99px"></div>
+          </div>
+        </div>
+        <div class="fdash-hbar-val">${fmtBRL(d.total)}</div>
+      </div>`;
+    }).join("");
+  }
+
+  // ── Meta de gastos ──
+  const metaEl = document.getElementById("fd-meta-content");
+  if(metaEl){
+    if(!FIN_META_GASTOS){ metaEl.innerHTML='<div style="font-size:.72rem;color:var(--muted)">Meta não definida — defina em Detalhes.</div>'; }
+    else {
+      const pct=Math.min(Math.round(despesas/FIN_META_GASTOS*100),100);
+      const cor=pct>=90?"var(--red)":pct>=70?"var(--orange)":"var(--green)";
+      metaEl.innerHTML=`
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:${cor}">${fmtBRL(despesas)}</span>
+          <span style="font-size:.7rem;color:var(--muted);align-self:flex-end">/ ${fmtBRL(FIN_META_GASTOS)}</span>
+        </div>
+        <div style="height:10px;background:var(--border);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${cor};border-radius:99px;transition:width .8s"></div>
+        </div>
+        <div style="font-size:.65rem;font-weight:700;color:${cor};margin-top:5px">${pct}% da meta ${pct>=90?"⚠️ Limite!":pct>=70?"⚠️ Atenção":"✓ No controle"}</div>`;
+    }
+  }
+
+  // ── Top categorias ──
+  const topEl = document.getElementById("fd-top-cat");
+  if(topEl){
+    const cats={};
+    tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").forEach(t=>{
+      const c=t.categoria||t.category||"Outros";
+      if(!cats[c])cats[c]={val:0,count:0};
+      cats[c].val+=t.valor;cats[c].count++;
+    });
+    const sorted2=Object.entries(cats).sort((a,b)=>b[1].val-a[1].val).slice(0,4);
+    const maxV=sorted2[0]?.[1]?.val||1;
+    topEl.innerHTML=!sorted2.length?'<div style="font-size:.72rem;color:var(--muted)">Nenhuma despesa</div>':
+      sorted2.map(([c,d],i)=>{
+        const medals=["🥇","🥈","🥉","4️⃣"];
+        return `<div class="fdash-hbar-row">
+          <div class="fdash-hbar-icon">${medals[i]}</div>
+          <div class="fdash-hbar-label">${c}</div>
+          <div class="fdash-hbar-track" style="flex:2"><div class="fdash-hbar-fill" style="width:${Math.round(d.val/maxV*100)}%;background:var(--accent)"></div></div>
+          <div class="fdash-hbar-val">${fmtBRL(d.val)}</div>
+        </div>`;
+      }).join("");
+  }
+
+  // ── Projeção 30 dias ──
+  const projBarsEl = document.getElementById("fd-proj-bars");
+  const projSaldoEl = document.getElementById("fd-proj-saldo");
+  const projMsgEl = document.getElementById("fd-proj-msg");
+  if(projBarsEl){
+    const saldoAtual = typeof saldoConta==="function" ? FIN_CONTAS.reduce((s,c)=>s+saldoConta(c.id),0) : 0;
+    if(projSaldoEl) projSaldoEl.textContent = fmtBRL(saldoAtual);
+    const fixasPend = getFixas().filter(f=>!f.paga);
+    const today = new Date();
+    const dias=[];
+    let sp=saldoAtual;
+    for(let i=0;i<30;i++){
+      const d=new Date(today);d.setDate(d.getDate()+i);
+      const day=d.getDate();
+      const saidas=fixasPend.filter(f=>f.dia===day).reduce((s,f)=>s+f.valor,0);
+      sp-=saidas;dias.push({dia:day,saldo:sp,saida:saidas});
+    }
+    const minS=Math.min(...dias.map(d=>d.saldo),0);
+    const maxS=Math.max(...dias.map(d=>d.saldo),1);
+    const range=maxS-minS||1;
+    const neg=dias.filter(d=>d.saldo<0).length;
+    if(projMsgEl){
+      projMsgEl.textContent=neg>0?`⚠️ ${neg} dia${neg>1?"s":""} negativo${neg>1?"s":""}`:"✓ Saldo positivo";
+      projMsgEl.style.color=neg>0?"var(--red)":"var(--green)";
+    }
+    const shown=dias.filter((_,i)=>i%2===0||dias[i].saida>0);
+    projBarsEl.innerHTML=shown.map(d=>{
+      const pct=Math.max(2,Math.round((d.saldo-minS)/range*100));
+      const cor=d.saldo<0?"var(--red)":d.saldo<maxS*.2?"var(--orange)":"var(--green)";
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px" title="Dia ${d.dia}: ${fmtBRL(d.saldo)}">
+        <div style="width:100%;border-radius:3px 3px 0 0;background:${cor};height:${pct}%;min-height:2px;transition:height .4s${d.saida>0?";outline:2px solid rgba(255,255,255,.25)":""}"></div>
+        <div style="font-size:.44rem;color:var(--muted)">${d.dia}</div>
+      </div>`;
+    }).join("");
+  }
+}
 
 function getMonthTx(){
   return FIN_TRANSACTIONS.filter(t=>{
