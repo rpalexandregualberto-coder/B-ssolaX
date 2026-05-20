@@ -1611,6 +1611,90 @@ textarea.form-input{border-radius:16px;resize:vertical}
 .cat-row-lock{font-size:.8rem;color:var(--dim);opacity:.5}
 .cat-del-btn{background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.2);color:var(--red);border-radius:7px;width:26px;height:26px;cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
 .cat-del-btn:hover{background:rgba(255,77,109,.25)}
+/* ═══════════════════════════════
+   CARTÕES DE CRÉDITO INTELIGENTE
+   ═══════════════════════════════ */
+.cc-page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.cc-add-btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 22px;cursor:pointer;font-weight:800;font-size:.85rem;font-family:'Outfit',sans-serif;transition:all .18s;box-shadow:0 4px 14px rgba(160,122,232,.35)}
+.cc-add-btn:hover{background:var(--accent-hover,#8a67d4);transform:translateY(-1px)}
+/* Visual credit card */
+.cc-card-visual{width:280px;min-width:280px;height:168px;border-radius:18px;padding:20px 22px;position:relative;overflow:hidden;cursor:pointer;transition:all .22s;box-shadow:0 8px 32px rgba(0,0,0,.32);flex-shrink:0;box-sizing:border-box}
+.cc-card-visual:hover{transform:translateY(-5px) scale(1.01);box-shadow:0 18px 50px rgba(0,0,0,.42)}
+.cc-card-visual.selected{outline:3px solid rgba(255,255,255,.6);transform:translateY(-3px)}
+.cc-card-chip{width:32px;height:24px;background:rgba(255,255,255,.28);border-radius:5px;margin-bottom:12px;position:relative}
+.cc-card-chip::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.35)}
+.cc-card-chip::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,.35)}
+.cc-card-number{font-family:'Courier New',monospace;font-size:.82rem;font-weight:700;letter-spacing:.2em;color:rgba(255,255,255,.85);margin-bottom:10px}
+.cc-card-footer{display:flex;justify-content:space-between;align-items:flex-end}
+.cc-card-bank-name{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:900;text-shadow:0 1px 4px rgba(0,0,0,.2)}
+.cc-card-meta{text-align:right;font-size:.58rem;opacity:.78;line-height:1.5}
+.cc-card-bg1{position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.07);right:-60px;top:-60px;pointer-events:none}
+.cc-card-bg2{position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.05);left:-40px;bottom:-60px;pointer-events:none}
+.cc-card-limit-bar{margin-top:8px;height:4px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}
+.cc-card-limit-fill{height:100%;background:rgba(255,255,255,.75);border-radius:99px;transition:width .8s ease}
+/* Cards scroll */
+.cc-cards-scroll{display:flex;gap:16px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.cc-cards-scroll::-webkit-scrollbar{height:4px}
+.cc-cards-scroll::-webkit-scrollbar-track{background:transparent}
+.cc-cards-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+/* Summary strip */
+.cc-summary-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.cc-summary-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;backdrop-filter:var(--card-blur)}
+.cc-summary-val{font-family:'Outfit',sans-serif;font-size:1.18rem;font-weight:900;color:var(--text)}
+.cc-summary-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:3px}
+/* Detail panel */
+.cc-detail{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;backdrop-filter:var(--card-blur);box-shadow:var(--card-shadow)}
+.cc-detail-top{display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap}
+.cc-detail-info{flex:1;min-width:220px}
+.cc-detail-info h3{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:900;margin-bottom:4px}
+.cc-info-row{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
+.cc-info-chip{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:7px 12px;text-align:center}
+.cc-info-chip-val{font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:900;color:var(--text)}
+.cc-info-chip-lbl{font-size:.56rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin-top:2px;letter-spacing:.06em}
+/* Status badge */
+.cc-status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:6px;font-size:.68rem;font-weight:800}
+.cc-status-aberta{background:rgba(91,143,238,.15);color:var(--blue);border:1px solid rgba(91,143,238,.3)}
+.cc-status-fechada{background:rgba(245,166,35,.12);color:var(--orange);border:1px solid rgba(245,166,35,.3)}
+.cc-status-paga{background:rgba(52,197,122,.1);color:var(--green);border:1px solid rgba(52,197,122,.3)}
+/* Fatura month tabs */
+.cc-fat-tabs{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px}
+.cc-fat-tab{padding:7px 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:.75rem;font-weight:700;color:var(--dim);transition:all .15s;white-space:nowrap;flex-shrink:0}
+.cc-fat-tab:hover{border-color:var(--accent);color:var(--accent)}
+.cc-fat-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* Charts row */
+.cc-charts-row{display:grid;grid-template-columns:190px 1fr 200px;gap:12px;margin-bottom:16px}
+.cc-chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
+.cc-chart-title{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px}
+/* Installments timeline */
+.cc-install-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--border);margin-bottom:5px}
+.cc-install-name{flex:1;font-size:.78rem;font-weight:600;color:var(--text)}
+.cc-install-prog{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.cc-install-fill{height:100%;background:var(--accent);border-radius:99px}
+.cc-install-info{font-size:.68rem;color:var(--muted);text-align:right;min-width:80px}
+/* AI Panel */
+.cc-ai-panel{background:rgba(160,122,232,.05);border:1px solid var(--accent-border);border-radius:16px;padding:20px;margin-top:16px}
+.cc-ai-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.cc-ai-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.cc-ai-score{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.cc-ai-score-val{font-family:'Outfit',sans-serif;font-size:1.55rem;font-weight:900;line-height:1}
+.cc-ai-score-lbl{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:3px}
+.cc-ai-score-bar{height:3px;border-radius:99px;margin-top:6px;background:var(--border);overflow:hidden}
+.cc-ai-score-fill{height:100%;border-radius:99px}
+.cc-ai-alert{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-radius:10px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);font-size:.78rem;color:var(--text);line-height:1.55}
+.cc-ai-insight{font-size:.83rem;line-height:1.72;padding:14px 16px;border-radius:12px;background:rgba(160,122,232,.07);border:1px solid var(--accent-border);font-style:italic;color:var(--text);margin-bottom:12px}
+.cc-ai-section-title{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:12px 0 6px}
+/* Fatura upload zone */
+.cc-upload-zone{border:2px dashed var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer;transition:all .18s;background:var(--surface)}
+.cc-upload-zone:hover{border-color:var(--accent);background:var(--accent-dim)}
+/* Add card modal */
+.ccm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.ccm-overlay.open{display:flex}
+.ccm-box{background:var(--card);backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:22px;padding:28px 30px;width:100%;max-width:480px;box-shadow:0 24px 80px rgba(0,0,0,.45)}
+.ccm-preview{height:120px;border-radius:14px;margin-bottom:20px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;transition:background .3s}
+.ccm-bank-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.ccm-bank-btn{border:2px solid var(--border);border-radius:10px;padding:8px 4px;cursor:pointer;text-align:center;font-size:.7rem;font-weight:700;transition:all .15s;background:var(--surface);color:var(--text)}
+.ccm-bank-btn:hover{border-color:var(--accent)}
+.ccm-bank-btn.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
 .cat-manage-btn{background:var(--surface);border:1px solid var(--border);color:var(--dim);border-radius:8px;padding:0 9px;height:28px;cursor:pointer;font-size:.8rem;display:inline-flex;align-items:center;gap:4px;transition:all .15s;flex-shrink:0}
 .cat-manage-btn:hover{border-color:var(--accent);color:var(--accent)}
 
@@ -2811,6 +2895,9 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <div class="nav-divider"></div>
     <button class="nav-btn" title="Financeiro" onclick="gotoView('financeiro',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    </button>
+    <button class="nav-btn" title="Cartões" onclick="gotoView('cartoes',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
     </button>
     <button class="nav-btn" title="Metas" onclick="gotoView('metas',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
@@ -4123,6 +4210,28 @@ textarea.form-input{border-radius:16px;resize:vertical}
     </div>
     </div><!-- /fin-detail-panel -->
   </div><!-- /view-financeiro -->
+
+  <!-- ═══════════════ CARTÕES DE CRÉDITO ═══════════════ -->
+  <div class="view" id="view-cartoes">
+    <div class="cc-page-header">
+      <div>
+        <h2 style="font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:900;margin:0">💳 Cartões Inteligentes</h2>
+        <p style="font-size:.8rem;color:var(--muted);margin:4px 0 0">Centro de inteligência de crédito, parcelamentos e comportamento financeiro</p>
+      </div>
+      <button class="cc-add-btn" onclick="openAddCard()">+ Novo Cartão</button>
+    </div>
+    <!-- Summary strip -->
+    <div class="cc-summary-strip" id="cc-summary-strip">
+      <div class="cc-summary-item"><div class="cc-summary-val" id="cc-s-cartoes">0</div><div class="cc-summary-lbl">Cartões</div></div>
+      <div class="cc-summary-item"><div class="cc-summary-val" id="cc-s-limite" style="color:var(--green)">R$ 0</div><div class="cc-summary-lbl">Limite Total</div></div>
+      <div class="cc-summary-item"><div class="cc-summary-val" id="cc-s-fatura" style="color:var(--orange)">R$ 0</div><div class="cc-summary-lbl">Fatura Atual Total</div></div>
+      <div class="cc-summary-item"><div class="cc-summary-val" id="cc-s-parcelas" style="color:var(--accent)">R$ 0</div><div class="cc-summary-lbl">Compromisso Futuro</div></div>
+    </div>
+    <!-- Card carousel -->
+    <div class="cc-cards-scroll" id="cc-cards-scroll"></div>
+    <!-- Detail panel (rendered dynamically) -->
+    <div id="cc-detail-wrap"></div>
+  </div>
 
   <!-- ═══════════════ NOTAS ═══════════════ -->
   <!-- ═══════════════ RELATÓRIO SEMANAL IA ═══════════════ -->
@@ -6366,6 +6475,7 @@ const viewMeta={
   ligacoes:["📞 Ligações Pendentes","Contatos e follow-ups para ligar"],
   projetos:["📁 Projetos","Iniciativas com tarefas vinculadas"],
   financeiro:["Financeiro Pessoal","Gestão financeira completa"],
+  cartoes:["💳 Cartões Inteligentes","Centro de inteligência de crédito e parcelamentos"],
   metas:["🎯 Metas","Objetivos com progresso automático"],
   templates:["Templates","Pacotes de tarefas prontas"],
   conquistas:["🏆 Conquistas & XP","Evolução, arquétipo e badges"],
@@ -6401,6 +6511,7 @@ function gotoView(name,el){
   if(name==="notas") renderNotasMirror();
   if(name==="habitos") renderHabitos();
   if(name==="conteudo") renderConteudo();
+  if(name==="cartoes") renderCartoes();
 }
 
 // ══════════════════════════════════════
@@ -9289,7 +9400,7 @@ RESPONDA APENAS COM JSON VÁLIDO (sem markdown):
         id: newId,
         nome: tx.nome,
         nome_original: tx.nome_original||tx.nome,
-        valor: Math.abs(tx.valor),
+        valor: parseAIValor(tx.valor),
         tipo: tx.tipo||"despesa_extra",
         categoria: tx.categoria||"Outros",
         data: tx.data||dataDefault,
@@ -9839,6 +9950,655 @@ function renderAllTasksList(){
 // ══════════════════════════════════════
 const STORAGE_KEY = "central_acao_v3";
 
+// ══════════════════════════════════════════════════════════
+//  CARTÕES DE CRÉDITO INTELIGENTE
+// ══════════════════════════════════════════════════════════
+let CARDS = [];
+let nextCardId = 1;
+let _selectedCardId = null;
+let _selectedCardMes = null;
+
+const BANKS = {
+  nubank:    {nome:"Nubank",          emoji:"💜", cor:"#8A05BE", cor2:"#C24BF0", corTexto:"#fff"},
+  itau:      {nome:"Itaú",            emoji:"🟠", cor:"#EC7000", cor2:"#FF9A40", corTexto:"#fff"},
+  bradesco:  {nome:"Bradesco",        emoji:"🔴", cor:"#CC092F", cor2:"#FF2D55", corTexto:"#fff"},
+  bb:        {nome:"Banco do Brasil", emoji:"🟡", cor:"#D4AA00", cor2:"#F0CC20", corTexto:"#111"},
+  santander: {nome:"Santander",       emoji:"🔴", cor:"#CC0000", cor2:"#FF2200", corTexto:"#fff"},
+  caixa:     {nome:"Caixa",           emoji:"🔵", cor:"#005CA9", cor2:"#0080D0", corTexto:"#fff"},
+  inter:     {nome:"Inter",           emoji:"🟠", cor:"#E05000", cor2:"#FF7100", corTexto:"#fff"},
+  c6:        {nome:"C6 Bank",         emoji:"⚫", cor:"#1A1A2E", cor2:"#2E2E4E", corTexto:"#FFD700"},
+  xp:        {nome:"XP",              emoji:"⚫", cor:"#0F0F0F", cor2:"#333333", corTexto:"#FFD700"},
+  neon:      {nome:"Neon",            emoji:"🟢", cor:"#00A896", cor2:"#00C2A8", corTexto:"#fff"},
+  picpay:    {nome:"PicPay",          emoji:"🟢", cor:"#1A9E4A", cor2:"#21C25E", corTexto:"#fff"},
+  sicoob:    {nome:"Sicoob",          emoji:"🟢", cor:"#006B30", cor2:"#00823B", corTexto:"#fff"},
+  bndes:     {nome:"BNDES",           emoji:"🔵", cor:"#002D80", cor2:"#003399", corTexto:"#fff"},
+  outro:     {nome:"Outro",           emoji:"💳", cor:"#5b4fb5", cor2:"#7c5fe6", corTexto:"#fff"},
+};
+
+// Fix decimal bug: AI returns 24.03955 when should be 24039.55
+function parseAIValor(v){
+  if(typeof v==="string"){
+    const s=v.replace(/R\$\s*/g,"").replace(/\./g,"").replace(",",".").trim();
+    return Math.abs(parseFloat(s)||0);
+  }
+  if(typeof v==="number"){
+    const s=v.toString();
+    // Detect 5-decimal pattern from Brazilian misparse: 24.03955 → 24039.55
+    const m=s.match(/^(\d+)\.(\d{5})$/);
+    if(m){ const f=m[1]+m[2]; return parseFloat(f.slice(0,-2)+"."+f.slice(-2)); }
+    return Math.abs(v);
+  }
+  return 0;
+}
+
+// ── Render main view ──────────────────────────────────────
+function renderCartoes(){
+  const scroll = document.getElementById("cc-cards-scroll");
+  const wrap   = document.getElementById("cc-detail-wrap");
+  if(!scroll||!wrap) return;
+
+  // Summary strip
+  const totalLimite   = CARDS.reduce((s,c)=>s+(c.limite||0),0);
+  const mesKey = monthKey();
+  const totalFatura   = CARDS.reduce((s,c)=>s+getFaturaTotal(c,mesKey),0);
+  const totalParcelas = calcComprometimentoFuturo();
+  setEl("cc-s-cartoes", CARDS.length.toString());
+  setEl("cc-s-limite",  fmtBRL(totalLimite));
+  setEl("cc-s-fatura",  fmtBRL(totalFatura));
+  setEl("cc-s-parcelas",fmtBRL(totalParcelas));
+
+  // Card carousel
+  if(CARDS.length===0){
+    scroll.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;padding:48px 20px;color:var(--muted)">
+      <div style="font-size:3rem;margin-bottom:12px">💳</div>
+      <div style="font-size:1rem;font-weight:700;margin-bottom:6px">Nenhum cartão cadastrado</div>
+      <div style="font-size:.8rem;opacity:.7">Clique em "+ Novo Cartão" para começar</div>
+    </div>`;
+    wrap.innerHTML="";
+    return;
+  }
+
+  scroll.innerHTML=CARDS.map(c=>renderCardVisual(c,mesKey)).join("");
+
+  // Show detail for selected card
+  if(_selectedCardId && CARDS.find(c=>c.id===_selectedCardId)){
+    renderCardDetail(_selectedCardId);
+  } else if(CARDS.length>0){
+    _selectedCardId=CARDS[0].id;
+    renderCardDetail(_selectedCardId);
+  }
+}
+
+function getFaturaTotal(card, mesAno){
+  const f=(card.faturas||{})[mesAno];
+  return f ? (f.valorTotal||0) : 0;
+}
+
+function calcComprometimentoFuturo(){
+  // Soma parcelas futuras de todos os cartões (transações tipo cartao com parcela_total > 1)
+  const hoje = new Date();
+  return FIN_TRANSACTIONS
+    .filter(t=>t.tipo==="cartao"&&t.parcela_total>1&&t.parcela_atual<t.parcela_total)
+    .reduce((s,t)=>{
+      const restantes=(t.parcela_total||1)-(t.parcela_atual||1);
+      return s+(t.valor||0)*restantes;
+    },0);
+}
+
+function renderCardVisual(card, mesKey){
+  const b=BANKS[card.banco]||BANKS.outro;
+  const usada=getFaturaTotal(card,mesKey);
+  const limite=card.limite||0;
+  const pct=limite>0?Math.min(100,usada/limite*100):0;
+  const pctCor=pct>80?"rgba(255,77,109,.9)":pct>50?"rgba(245,166,35,.9)":"rgba(255,255,255,.75)";
+  const sel=_selectedCardId===card.id?" selected":"";
+  return `<div class="cc-card-visual${sel}" onclick="selectCard('${card.id}')"
+    style="background:linear-gradient(135deg,${b.cor},${b.cor2});color:${b.corTexto}">
+    <div class="cc-card-bg1"></div><div class="cc-card-bg2"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div class="cc-card-chip"></div>
+      <div style="font-size:.65rem;font-weight:800;opacity:.8;letter-spacing:.06em">${b.nome.toUpperCase()}</div>
+    </div>
+    <div class="cc-card-number">•••• •••• •••• ${card.ultimos4||"••••"}</div>
+    <div class="cc-card-footer">
+      <div>
+        <div class="cc-card-bank-name">${card.nome||b.nome}</div>
+        <div style="font-size:.58rem;opacity:.7;margin-top:2px">Fecha dia ${card.fechamento||"?"} · Vence dia ${card.vencimento||"?"}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.62rem;opacity:.65">Fatura</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:900">${fmtBRL(usada)}</div>
+        <div style="font-size:.58rem;opacity:.65">de ${fmtBRL(limite)}</div>
+      </div>
+    </div>
+    <div class="cc-card-limit-bar"><div class="cc-card-limit-fill" style="width:${pct}%;background:${pctCor}"></div></div>
+  </div>`;
+}
+
+function selectCard(id){
+  _selectedCardId=id;
+  // Re-render carousel for selection highlight
+  const mesKey=monthKey();
+  const scroll=document.getElementById("cc-cards-scroll");
+  if(scroll) scroll.innerHTML=CARDS.map(c=>renderCardVisual(c,mesKey)).join("");
+  renderCardDetail(id);
+}
+
+function renderCardDetail(cardId){
+  const card=CARDS.find(c=>c.id===cardId);
+  const wrap=document.getElementById("cc-detail-wrap");
+  if(!card||!wrap) return;
+  const b=BANKS[card.banco]||BANKS.outro;
+  const mesKey=_selectedCardMes||monthKey();
+  _selectedCardMes=mesKey;
+  const fatura=(card.faturas||{})[mesKey]||null;
+  const statusBadge=fatura?`<span class="cc-status cc-status-${fatura.status||'aberta'}">${{aberta:"🔵 Aberta",fechada:"🟡 Fechada",paga:"🟢 Paga"}[fatura.status]||"🔵 Aberta"}</span>`:"";
+
+  // Build month tabs (last 6 months)
+  const tabs=[];
+  const now=new Date();
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+    const lbl=d.toLocaleString("pt-BR",{month:"short",year:"2-digit"}).replace("."," '");
+    const hasFat=!!(card.faturas||{})[k];
+    tabs.push(`<button class="cc-fat-tab${k===mesKey?" active":""}" onclick="switchCardFatura('${cardId}','${k}')">${lbl}${hasFat?" 📄":""}</button>`);
+  }
+
+  // Limit gauge
+  const usada=getFaturaTotal(card,mesKey);
+  const limite=card.limite||0;
+  const pctLim=limite>0?Math.min(100,(usada/limite*100)).toFixed(1):0;
+  const limCor=pctLim>80?"var(--red)":pctLim>50?"var(--orange)":"var(--green)";
+
+  // Transactions in this fatura
+  const txIds=(fatura?.txIds)||[];
+  const txs=FIN_TRANSACTIONS.filter(t=>txIds.includes(t.id));
+
+  wrap.innerHTML=`
+  <div class="cc-detail" style="margin-top:16px">
+    <!-- Header -->
+    <div class="cc-detail-top">
+      <div style="width:140px;height:84px;border-radius:12px;background:linear-gradient(135deg,${b.cor},${b.cor2});flex-shrink:0;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:10px 12px">
+        <div class="cc-card-bg1" style="width:100px;height:100px;right:-30px;top:-30px"></div>
+        <div style="font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:900;color:${b.corTexto}">${card.nome||b.nome}</div>
+        <div style="font-size:.55rem;color:${b.corTexto};opacity:.75">•••• ${card.ultimos4||"••••"}</div>
+      </div>
+      <div class="cc-detail-info">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <h3 style="margin:0">${card.nome||b.nome}</h3>
+          ${statusBadge}
+          <button onclick="deleteCard('${cardId}')" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:7px;padding:3px 8px;cursor:pointer;color:var(--muted);font-size:.7rem">🗑</button>
+        </div>
+        <div class="cc-info-row">
+          <div class="cc-info-chip"><div class="cc-info-chip-val" style="color:var(--green)">${fmtBRL(limite)}</div><div class="cc-info-chip-lbl">Limite Total</div></div>
+          <div class="cc-info-chip"><div class="cc-info-chip-val" style="color:${limCor}">${fmtBRL(usada)}</div><div class="cc-info-chip-lbl">Fatura ${mesKey}</div></div>
+          <div class="cc-info-chip"><div class="cc-info-chip-val" style="color:var(--accent)">${fmtBRL(Math.max(0,limite-usada))}</div><div class="cc-info-chip-lbl">Disponível</div></div>
+          <div class="cc-info-chip"><div class="cc-info-chip-val">Dia ${card.fechamento||"–"}</div><div class="cc-info-chip-lbl">Fechamento</div></div>
+          <div class="cc-info-chip"><div class="cc-info-chip-val">Dia ${card.vencimento||"–"}</div><div class="cc-info-chip-lbl">Vencimento</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Month tabs -->
+    <div class="cc-fat-tabs">${tabs.join("")}</div>
+
+    <!-- Charts row -->
+    <div class="cc-charts-row" id="cc-charts-${cardId}">
+      ${renderCardChartsHTML(card, mesKey, txs, limite)}
+    </div>
+
+    <!-- Installments tracker -->
+    ${renderInstallsHTML(cardId)}
+
+    <!-- Fatura upload / AI -->
+    <div style="display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap">
+      <label style="cursor:pointer">
+        <input type="file" accept=".pdf,.txt,.csv" style="display:none" onchange="uploadCardFatura('${cardId}',this)">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:11px;border:1.5px dashed var(--accent);color:var(--accent);font-weight:700;font-size:.82rem;transition:all .18s" onmouseover="this.style.background='var(--accent-dim)'" onmouseout="this.style.background=''">
+          📄 Subir Fatura / Extrato
+        </div>
+      </label>
+      ${fatura&&fatura.status!=="paga"?`<button onclick="markFaturaPaga('${cardId}','${mesKey}')" style="padding:9px 16px;border-radius:10px;border:1px solid var(--green-border);background:rgba(52,197,122,.1);color:var(--green);cursor:pointer;font-weight:700;font-size:.8rem">✅ Marcar como Paga</button>`:""}
+      <div id="cc-upload-status-${cardId}" style="font-size:.78rem;color:var(--muted)"></div>
+    </div>
+
+    <!-- AI Panel -->
+    ${fatura&&fatura.analiseIA ? renderCardAIPanel(fatura.analiseIA) : ""}
+
+    <!-- Transaction list -->
+    ${txs.length>0?renderCardTxList(txs):""}
+  </div>`;
+}
+
+function renderCardChartsHTML(card, mesKey, txs, limite){
+  // Category donut data
+  const catMap={};
+  txs.filter(t=>t.tipo==="cartao"||t.tipo==="despesa_extra").forEach(t=>{
+    const c=t.categoria||"Outros";
+    catMap[c]=(catMap[c]||0)+(t.valor||0);
+  });
+  const catEntries=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const totalCat=catEntries.reduce((s,[,v])=>s+v,0);
+  const COLORS=["#a07ae8","#5b8fee","#34c57a","#f5a623","#ff6b6b","#00d2d3","#feca57","#ff9ff3"];
+  const circf=2*Math.PI*36;
+
+  let donutSVG="";
+  let donutLegend="";
+  if(totalCat>0){
+    let off=0;
+    donutSVG=catEntries.map(([c,v],i)=>{
+      const pct=v/totalCat;
+      const dash=pct*circf;
+      const el=`<circle cx="44" cy="44" r="36" fill="none" stroke="${COLORS[i%COLORS.length]}" stroke-width="10" stroke-dasharray="${dash} ${circf-dash}" stroke-dashoffset="${-off}" stroke-linecap="butt"/>`;
+      off+=dash;
+      return el;
+    }).join("")+`<circle cx="44" cy="44" r="31" fill="var(--card)"/>`;
+    donutLegend=catEntries.slice(0,5).map(([c,v],i)=>
+      `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span style="width:8px;height:8px;border-radius:2px;background:${COLORS[i%COLORS.length]};flex-shrink:0;display:inline-block"></span>
+        <span style="flex:1;font-size:.65rem;color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c}</span>
+        <span style="font-size:.62rem;color:var(--muted)">${Math.round(v/totalCat*100)}%</span>
+      </div>`
+    ).join("");
+  } else {
+    donutSVG=`<circle cx="44" cy="44" r="36" fill="none" stroke="var(--border)" stroke-width="10"/>`;
+    donutLegend=`<div style="font-size:.72rem;color:var(--muted);text-align:center;padding:10px 0">Sem gastos neste mês</div>`;
+  }
+
+  // Limit gauge
+  const usada=getFaturaTotal(card,mesKey);
+  const pct=limite>0?Math.min(100,usada/limite*100):0;
+  const gaugeCirc=2*Math.PI*36;
+  const gaugeOff=gaugeCirc-(pct/100)*gaugeCirc;
+  const gaugeCor=pct>80?"var(--red)":pct>50?"var(--orange)":"var(--green)";
+
+  return `
+  <!-- Donut categorias -->
+  <div class="cc-chart-card">
+    <div class="cc-chart-title">🍩 Por Categoria</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div style="position:relative;flex-shrink:0">
+        <svg width="88" height="88" viewBox="0 0 88 88" style="transform:rotate(-90deg)">${donutSVG}</svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none">
+          <div style="font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:900;color:var(--text);line-height:1">${totalCat>0?fmtBRL(totalCat):"–"}</div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:0">${donutLegend}</div>
+    </div>
+  </div>
+  <!-- Limite gauge -->
+  <div class="cc-chart-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+    <div class="cc-chart-title" style="text-align:center">🎯 Limite Usado</div>
+    <div style="position:relative">
+      <svg width="110" height="110" viewBox="0 0 140 140" style="transform:rotate(-90deg);display:block">
+        <circle cx="70" cy="70" r="36" fill="none" stroke="var(--border)" stroke-width="10"/>
+        <circle cx="70" cy="70" r="36" fill="none" stroke="${gaugeCor}" stroke-width="10"
+          stroke-dasharray="${gaugeCirc}" stroke-dashoffset="${gaugeOff}" stroke-linecap="butt"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:900;color:${gaugeCor}">${pct.toFixed(0)}%</div>
+        <div style="font-size:.5rem;color:var(--muted)">do limite</div>
+      </div>
+    </div>
+    <div style="font-size:.65rem;color:var(--muted);margin-top:4px">${fmtBRL(usada)} de ${fmtBRL(limite)}</div>
+  </div>
+  <!-- Parcelas ativas -->
+  <div class="cc-chart-card">
+    <div class="cc-chart-title">📦 Parcelamentos</div>
+    ${renderInstallsHTML(card.id,true)}
+  </div>`;
+}
+
+function renderInstallsHTML(cardId, compact=false){
+  const installs=FIN_TRANSACTIONS.filter(t=>
+    t.cartao_id===cardId&&t.parcela_total>1
+  );
+  if(installs.length===0){
+    return `<div style="font-size:.72rem;color:var(--muted);padding:${compact?"8px 0":"12px 0"};text-align:center">Nenhum parcelamento ativo</div>`;
+  }
+  const items=installs.slice(0,compact?4:10).map(t=>{
+    const pct=Math.round((t.parcela_atual||1)/(t.parcela_total||1)*100);
+    const restantes=(t.parcela_total||1)-(t.parcela_atual||1);
+    return `<div class="cc-install-item">
+      <div class="cc-install-name">${t.nome||"–"}</div>
+      <div class="cc-install-prog"><div class="cc-install-fill" style="width:${pct}%"></div></div>
+      <div class="cc-install-info">${t.parcela_atual||1}/${t.parcela_total||1} · ${fmtBRL((t.valor||0)*restantes)} futuros</div>
+    </div>`;
+  }).join("");
+  return compact?items:`<div style="margin-top:8px">${items}</div>`;
+}
+
+function renderCardTxList(txs){
+  const rows=txs.slice(0,30).map(t=>{
+    const conf=t.confianca?`<span style="font-size:.58rem;padding:1px 5px;border-radius:4px;background:${t.confianca>=90?"rgba(52,197,122,.15)":t.confianca>=70?"rgba(245,166,35,.12)":"rgba(255,77,109,.12)"};color:${t.confianca>=90?"var(--green)":t.confianca>=70?"var(--orange)":"var(--red)"};font-weight:800">${t.confianca}%</span>`:"";
+    const parc=t.parcela_total>1?`<span style="font-size:.58rem;color:var(--accent);font-weight:700">${t.parcela_atual}/${t.parcela_total}</span>`:"";
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.78rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.nome||"–"}</div>
+        <div style="font-size:.62rem;color:var(--muted)">${t.data||""} · ${t.categoria||""}</div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center">${conf}${parc}</div>
+      <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:900;color:var(--red);white-space:nowrap">−${fmtBRL(t.valor||0)}</div>
+    </div>`;
+  }).join("");
+  return `<div style="margin-top:16px">
+    <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px">Transações desta Fatura</div>
+    ${rows}
+  </div>`;
+}
+
+function renderCardAIPanel(ai){
+  if(!ai) return "";
+  const sc=ai.scores||{};
+  const scoreCard=(lbl,val,cor)=>`
+    <div class="cc-ai-score">
+      <div class="cc-ai-score-val" style="color:${cor}">${val}</div>
+      <div class="cc-ai-score-lbl">${lbl}</div>
+      <div class="cc-ai-score-bar"><div class="cc-ai-score-fill" style="width:${val}%;background:${cor}"></div></div>
+    </div>`;
+  const saude=sc.saude_cartao||0;
+  const risco=sc.risco_endividamento||0;
+  const comprometimento=sc.comprometimento||0;
+  const alertas=(ai.alertas||[]).map(a=>`<div class="cc-ai-alert">⚠️ ${a}</div>`).join("");
+  const assinaturas=(ai.assinaturas_detectadas||[]).map(a=>`<span style="font-size:.7rem;padding:3px 9px;border-radius:6px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-border);margin:2px;display:inline-block">${a}</span>`).join("");
+  const parcelas=(ai.parcelamentos_ativos||[]).map(p=>`<div style="font-size:.77rem;padding:6px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--border);margin-bottom:4px">📦 <strong>${p.nome||""}</strong> — ${p.parcela_atual||"?"}/${p.parcela_total||"?"} · impacto futuro ${fmtBRL(p.impacto_futuro||0)}</div>`).join("");
+
+  return `<div class="cc-ai-panel">
+    <div class="cc-ai-header">
+      <span style="font-size:1.4rem">🧠</span>
+      <div>
+        <div style="font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:900">Inteligência Financeira · Claude Sonnet</div>
+        <div style="font-size:.65rem;color:var(--muted)">Open Finance · Análise Comportamental · Previsão Futura</div>
+      </div>
+    </div>
+    <div class="cc-ai-scores">
+      ${scoreCard("Saúde do Cartão",saude,saude>=70?"var(--green)":saude>=50?"var(--orange)":"var(--red)")}
+      ${scoreCard("Comprometimento",comprometimento,comprometimento<=50?"var(--green)":comprometimento<=70?"var(--orange)":"var(--red)")}
+      ${scoreCard("Risco Dívida",risco,risco<=30?"var(--green)":risco<=60?"var(--orange)":"var(--red)")}
+      ${scoreCard("Próxima Fatura",sc.projecao_prox_fatura||0,"var(--accent)")}
+    </div>
+    ${ai.insight_comportamental?`<div class="cc-ai-insight">"${ai.insight_comportamental}"</div>`:""}
+    ${alertas?`<div class="cc-ai-section-title">⚠️ Alertas</div>${alertas}`:""}
+    ${assinaturas?`<div class="cc-ai-section-title">🔁 Assinaturas Detectadas</div><div style="margin-bottom:10px">${assinaturas}</div>`:""}
+    ${parcelas?`<div class="cc-ai-section-title">📦 Parcelamentos Ativos</div>${parcelas}`:""}
+    ${ai.diagnostico?`<div class="cc-ai-section-title">🎯 Diagnóstico</div><div class="cc-ai-insight" style="margin-top:4px">${ai.diagnostico}</div>`:""}
+  </div>`;
+}
+
+function switchCardFatura(cardId, mesAno){
+  _selectedCardMes=mesAno;
+  renderCardDetail(cardId);
+}
+
+function markFaturaPaga(cardId, mesAno){
+  const card=CARDS.find(c=>c.id===cardId);
+  if(!card) return;
+  if(!card.faturas) card.faturas={};
+  if(!card.faturas[mesAno]) card.faturas[mesAno]={mesAno,status:"aberta",valorTotal:0,txIds:[]};
+  card.faturas[mesAno].status="paga";
+  saveData();
+  renderCartoes();
+}
+
+function deleteCard(id){
+  if(!confirm("Excluir este cartão? As transações associadas serão mantidas.")) return;
+  const idx=CARDS.findIndex(c=>c.id===id);
+  if(idx>-1) CARDS.splice(idx,1);
+  if(_selectedCardId===id) _selectedCardId=CARDS.length>0?CARDS[0].id:null;
+  saveData();
+  renderCartoes();
+}
+
+// ── Add card modal ─────────────────────────────────────────
+let _ccmBanco="outro";
+
+function openAddCard(){
+  _ccmBanco="outro";
+  const modal=document.getElementById("ccm-overlay");
+  if(!modal) return;
+  modal.classList.add("open");
+  // Build bank grid
+  const grid=document.getElementById("ccm-bank-grid");
+  if(grid){
+    grid.innerHTML=Object.entries(BANKS).map(([k,b])=>
+      `<button class="ccm-bank-btn${k===_ccmBanco?" selected":""}" onclick="ccmSelectBank('${k}')" title="${b.nome}">
+        <div style="font-size:1.2rem;margin-bottom:2px">${b.emoji}</div>
+        <div style="font-size:.6rem">${b.nome.split(" ")[0]}</div>
+      </button>`
+    ).join("");
+  }
+  ccmUpdatePreview();
+  setTimeout(()=>document.getElementById("ccm-nome")?.focus(),100);
+}
+
+function closeAddCard(){
+  document.getElementById("ccm-overlay")?.classList.remove("open");
+  // Reset fields
+  ["ccm-nome","ccm-ultimos4","ccm-limite","ccm-fechamento","ccm-vencimento"].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value="";
+  });
+}
+
+function ccmSelectBank(banco){
+  _ccmBanco=banco;
+  document.querySelectorAll(".ccm-bank-btn").forEach(b=>b.classList.remove("selected"));
+  event.currentTarget.classList.add("selected");
+  ccmUpdatePreview();
+}
+
+function ccmUpdatePreview(){
+  const b=BANKS[_ccmBanco]||BANKS.outro;
+  const prev=document.getElementById("ccm-preview");
+  if(prev) prev.style.background=`linear-gradient(135deg,${b.cor},${b.cor2})`;
+  const nomeEl=document.getElementById("ccm-nome");
+  const nome=nomeEl?.value||b.nome;
+  const lbl=document.getElementById("ccm-name-lbl");
+  if(lbl) lbl.textContent=nome;
+  const bancoLbl=document.getElementById("ccm-banco-lbl");
+  if(bancoLbl) bancoLbl.textContent=b.nome.toUpperCase();
+  const numPrev=document.getElementById("ccm-num-preview");
+  if(numPrev){ const u4=document.getElementById("ccm-ultimos4")?.value||"0000"; numPrev.textContent=u4.padEnd(4,"•"); }
+  const limEl=document.getElementById("ccm-limite");
+  const limLbl=document.getElementById("ccm-limit-lbl");
+  if(limLbl&&limEl) limLbl.textContent=limEl.value?fmtBRL(parseFloat(limEl.value)||0):"R$ 0,00";
+}
+
+function saveNewCard(){
+  const b=BANKS[_ccmBanco]||BANKS.outro;
+  const nome=(document.getElementById("ccm-nome")?.value||"").trim()||b.nome;
+  const ultimos4=(document.getElementById("ccm-ultimos4")?.value||"").trim();
+  const limite=parseFloat(document.getElementById("ccm-limite")?.value||0)||0;
+  const fechamento=parseInt(document.getElementById("ccm-fechamento")?.value||15)||15;
+  const vencimento=parseInt(document.getElementById("ccm-vencimento")?.value||22)||22;
+  const card={
+    id:"card_"+(nextCardId++),
+    nome, banco:_ccmBanco, ultimos4, cor:b.cor, cor2:b.cor2, corTexto:b.corTexto,
+    limite, fechamento, vencimento, ativo:true, faturas:{}, criadoEm:new Date().toISOString()
+  };
+  CARDS.push(card);
+  _selectedCardId=card.id;
+  closeAddCard();
+  saveData();
+  renderCartoes();
+}
+
+// ── Fatura upload + AI ──────────────────────────────────────
+async function uploadCardFatura(cardId, input){
+  const file=input.files[0];
+  if(!file) return;
+  const statusEl=document.getElementById(`cc-upload-status-${cardId}`);
+  const userApiKey=localStorage.getItem("central_acao_apikey")||"";
+  if(!userApiKey){ alert("Configure sua API key da Anthropic em Configurações."); return; }
+
+  const mesAno=_selectedCardMes||monthKey();
+  if(statusEl) statusEl.textContent="📄 Lendo arquivo...";
+
+  const text = await new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>res(e.target.result);
+    r.onerror=rej;
+    r.readAsText(file,"UTF-8");
+  });
+
+  if(statusEl) statusEl.textContent="🧠 Analisando fatura com IA...";
+
+  const card=CARDS.find(c=>c.id===cardId);
+  const cardNome=card?card.nome:"Cartão";
+
+  // Histórico de categorizações
+  const histCats={};
+  FIN_TRANSACTIONS.filter(t=>t.cartao_id===cardId).slice(-50).forEach(t=>{
+    const k=(t.nome||"").toLowerCase().slice(0,15);
+    if(k) histCats[k]=t.categoria;
+  });
+  const histStr=Object.entries(histCats).slice(0,15).map(([k,v])=>`"${k}" → ${v}`).join("; ");
+  const mesLabel=mesAno;
+  const dataDefault=`${mesAno}-15`;
+
+  const prompt=`Você é uma IA especialista em cartão de crédito, Open Finance, análise de faturas, parcelamentos e inteligência comportamental financeira de altíssima precisão.
+
+════════════════════
+REGRAS ABSOLUTAS
+════════════════════
+1. NUNCA ignore uma compra — processe todas
+2. NUNCA invente transações — só extraia o que está no texto
+3. NUNCA duplique lançamentos
+4. NUNCA deixe compra sem categoria
+5. DETECTAR parcelamentos: "1/12", "2x", "PARC 3/6" etc
+6. VALORES: sempre float puro em reais. R$ 24.039,55 → 24039.55 (NÃO 24.03955)
+7. Remova pontos de milhar, substitua vírgula decimal por ponto
+8. RECONCILIAR: somar todas as compras e comparar com total da fatura
+
+════════════════════
+DOCUMENTO: FATURA DE CARTÃO
+Cartão: ${cardNome}
+Período: ${mesLabel}
+════════════════════
+
+════════════════════
+CATEGORIAS DISPONÍVEIS
+════════════════════
+Alimentação, Restaurante, iFood, Mercado, Combustível, Uber/Transporte, Viagem,
+Assinatura/Streaming, SaaS/Software, Marketing/Tráfego Pago, Investimento,
+Educação, Saúde/Farmácia, Lazer, Compras/Roupas, Tecnologia/Eletrônicos,
+Consórcio, Imóveis, Equipe/Fornecedores, Escritório, Emergência, Juros/IOF, Outros
+
+════════════════════
+SEMÂNTICA BANCÁRIA
+════════════════════
+IFOOD* → iFood | UBER TRIP → Uber/Transporte | FACEBK ADS → Marketing/Tráfego Pago
+AMAZON PRIME → Assinatura | NETFLIX → Assinatura | SPOTIFY → Assinatura
+*APPLE.COM → Assinatura | GOOGLE → SaaS/Software | MERCPAGO → Marketplace
+PAG* → PIX/Transferência | POSTO/SHELL/BR → Combustível
+
+Histórico de categorizações: ${histStr||"(sem histórico)"}
+
+════════════════════
+ANÁLISE COMPORTAMENTAL
+════════════════════
+Detecte: gastos emocionais/impulsivos, assinaturas esquecidas, parcelamentos excessivos,
+crescimento anormal, compras duplicadas, gastos noturnos, dependência de crédito
+
+════════════════════
+TEXTO DA FATURA
+════════════════════
+${text.slice(0,15000)}
+
+════════════════════
+RESPONDA APENAS COM JSON VÁLIDO:
+════════════════════
+{
+  "resumo": {
+    "total_fatura": 0.00,
+    "total_compras": 0.00,
+    "total_parcelamentos": 0.00,
+    "total_assinaturas": 0.00,
+    "qtd_transacoes": 0,
+    "periodo": "${mesLabel}",
+    "saude_financeira": "boa|regular|atenção|crítica",
+    "alertas": ["alerta 1"],
+    "assinaturas_detectadas": ["Netflix", "Spotify"],
+    "insight_comportamental": "análise profunda do comportamento de consumo",
+    "diagnostico": "diagnóstico honesto como analista financeiro senior"
+  },
+  "scores": {
+    "saude_cartao": 75,
+    "comprometimento": 45,
+    "risco_endividamento": 30,
+    "projecao_prox_fatura": 0
+  },
+  "parcelamentos_ativos": [
+    {"nome":"iPhone 15","parcela_atual":2,"parcela_total":12,"valor_parcela":489.00,"impacto_futuro":4890.00}
+  ],
+  "transacoes": [
+    {
+      "nome": "nome limpo e legível",
+      "nome_original": "como aparece na fatura",
+      "valor": 99.90,
+      "categoria": "categoria da lista",
+      "data": "YYYY-MM-DD",
+      "parcela_atual": 1,
+      "parcela_total": 1,
+      "confianca": 95,
+      "padrao": "único|recorrente|assinatura|parcelado|suspeito"
+    }
+  ]
+}`;
+
+  try{
+    const resp=await fetch("/api/ai-proxy",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
+      body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:8192,messages:[{role:"user",content:prompt}]})
+    });
+    const data=await resp.json();
+    if(!resp.ok) throw new Error(data?.error?.message||"Erro API");
+    const raw=(data.content||[]).map(b=>b.text||"").join("").trim();
+    const clean=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    const result=JSON.parse(clean);
+
+    // Import transactions
+    const txIds=[];
+    (result.transacoes||[]).forEach(tx=>{
+      if(!tx.nome||tx.valor==null) return;
+      const newId=nextFinId++;
+      FIN_TRANSACTIONS.push({
+        id:newId, nome:tx.nome, nome_original:tx.nome_original||tx.nome,
+        valor:parseAIValor(tx.valor), tipo:"cartao", categoria:tx.categoria||"Outros",
+        data:tx.data||dataDefault, origem:"ia", cartao_id:cardId,
+        parcela_atual:tx.parcela_atual||1, parcela_total:tx.parcela_total||1,
+        confianca:tx.confianca||null, padrao:tx.padrao||null
+      });
+      txIds.push(newId);
+    });
+
+    // Save fatura metadata
+    if(!card.faturas) card.faturas={};
+    card.faturas[mesAno]={
+      mesAno, status:"aberta",
+      valorTotal:parseAIValor(result.resumo?.total_fatura||0)||txIds.reduce((s,id)=>{const t=FIN_TRANSACTIONS.find(x=>x.id===id);return s+(t?.valor||0);},0),
+      txIds, analiseIA:{
+        ...result.resumo, scores:result.scores,
+        parcelamentos_ativos:result.parcelamentos_ativos||[]
+      }
+    };
+
+    if(statusEl) statusEl.textContent=`✅ ${txIds.length} transações importadas!`;
+    setTimeout(()=>{ if(statusEl) statusEl.textContent=""; },3000);
+    saveData();
+    renderCartoes();
+  }catch(e){
+    if(statusEl) statusEl.textContent="❌ "+e.message;
+    setTimeout(()=>{ if(statusEl) statusEl.textContent=""; },5000);
+  }
+  input.value="";
+}
+
+// ══════════════════════════════════════════════════════════
+//  FIM — CARTÕES DE CRÉDITO
+// ══════════════════════════════════════════════════════════
+
 function saveData(){
   try{
     const data = {
@@ -9884,6 +10644,8 @@ function saveData(){
       HABITS_DONE,
       nextHabId,
       CUSTOM_CATS,
+      CARDS,
+      nextCardId,
       finYear,
       finMonth,
       nextFinId,
@@ -9975,9 +10737,10 @@ function loadData(){
     if(data.nextHabId!=null)     nextHabId = data.nextHabId;
     if(data.CUSTOM_CATS){
       CUSTOM_CATS.splice(0,CUSTOM_CATS.length,...data.CUSTOM_CATS);
-      // Restaurar no CAT_LABEL_MAP
       CUSTOM_CATS.forEach(c=>{ CAT_LABEL_MAP[c.key]={label:c.label,badge:"c-outros",icon:c.icon||"🏷"}; });
     }
+    if(data.CARDS)         CARDS.splice(0,CARDS.length,...data.CARDS);
+    if(data.nextCardId!=null) nextCardId = data.nextCardId;
     // Restaurar meta fixada
     try{ const pg=localStorage.getItem("bsx_pinned_goal"); if(pg) pinnedGoalId=parseInt(pg)||null; }catch(e){}
 
@@ -12439,6 +13202,58 @@ switchDashView("dash");
       <span>↑↓ navegar</span>
       <span>↵ abrir</span>
       <span>ESC fechar</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ADICIONAR CARTÃO ══ -->
+<div class="ccm-overlay" id="ccm-overlay" onclick="closeAddCard()">
+  <div class="ccm-box" onclick="event.stopPropagation()">
+    <!-- Preview do cartão -->
+    <div class="ccm-preview" id="ccm-preview" style="background:linear-gradient(135deg,#6b5ce7,#a07ae8)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="cc-card-chip"></div>
+        <div style="font-size:.65rem;color:rgba(255,255,255,.7);font-weight:700" id="ccm-banco-lbl">Banco</div>
+      </div>
+      <div style="font-family:'Courier New',monospace;font-size:.75rem;letter-spacing:.2em;color:rgba(255,255,255,.8)" id="ccm-num-lbl">•••• •••• •••• <span id="ccm-num-preview">0000</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div style="font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:900;color:#fff" id="ccm-name-lbl">Nome do Cartão</div>
+        <div style="font-size:.58rem;color:rgba(255,255,255,.7);text-align:right">Limite<br><span style="font-size:.8rem;font-weight:900;color:#fff" id="ccm-limit-lbl">R$ 0,00</span></div>
+      </div>
+      <div class="cc-card-bg1"></div><div class="cc-card-bg2"></div>
+    </div>
+    <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;margin-bottom:16px;color:var(--text)">+ Novo Cartão</div>
+    <!-- Banco selector -->
+    <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Banco / Emissor</div>
+    <div class="ccm-bank-grid" id="ccm-bank-grid"></div>
+    <!-- Fields -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-size:.65rem;font-weight:700;color:var(--muted);margin-bottom:5px">Nome personalizado</div>
+        <input type="text" id="ccm-nome" placeholder="Ex: Nubank Principal" oninput="ccmUpdatePreview()" style="width:100%;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;box-sizing:border-box">
+      </div>
+      <div>
+        <div style="font-size:.65rem;font-weight:700;color:var(--muted);margin-bottom:5px">Últimos 4 dígitos</div>
+        <input type="text" id="ccm-ultimos4" placeholder="1234" maxlength="4" oninput="ccmUpdatePreview()" style="width:100%;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;box-sizing:border-box">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">
+      <div>
+        <div style="font-size:.65rem;font-weight:700;color:var(--muted);margin-bottom:5px">Limite (R$)</div>
+        <input type="number" id="ccm-limite" placeholder="5000" min="0" oninput="ccmUpdatePreview()" style="width:100%;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;box-sizing:border-box">
+      </div>
+      <div>
+        <div style="font-size:.65rem;font-weight:700;color:var(--muted);margin-bottom:5px">Fechamento (dia)</div>
+        <input type="number" id="ccm-fechamento" placeholder="15" min="1" max="31" style="width:100%;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;box-sizing:border-box">
+      </div>
+      <div>
+        <div style="font-size:.65rem;font-weight:700;color:var(--muted);margin-bottom:5px">Vencimento (dia)</div>
+        <input type="number" id="ccm-vencimento" placeholder="22" min="1" max="31" style="width:100%;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;box-sizing:border-box">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closeAddCard()" style="padding:9px 18px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-weight:700">Cancelar</button>
+      <button onclick="saveNewCard()" style="padding:9px 22px;border-radius:10px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:800;font-family:'Outfit',sans-serif">Adicionar Cartão</button>
     </div>
   </div>
 </div>
