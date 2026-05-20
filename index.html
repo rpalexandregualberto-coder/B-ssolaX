@@ -9145,72 +9145,135 @@ async function processFinFile(event, tipo){
     r.readAsText(file,"UTF-8");
   });
 
-  if(statusText) statusText.textContent="IA categorizando...";
+  if(statusText) statusText.textContent=`🧠 Motor financeiro inteligente processando...`;
 
-  const mesLabel=FIN_MONTHS[finMonth]+" "+finYear;
-  const catsList=tipo==="fatura"
+  const mesLabel = FIN_MONTHS[finMonth]+" "+finYear;
+  const catsList  = tipo==="fatura"
     ? FIN_CATS.cartao.join(", ")
     : [...FIN_CATS.receita,...FIN_CATS.despesa_extra,...FIN_CATS.investimento].join(", ");
 
-  const prompt=`Você é o CFO pessoal do usuário, especialista em finanças pessoais brasileiras.
-Sua missão: extrair MINUCIOSAMENTE TODAS as transações deste ${tipo==="fatura"?"extrato de fatura de cartão de crédito":"extrato bancário / PIX"}, sem deixar NENHUMA passar.
+  // Histórico de categorias para autoaprendizado contextual
+  const histCats = {};
+  FIN_TRANSACTIONS.slice(-100).forEach(t=>{
+    const k = (t.nome||"").toLowerCase().slice(0,15);
+    if(k) histCats[k] = t.categoria;
+  });
+  const histStr = Object.entries(histCats).slice(0,20).map(([k,v])=>`"${k}" → ${v}`).join("; ");
 
-REGRAS CRÍTICAS DE PRECISÃO:
-1. Identifique CADA linha que represente uma transação financeira. Se tiver 100 transações, retorne 100 — NÃO RESUMA, NÃO AGRUPE.
-2. Quando NÃO tiver certeza da categoria, use "Outros" e marque "needsReview": true.
-3. Se o nome estiver muito codificado/abreviado e você não souber o que é, use o nome cru e marque "needsReview": true.
-4. NUNCA invente transações. Só extraia o que está literalmente no texto.
+  const dataDefault = `${finYear}-${String(finMonth+1).padStart(2,"0")}-15`;
 
-Retorne APENAS JSON válido (sem markdown):
+  const prompt=`Você é uma IA especialista em Open Finance, engenharia financeira, conciliação bancária, classificação semântica de transações e análise comportamental financeira. Atua como motor financeiro inteligente de altíssima precisão.
+
+════════════════════
+REGRAS ABSOLUTAS
+════════════════════
+1. NUNCA ignore uma transação — se tiver 80 linhas, retorne 80 transações
+2. NUNCA descarte linhas incompletas — processe semanticamente
+3. NUNCA invente transações — só extraia o que está no texto
+4. NUNCA deixe transação sem categoria — use "Outros" se incerto
+5. NUNCA duplique lançamentos
+6. NUNCA altere valores originais
+7. SEMPRE categorize com nível de confiança
+8. SEMPRE valide o total — saldo_periodo = total_entradas − total_saidas
+
+════════════════════
+TIPO DE DOCUMENTO
+════════════════════
+${tipo==="fatura"
+  ? "FATURA DE CARTÃO DE CRÉDITO\n- Todas as compras = tipo 'cartao'\n- Créditos, estornos, pagamentos = tipo 'receita'\n- Parcelamentos: detectar e indicar 'parcelado' no padrão"
+  : "EXTRATO BANCÁRIO\n- PIX recebido, salário, comissão, transferências recebidas = tipo 'receita'\n- PIX enviado, compras, débito = tipo 'despesa_extra'\n- Contas fixas (Nubank, Aluguel, TERANET, Daycoval, EVOY, MIDWAY, Escola) = tipo 'despesa_fixa'\n- Aplicações, CDB, RDB, investimentos = tipo 'investimento'"}
+
+Período de referência: ${mesLabel}
+Data padrão (quando não identificada): ${dataDefault}
+
+════════════════════
+CATEGORIAS DISPONÍVEIS
+════════════════════
+${catsList}
+
+Regras específicas do usuário:
+- iFood, Ifood* → 🍔 iFood
+- Pão e Vinho, Doce Pão, padaria → 🥖 Padaria
+- Bistro19, Rancho do Cupim, restaurante, lanchonete → 🍽️ Restaurante
+- Uber, 99taxi, Cabify, INDRIVER → 🚗 Uber / Transporte
+- Mega, Mercadão, Assaí, Atacadão, Extra, supermercado → 🛒 Mercado
+- Conveniência, posto combustível, BR café → 🏪 Conveniência
+- RDB, CDB, Tesouro, aplicação automática → 📈 RDB / CDB
+- PIX recebido, transferência recebida → 📨 PIX Recebido
+- Salário, comissão, gratificação → 💼 Salário / Comissão
+- Netflix, Spotify, Amazon, Apple, Google, Globoplay → 📱 Assinatura
+- FACEBK, Meta Ads, Google Ads → 📣 Tráfego Pago
+- Farmácia, Drogasil, Droga Raia → 💊 Farmácia / Saúde
+
+Nomes abreviados bancários comuns:
+- IFOOD*PEDIDO → iFood
+- UBER TRIP → Uber / Transporte
+- GOOGLE TEMP → Assinatura
+- FACEBK ADS → Tráfego Pago
+- MERCPAGO → Marketplace / Transferência
+- PAG*NOME → PIX / Transferência pessoal
+- *APPLE.COM → Assinatura
+- NETFLIX → Assinatura
+
+Histórico de categorizações anteriores (use para aprendizado contextual):
+${histStr||"(sem histórico ainda)"}
+
+════════════════════
+ANÁLISE COMPORTAMENTAL
+════════════════════
+Detecte e informe no resumo:
+- gastos emocionais / impulsivos (muitas microtransações, horários noturnos)
+- assinaturas recorrentes esquecidas
+- cobranças anormais ou duplicadas
+- concentração de gastos em categorias específicas
+- inconsistências no saldo
+- padrões incomuns
+
+════════════════════
+TEXTO DO DOCUMENTO
+════════════════════
+${text.slice(0,15000)}
+
+════════════════════
+RESPONDA APENAS COM JSON VÁLIDO (sem markdown):
+════════════════════
 {
   "resumo": {
     "total_transacoes": 0,
     "total_entradas": 0.00,
     "total_saidas": 0.00,
     "saldo_periodo": 0.00,
-    "observacoes": "string curta com observação relevante"
+    "periodo": "${mesLabel}",
+    "saude_financeira": "boa|regular|atenção|crítica",
+    "alertas": ["alerta detectado 1", "alerta 2"],
+    "inconsistencias": ["inconsistência 1"],
+    "padroes_detectados": ["padrão recorrente 1"],
+    "assinaturas_detectadas": ["Netflix", "Spotify"],
+    "insight_comportamental": "análise do comportamento financeiro detectado",
+    "observacoes": "observação geral relevante"
   },
   "transacoes": [
     {
-      "nome": "descrição limpa",
+      "nome": "nome limpo e legível",
+      "nome_original": "como aparece no extrato",
       "valor": 99.90,
-      "tipo": "${tipo==="fatura"?"cartao":"receita | despesa_extra | despesa_fixa | investimento"}",
-      "categoria": "categoria da lista (ou 'Outros' se incerto)",
+      "tipo": "receita|despesa_extra|despesa_fixa|investimento|cartao",
+      "categoria": "categoria exata da lista",
       "data": "YYYY-MM-DD",
+      "confianca": 97,
+      "padrao": "único|recorrente|assinatura|parcelado|suspeito",
       "needsReview": false,
-      "motivo_review": "string opcional"
+      "motivo_review": "motivo se needsReview=true"
     }
   ]
-}
-
-Categorias disponíveis: ${catsList}
-
-Regras de categorização do usuário:
-- iFood = 🍔 iFood
-- Pão e Vinho, Doce Pão = 🥖 Padaria
-- Bistro19, Rancho do Cupim, restaurantes = 🍽️ Restaurante
-- Uber, 99 = 🚗 Uber / Transporte
-- Mega, Mercadão, supermercados = 🛒 Mercado
-- Conveniência, posto BR café = 🏪 Conveniência
-- RDB, CDB, aplicação = 📈 RDB / CDB
-- PIX recebido = 📨 PIX Recebido
-- Salário, comissão = 💼 Salário / Comissão
-- Se não souber a data, use 15/${(finMonth+1).toString().padStart(2,"0")}/${finYear}
-- Limpe nomes (sem asteriscos, códigos, IDs)
-- Valores sempre positivos
-- Se encontrar pagamento de conta fixa (Nubank, Aluguel, Davi Emmanuel, Camila, TERANET, Daycoval, EVOY, Riachuelo, MIDWAY, Escola, Aimê), marque tipo como "despesa_fixa"
-${tipo==="fatura"?"- Fatura: tudo é 'cartao', exceto créditos/estornos que são 'receita'":"- PIX saídas = despesa_extra, PIX entradas = receita, aplicações = investimento"}
-
-TEXTO:
-${text.slice(0,5000)}
-
-Responda APENAS com o JSON.`;
+}`;
 
   try{
+    if(statusText) statusText.textContent="🔍 Identificando e classificando transações...";
     const resp=await fetch("/api/ai-proxy",{
       method:"POST",
       headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
-      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:8192,messages:[{role:"user",content:prompt}]})
+      body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:8192,messages:[{role:"user",content:prompt}]})
     });
     const data=await resp.json();
     if(!resp.ok) throw new Error(data?.error?.message||"Erro API");
@@ -9220,17 +9283,24 @@ Responda APENAS com o JSON.`;
     let count=0;
     const importedIds = [];
     (result.transacoes||[]).forEach(tx=>{
-      if(!tx.nome||!tx.valor) return;
+      if(!tx.nome||tx.valor==null) return;
       const newId = nextFinId++;
       const newTx = {
-        id: newId, nome: tx.nome, valor: Math.abs(tx.valor),
-        tipo: tx.tipo||"despesa_extra", categoria: tx.categoria||"Outros",
-        data: tx.data||new Date().toISOString().split("T")[0], origem: "ia",
-        needsReview: !!tx.needsReview, motivoReview: tx.motivo_review || ""
+        id: newId,
+        nome: tx.nome,
+        nome_original: tx.nome_original||tx.nome,
+        valor: Math.abs(tx.valor),
+        tipo: tx.tipo||"despesa_extra",
+        categoria: tx.categoria||"Outros",
+        data: tx.data||dataDefault,
+        origem: "ia",
+        confianca: tx.confianca||null,
+        padrao: tx.padrao||null,
+        needsReview: !!tx.needsReview,
+        motivoReview: tx.motivo_review||""
       };
-      // Vincula ao cartao ou conta
-      const _vId = (typeof vinculoId !== 'undefined') ? vinculoId : window._finImportVinculoId;
-      const _vTipo = (typeof tipo !== 'undefined') ? tipo : window._finImportTipo;
+      const _vId   = (typeof vinculoId !== "undefined") ? vinculoId : window._finImportVinculoId;
+      const _vTipo = (typeof tipo !== "undefined") ? tipo : window._finImportTipo;
       if(_vId != null){
         if(_vTipo === "fatura"){
           newTx.cartao_id = _vId;
@@ -9244,11 +9314,11 @@ Responda APENAS com o JSON.`;
       count++;
     });
     matchFixasFromTransactions();
-    if(statusText) statusText.textContent=`✅ ${count} transações importadas!`;
-    setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; }, 2000);
+    if(statusText) statusText.textContent=`✅ ${count} transações importadas com inteligência financeira!`;
+    setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; }, 2500);
     renderFinanceiro();
     try{ saveData(); }catch(e){}
-    setTimeout(()=>showImportReview(importedIds, result.resumo), 500);
+    setTimeout(()=>showImportReview(importedIds, result.resumo), 600);
   }catch(e){
     if(statusText) statusText.textContent="❌ "+e.message;
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },4000);
@@ -9257,53 +9327,173 @@ Responda APENAS com o JSON.`;
 }
 
 function showImportReview(importedIds, resumo){
-  const txs = FIN_TRANSACTIONS.filter(t=>importedIds.includes(t.id));
+  const txs    = FIN_TRANSACTIONS.filter(t=>importedIds.includes(t.id));
   const review = txs.filter(t=>t.needsReview);
-  const overlay = document.createElement("div");
-  overlay.id = "import-review-overlay";
-  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:20px";
-  const resumoHtml = resumo ? `
-    <div style="background:rgba(91,159,255,.06);border:1px solid rgba(91,159,255,.3);border-radius:10px;padding:14px 18px;margin-bottom:16px">
-      <div style="font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--blue);margin-bottom:8px">📊 Resumo da IA</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;font-size:.78rem">
-        <div><div style="color:var(--muted);font-size:.65rem">Total</div><div style="font-weight:800">${resumo.total_transacoes||txs.length}</div></div>
-        <div><div style="color:var(--muted);font-size:.65rem">Entradas</div><div style="font-weight:800;color:var(--green)">${fmtBRL(resumo.total_entradas||0)}</div></div>
-        <div><div style="color:var(--muted);font-size:.65rem">Saídas</div><div style="font-weight:800;color:var(--red)">${fmtBRL(resumo.total_saidas||0)}</div></div>
-        <div><div style="color:var(--muted);font-size:.65rem">Saldo</div><div style="font-weight:800;color:${(resumo.saldo_periodo||0)>=0?'var(--green)':'var(--red)'}">${fmtBRL(resumo.saldo_periodo||0)}</div></div>
+  const allCats = [...FIN_CATS.receita,...FIN_CATS.despesa_extra,...(FIN_CATS.despesa_fixa||[]),...FIN_CATS.investimento,...FIN_CATS.cartao].filter((v,i,a)=>a.indexOf(v)===i);
+
+  const esc = s => (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+  // ── Saúde financeira badge ──
+  const saudeMap = {
+    "boa":     {cor:"var(--green)",  icon:"💚"},
+    "regular": {cor:"var(--blue)",   icon:"💙"},
+    "atenção": {cor:"var(--orange)", icon:"⚠️"},
+    "crítica": {cor:"var(--red)",    icon:"🚨"}
+  };
+  const saude = saudeMap[resumo?.saude_financeira] || saudeMap["regular"];
+
+  // ── Confidence badge helper ──
+  const confBadge = c => {
+    if(!c) return "";
+    const cor = c>=90?"var(--green)":c>=70?"var(--blue)":c>=50?"var(--orange)":"var(--red)";
+    return `<span style="font-size:.6rem;font-weight:700;padding:1px 7px;border-radius:5px;background:${cor}22;color:${cor};border:1px solid ${cor}44">${c}%</span>`;
+  };
+
+  // ── Padrão badge helper ──
+  const padraoBadge = p => {
+    if(!p) return "";
+    const map = {
+      recorrente: {cor:"#5b9fff",lbl:"🔁 Recorrente"},
+      assinatura: {cor:"#a07ae8",lbl:"📱 Assinatura"},
+      parcelado:  {cor:"#f5a623",lbl:"📦 Parcelado"},
+      suspeito:   {cor:"#ff4d6d",lbl:"⚠️ Suspeito"},
+      único:      {cor:"var(--dim)",lbl:"• Único"}
+    };
+    const d = map[p]||{cor:"var(--dim)",lbl:p};
+    return `<span style="font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:5px;background:${d.cor}22;color:${d.cor}">${d.lbl}</span>`;
+  };
+
+  // ── KPIs ──
+  const saldo = (resumo?.saldo_periodo||0);
+  const kpisHtml = `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+      <div style="background:var(--surface);border-radius:12px;padding:10px 12px;border:1px solid var(--border);text-align:center">
+        <div style="font-size:.6rem;color:var(--muted);font-weight:700">TRANSAÇÕES</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:900;color:var(--text)">${resumo?.total_transacoes||txs.length}</div>
       </div>
-      ${resumo.observacoes?`<div style="margin-top:10px;font-size:.74rem;color:var(--text);font-style:italic">💡 ${resumo.observacoes}</div>`:''}
-    </div>` : '';
+      <div style="background:var(--surface);border-radius:12px;padding:10px 12px;border:1px solid rgba(52,197,122,.3);text-align:center">
+        <div style="font-size:.6rem;color:var(--muted);font-weight:700">ENTRADAS</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--green)">${fmtBRL(resumo?.total_entradas||0)}</div>
+      </div>
+      <div style="background:var(--surface);border-radius:12px;padding:10px 12px;border:1px solid rgba(255,77,109,.3);text-align:center">
+        <div style="font-size:.6rem;color:var(--muted);font-weight:700">SAÍDAS</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--red)">${fmtBRL(resumo?.total_saidas||0)}</div>
+      </div>
+      <div style="background:var(--surface);border-radius:12px;padding:10px 12px;border:1px solid ${saldo>=0?"rgba(52,197,122,.3)":"rgba(255,77,109,.3)"};text-align:center">
+        <div style="font-size:.6rem;color:var(--muted);font-weight:700">SALDO</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:${saldo>=0?"var(--green)":"var(--red)"}">${saldo<0?"−":""}${fmtBRL(saldo)}</div>
+      </div>
+    </div>`;
+
+  // ── Inteligência financeira ──
+  const alertas = resumo?.alertas||[];
+  const inconsistencias = resumo?.inconsistencias||[];
+  const padroes = resumo?.padroes_detectados||[];
+  const assinaturas = resumo?.assinaturas_detectadas||[];
+
+  const intelHtml = (alertas.length||inconsistencias.length||padroes.length||assinaturas.length||resumo?.insight_comportamental) ? `
+    <div style="margin-bottom:12px">
+      ${resumo?.insight_comportamental?`
+        <div style="background:rgba(160,122,232,.08);border:1px solid var(--accent-border);border-radius:10px;padding:12px 14px;margin-bottom:8px">
+          <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;color:var(--accent);margin-bottom:5px">🧠 Inteligência Comportamental</div>
+          <div style="font-size:.8rem;color:var(--text);line-height:1.6;font-style:italic">${esc(resumo.insight_comportamental)}</div>
+        </div>`:""}
+      ${alertas.length?`
+        <div style="background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.3);border-radius:10px;padding:10px 14px;margin-bottom:8px">
+          <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;color:var(--red);margin-bottom:5px">🚨 Alertas Detectados</div>
+          ${alertas.map(a=>`<div style="font-size:.76rem;color:var(--text);padding:2px 0">→ ${esc(a)}</div>`).join("")}
+        </div>`:""}
+      ${inconsistencias.length?`
+        <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:10px 14px;margin-bottom:8px">
+          <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;color:var(--orange);margin-bottom:5px">⚡ Inconsistências</div>
+          ${inconsistencias.map(i=>`<div style="font-size:.76rem;color:var(--text);padding:2px 0">⚡ ${esc(i)}</div>`).join("")}
+        </div>`:""}
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${assinaturas.length?`<div style="background:rgba(160,122,232,.08);border:1px solid var(--accent-border);border-radius:9px;padding:8px 12px;flex:1;min-width:160px">
+          <div style="font-size:.6rem;font-weight:800;text-transform:uppercase;color:var(--accent);margin-bottom:4px">📱 Assinaturas</div>
+          ${assinaturas.map(s=>`<span style="font-size:.7rem;background:var(--surface);padding:2px 8px;border-radius:5px;margin:2px;display:inline-block">${esc(s)}</span>`).join("")}
+        </div>`:""}
+        ${padroes.length?`<div style="background:rgba(91,143,238,.06);border:1px solid rgba(91,143,238,.3);border-radius:9px;padding:8px 12px;flex:1;min-width:160px">
+          <div style="font-size:.6rem;font-weight:800;text-transform:uppercase;color:var(--blue);margin-bottom:4px">🔁 Padrões</div>
+          ${padroes.map(p=>`<div style="font-size:.7rem;color:var(--text);padding:1px 0">${esc(p)}</div>`).join("")}
+        </div>`:""}
+      </div>
+      ${resumo?.observacoes?`<div style="font-size:.74rem;color:var(--dim);margin-top:8px;padding:8px 12px;background:var(--surface);border-radius:8px;font-style:italic">💡 ${esc(resumo.observacoes)}</div>`:""}
+    </div>` : "";
+
+  // ── Revisão das incertas ──
   const reviewHtml = review.length ? `
-    <div style="background:rgba(255,170,60,.06);border:1px solid rgba(255,170,60,.3);border-radius:10px;padding:14px 18px;margin-bottom:14px">
-      <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--orange);margin-bottom:10px">⚠️ ${review.length} ${review.length===1?'transação precisa':'transações precisam'} de revisão</div>
-      <div style="font-size:.72rem;color:var(--muted);margin-bottom:12px">A IA não conseguiu classificar com certeza. Confirme/ajuste:</div>
-      <div style="display:grid;gap:10px;max-height:340px;overflow-y:auto">
-        ${review.map(t=>{
-          const allCats = [...FIN_CATS.receita,...FIN_CATS.despesa_extra,...(FIN_CATS.despesa_fixa||[]),...FIN_CATS.investimento,...FIN_CATS.cartao].filter((v,i,a)=>a.indexOf(v)===i);
-          return `<div data-rev-id="${t.id}" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
-            <div style="font-weight:600;font-size:.82rem;margin-bottom:4px">${t.nome} <span style="color:var(--orange);font-weight:700">${fmtBRL(t.valor)}</span></div>
-            ${t.motivoReview?`<div style="font-size:.66rem;color:var(--muted);margin-bottom:6px">↳ ${t.motivoReview}</div>`:''}
+    <div style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--orange);margin-bottom:4px">⚠️ ${review.length} ${review.length===1?"transação precisa":"transações precisam"} de revisão</div>
+      <div style="font-size:.7rem;color:var(--muted);margin-bottom:10px">IA classificou com baixa confiança — confirme ou ajuste:</div>
+      <div style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto">
+        ${review.map(t=>`
+          <div data-rev-id="${t.id}" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">
+              <span style="font-weight:700;font-size:.82rem;flex:1">${esc(t.nome)}</span>
+              <span style="font-family:'Outfit',sans-serif;font-weight:900;color:var(--orange)">${fmtBRL(t.valor)}</span>
+              ${confBadge(t.confianca)}
+              ${padraoBadge(t.padrao)}
+            </div>
+            ${t.nome_original&&t.nome_original!==t.nome?`<div style="font-size:.62rem;color:var(--dim);margin-bottom:4px">Original: "${esc(t.nome_original)}"</div>`:""}
+            ${t.motivoReview?`<div style="font-size:.68rem;color:var(--orange);margin-bottom:6px">↳ ${esc(t.motivoReview)}</div>`:""}
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-              <select id="review-cat-${t.id}" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:.74rem;color:var(--text);outline:none">
-                ${allCats.map(c=>`<option value="${c}" ${c===t.categoria?'selected':''}>${c}</option>`).join('')}
+              <select id="review-cat-${t.id}" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:.74rem;color:var(--text);outline:none;flex:1">
+                ${allCats.map(c=>`<option value="${c}" ${c===t.categoria?"selected":""}>${c}</option>`).join("")}
               </select>
-              <button onclick="confirmReviewTx(${t.id})" style="background:var(--green);color:#000;border:none;border-radius:6px;padding:4px 12px;font-size:.7rem;font-weight:700;cursor:pointer">✓ Ok</button>
+              <button onclick="confirmReviewTx(${t.id})" style="background:var(--green);color:#000;border:none;border-radius:6px;padding:4px 12px;font-size:.7rem;font-weight:700;cursor:pointer;white-space:nowrap">✓ Confirmar</button>
               <button onclick="deleteReviewTx(${t.id})" style="background:var(--card);border:1px solid var(--border);color:var(--red);border-radius:6px;padding:4px 10px;font-size:.7rem;cursor:pointer">🗑</button>
             </div>
+          </div>`).join("")}
+      </div>
+    </div>` : `
+    <div style="text-align:center;padding:16px;background:rgba(52,197,122,.06);border:1px solid rgba(52,197,122,.3);border-radius:10px;margin-bottom:12px">
+      <div style="font-size:1.4rem;margin-bottom:4px">🎯</div>
+      <div style="font-size:.82rem;color:var(--green);font-weight:700">Todas as ${txs.length} transações classificadas com alta confiança!</div>
+    </div>`;
+
+  // ── Lista completa ──
+  const listaHtml = `
+    <details style="margin-bottom:12px">
+      <summary style="cursor:pointer;font-size:.72rem;font-weight:700;color:var(--dim);padding:8px 0;list-style:none;display:flex;align-items:center;gap:6px">
+        <span>▶</span> Ver todas as ${txs.length} transações importadas
+      </summary>
+      <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;max-height:320px;overflow-y:auto">
+        ${txs.map(t=>{
+          const tipoColor = t.tipo==="receita"?"var(--green)":t.tipo==="investimento"?"var(--blue)":"var(--red)";
+          return `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--border)${t.needsReview?";border-color:rgba(245,166,35,.4)":""}">
+            <span style="font-size:.7rem;flex:1;color:var(--text)">${esc(t.nome)}</span>
+            <span style="font-size:.65rem;color:var(--dim)">${t.categoria}</span>
+            ${confBadge(t.confianca)}
+            ${padraoBadge(t.padrao)}
+            <span style="font-size:.75rem;font-weight:700;color:${tipoColor};white-space:nowrap">${t.tipo==="receita"?"+":"−"}${fmtBRL(t.valor)}</span>
           </div>`;
-        }).join('')}
+        }).join("")}
       </div>
-    </div>` : `<div style="text-align:center;padding:20px;color:var(--green);font-size:.82rem">✅ Todas as ${txs.length} transações foram classificadas com confiança pela IA!</div>`;
+    </details>`;
+
+  const overlay = document.createElement("div");
+  overlay.id = "import-review-overlay";
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:16px";
   overlay.innerHTML = `
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;padding:22px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-        <div style="font-size:1.4rem">🤖</div>
-        <div style="font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:800;color:var(--text)">Revisão da Importação</div>
-        <button onclick="closeImportReview()" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer">✕</button>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:18px;max-width:720px;width:100%;max-height:92vh;overflow-y:auto;padding:22px;box-shadow:0 32px 100px rgba(0,0,0,.5)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px">
+        <div style="font-size:1.5rem">🏦</div>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;color:var(--text)">Motor Financeiro Inteligente</div>
+          <div style="font-size:.7rem;color:var(--dim)">Análise concluída · Claude Sonnet · Open Finance</div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+          ${resumo?.saude_financeira?`<span style="font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:8px;background:${saude.cor}22;color:${saude.cor};border:1px solid ${saude.cor}44">${saude.icon} ${resumo.saude_financeira.toUpperCase()}</span>`:""}
+          <button onclick="closeImportReview()" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center">✕</button>
+        </div>
       </div>
-      ${resumoHtml}${reviewHtml}
-      <div style="margin-top:16px;display:flex;justify-content:flex-end;gap:8px">
-        <button onclick="closeImportReview()" class="btn btn-primary">Fechar e finalizar</button>
+      ${kpisHtml}
+      ${intelHtml}
+      ${reviewHtml}
+      ${listaHtml}
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:12px;border-top:1px solid var(--border)">
+        <button onclick="closeImportReview()" class="btn btn-primary" style="padding:8px 22px">✅ Finalizar Importação</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
