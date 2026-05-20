@@ -8611,7 +8611,7 @@ function renderFinanceiro(){
         return `<div class="fin-tx-item">
           <div class="fin-tx-cat-dot" style="background:${color}"></div>
           <div class="fin-tx-info">
-            <div class="fin-tx-name">${t.nome}</div>
+            <div class="fin-tx-name">${t.nome}${t.futuro?` <span style="font-size:.58rem;background:#f59e0b22;color:#f59e0b;border-radius:4px;padding:1px 5px;font-weight:700;vertical-align:middle">⏳ PENDENTE</span>`:""}</div>
             <div class="fin-tx-meta">
               <span>${t.categoria}</span>
               <span>📅 ${d}</span>
@@ -9415,6 +9415,13 @@ async function processFinFile(event, tipo){
   window._finImportVinculoId = vinculoId;
   window._finImportTipo = tipo;
 
+  // Pergunta se a fatura já foi paga (somente para fatura de cartão)
+  let isFuturo = false;
+  if(tipo === "fatura"){
+    isFuturo = !confirm("Esta fatura já foi paga?\n\n✅ OK = Fatura paga (lançamentos normais)\n⏳ Cancelar = Fatura em aberto / futura");
+  }
+  window._finImportFuturo = isFuturo;
+
   if(statusEl) statusEl.style.display="flex";
   if(statusText) statusText.textContent=`Lendo ${tipo==="fatura"?"fatura do cartão":"extrato bancário"}...`;
 
@@ -9489,6 +9496,8 @@ JSON SOMENTE:
         estorno: tx.estorno||false
       };
       if(tx.estorno) newTx.valor=-Math.abs(tx.valor); // estorno reduz o total
+      const _futuro=(typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
+      if(_futuro) newTx.futuro=true;
       const _vId=(typeof vinculoId!=="undefined")?vinculoId:window._finImportVinculoId;
       const _vTipo=(typeof tipo!=="undefined")?tipo:window._finImportTipo;
       if(_vId!=null){ if(_vTipo==="fatura") newTx.cartao_id=_vId; else newTx.conta_id=_vId; }
@@ -9496,7 +9505,8 @@ JSON SOMENTE:
       importedIds.push(newId);
     });
     matchFixasFromTransactions();
-    if(statusText) statusText.textContent=`✅ ${importedIds.length} transações importadas do CSV!`;
+    const _fut2=isFuturo||!!window._finImportFuturo;
+    if(statusText) statusText.textContent=`✅ ${importedIds.length} transações importadas${_fut2?" (pendentes — fatura em aberto)":""}!`;
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },2500);
     renderFinanceiro(); try{ saveData(); }catch(e){}
     const totalLiq=nubankTxsRaw.reduce((s,t)=>s+t.valor,0);
@@ -9565,6 +9575,8 @@ JSON SOMENTE:
           newTx.conta_id = _vId;
         }
       }
+      const _futuro2=(typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
+      if(_futuro2) newTx.futuro=true;
       FIN_TRANSACTIONS.push(newTx);
       importedIds.push(newId);
       count++;
