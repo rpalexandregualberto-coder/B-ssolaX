@@ -1558,6 +1558,42 @@ textarea.form-input{border-radius:16px;resize:vertical}
   font-size:.85rem;color:var(--text);line-height:1.75;
   margin-bottom:16px;
 }
+/* ══ RELATÓRIO IA — INTELLIGENCE UPGRADE ══ */
+.rel-geral-block{display:flex;align-items:center;gap:22px;padding:18px 22px;border-radius:16px;margin-bottom:16px;background:linear-gradient(135deg,rgba(160,122,232,.12),rgba(91,143,238,.06));border:1px solid var(--accent-border)}
+.rel-geral-num{font-family:'Outfit',sans-serif;font-size:3.4rem;font-weight:900;line-height:1}
+.rel-geral-label{font-weight:800;font-size:.95rem;margin-bottom:3px}
+.rel-geral-sub{font-size:.72rem;color:var(--dim)}
+.rel-score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+.rel-score-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 10px;text-align:center}
+.rel-score-val{font-family:'Outfit',sans-serif;font-size:1.55rem;font-weight:900;line-height:1}
+.rel-score-lbl{font-size:.56rem;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.rel-score-bar{height:3px;border-radius:99px;margin-top:5px;background:var(--border);overflow:hidden}
+.rel-score-bar-fill{height:100%;border-radius:99px}
+.rel-index-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.rel-index-lbl{font-size:.73rem;font-weight:700;flex:1;color:var(--text)}
+.rel-index-track{flex:2;height:10px;background:var(--border);border-radius:99px;overflow:hidden}
+.rel-index-fill{height:100%;border-radius:99px;transition:width 1.2s ease}
+.rel-index-num{font-size:.75rem;font-weight:800;min-width:38px;text-align:right}
+.rel-insight-item{font-size:.8rem;line-height:1.65;padding:8px 12px 8px 14px;border-left:3px solid var(--accent);background:var(--accent-dim);border-radius:0 10px 10px 0;margin-bottom:5px;color:var(--text)}
+.rel-plan-row{padding:10px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--border);margin-bottom:6px;display:flex;align-items:flex-start;gap:10px}
+.rel-plan-prio{font-size:.58rem;font-weight:700;padding:3px 8px;border-radius:5px;flex-shrink:0;margin-top:2px}
+.rel-plan-prio-alta{background:rgba(255,77,109,.15);color:var(--red)}
+.rel-plan-prio-media{background:rgba(245,166,35,.12);color:var(--orange)}
+.rel-plan-prio-baixa{background:rgba(52,197,122,.1);color:var(--green)}
+.rel-plan-acao{font-size:.82rem;color:var(--text);flex:1;line-height:1.5}
+.rel-plan-impacto{font-size:.7rem;color:var(--dim);margin-top:2px}
+.rel-diag-box{font-size:.83rem;line-height:1.75;padding:16px 18px;border-radius:12px;background:rgba(160,122,232,.07);border:1px solid var(--accent-border);color:var(--text);font-style:italic}
+.rel-prob-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.rel-prob-lbl{font-size:.73rem;font-weight:700;flex:1;color:var(--text)}
+.rel-prob-track{flex:2;height:10px;background:var(--border);border-radius:99px;overflow:hidden}
+.rel-prob-fill{height:100%;border-radius:99px;transition:width 1.2s ease}
+.rel-prob-num{font-size:.75rem;font-weight:800;min-width:38px;text-align:right}
+.rel-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.rel-col-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.rel-col-title{font-size:.63rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.rel-col-item{font-size:.77rem;line-height:1.55;color:var(--text);padding:3px 0;border-bottom:1px solid var(--border)}
+.rel-col-item:last-child{border-bottom:none}
+.rel-frase{background:linear-gradient(135deg,rgba(160,122,232,.1),rgba(91,143,238,.06));border:1px solid var(--accent-border);border-radius:14px;padding:18px 20px;text-align:center;font-size:.9rem;line-height:1.8;color:var(--text);font-style:italic;font-weight:500}
 
 /* ══════════════════════════════════════
    DASHBOARD EQUIPES
@@ -6878,51 +6914,209 @@ async function gerarRelatorio(){
   if(!btn||!content) return;
 
   btn.classList.add("loading");
-  btn.textContent="⏳ Analisando...";
+  btn.textContent="⏳ Gerando inteligência...";
   content.innerHTML=`<div class="relatorio-loading">
     <div class="ai-spinner"></div>
-    A IA está analisando toda a sua semana...
+    IA analisando toda a sua semana com profundidade estratégica...
   </div>`;
 
-  // Build context for AI
+  // ── COLETA DE DADOS COMPLETA ──
   const total   = TASKS.length;
   const done    = doneSet.size;
   const proc    = procSet.size;
-  const pend    = total-done-proc;
+  const pend    = total - done - proc;
   const venc    = getVencidas().length;
   const {score} = calcScore();
-  const urgDone = TASKS.filter(t=>(t.urg==="paontem"||t.urg==="urgente")&&doneSet.has(t.id)).length;
-  const urgTot  = TASKS.filter(t=>t.urg==="paontem"||t.urg==="urgente").length;
-  const projSumm= PROJECTS.map(p=>`${p.name}(${projectProgress(p.id)}%)`).join(", ")||"Nenhum projeto";
-  const tasksDone = TASKS.filter(t=>doneSet.has(t.id)).map(t=>t.name).join(", ")||"Nenhuma";
-  const tasksPend = TASKS.filter(t=>!doneSet.has(t.id)&&t.urg!=="pouco").map(t=>t.name).slice(0,8).join(", ")||"Nenhuma";
-  const meetCount = meetings.filter(m=>m.aiData).length;
 
-  const _uName2=(typeof USER_PROFILE!=="undefined"&&USER_PROFILE.name)?USER_PROFILE.name:"o usuário";
-  const _uRole2=(typeof USER_PROFILE!=="undefined"&&USER_PROFILE.role)?USER_PROFILE.role:"profissional";
-  const _uCity2=(typeof USER_PROFILE!=="undefined"&&USER_PROFILE.city)?USER_PROFILE.city:"";
-  const prompt = `Você é o assistente pessoal de ${_uName2}, ${_uRole2}${_uCity2?" em "+_uCity2:""}.
-Analise a semana abaixo e retorne APENAS JSON válido (sem markdown):
+  // Tarefas por urgência
+  const urgTot    = TASKS.filter(t=>t.urg==="paontem"||t.urg==="urgente").length;
+  const urgDone   = TASKS.filter(t=>(t.urg==="paontem"||t.urg==="urgente")&&doneSet.has(t.id)).length;
+  const taxaConclusao = total>0 ? Math.round(done/total*100) : 0;
+
+  // Tarefas por categoria
+  const catCount = {};
+  TASKS.forEach(t=>{ catCount[t.cat||"outros"]=(catCount[t.cat||"outros"]||0)+1; });
+  const catStr = Object.entries(catCount).map(([c,n])=>`${c}:${n}`).join(", ");
+
+  // Tarefas concluídas e pendentes
+  const tasksDone = TASKS.filter(t=>doneSet.has(t.id)).map(t=>t.name).slice(0,10).join("; ")||"Nenhuma";
+  const tasksPend = TASKS.filter(t=>!doneSet.has(t.id)&&!procSet.has(t.id)).map(t=>`${t.name}(${t.urg||"normal"})`).slice(0,8).join("; ")||"Nenhuma";
+  const tasksVenc = TASKS.filter(t=>getVencidas().some(v=>v.id===t.id)).map(t=>t.name).join("; ")||"Nenhuma";
+
+  // Projetos
+  const projSumm = PROJECTS.map(p=>`${p.name}:${projectProgress(p.id)}%`).join(", ")||"Nenhum projeto";
+
+  // Metas
+  const goalsSumm = (GOALS||[]).map(g=>{
+    const prog = g.current && g.target ? Math.round(g.current/g.target*100) : (g.progress||0);
+    return `${g.name}:${prog}%`;
+  }).join(", ")||"Nenhuma meta";
+
+  // Financeiro do mês
+  const txs = (FIN_TRANSACTIONS||[]);
+  const now = new Date();
+  const monthTxs = txs.filter(t=>{ const d=new Date(t.data); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  const totalEnt  = monthTxs.filter(t=>t.tipo==="entrada").reduce((s,t)=>s+(t.valor||0),0);
+  const totalDesp = monthTxs.filter(t=>t.tipo==="saida").reduce((s,t)=>s+(t.valor||0),0);
+  const saldoMes  = totalEnt - totalDesp;
+  const topCats   = {};
+  monthTxs.filter(t=>t.tipo==="saida").forEach(t=>{ topCats[t.categoria||"outros"]=(topCats[t.categoria||"outros"]||0)+(t.valor||0); });
+  const topCatsStr = Object.entries(topCats).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([c,v])=>`${c}:R$${v.toFixed(0)}`).join(", ")||"Sem dados";
+  const metaGastos = FIN_META_GASTOS||0;
+  const metaStatus = metaGastos>0 ? `Meta R$${metaGastos} — gasto R$${totalDesp.toFixed(0)} (${Math.round(totalDesp/metaGastos*100)}%)` : "Sem meta definida";
+
+  // Hábitos
+  const todayStr = now.toISOString().split("T")[0];
+  const habTotal  = (HABITS||[]).length;
+  const habDoneHj = (HABITS||[]).filter(h=>(HABITS_DONE||{})[`${h.id}_${todayStr}`]).length;
+  const habSumm   = (HABITS||[]).map(h=>{
+    const str = getHabitStreak?.(h)||0;
+    return `${h.nome}(streak:${str}d)`;
+  }).join(", ")||"Nenhum hábito";
+
+  // XP e gamificação
+  const xpTotal = totalXP||0;
+  const xpLevel = typeof calcLevel==="function" ? calcLevel(xpTotal) : Math.floor(xpTotal/100);
+
+  // Reuniões com IA
+  const meetAnalisadas = meetings.filter(m=>m.aiData).length;
+  const meetInsights   = meetings.filter(m=>m.aiData).slice(-3).map(m=>{
+    const s = m.aiData?.scores?.geral||"?";
+    const prob = m.aiData?.probabilidades?.execucao_plano||"?";
+    return `"${m.title}"(nota:${s},execução:${prob}%)`;
+  }).join("; ")||"Nenhuma reunião analisada";
+
+  // Conteúdo
+  const postsPorStatus = {};
+  (CONTENT_POSTS||[]).forEach(p=>{ postsPorStatus[p.status]=(postsPorStatus[p.status]||0)+1; });
+  const contentStr = Object.entries(postsPorStatus).map(([s,n])=>`${s}:${n}`).join(", ")||"Sem posts";
+
+  // Perfil do usuário
+  const uName = (USER_PROFILE?.name)||"usuário";
+  const uRole = (USER_PROFILE?.role)||"profissional";
+  const uCity = (USER_PROFILE?.city)||"";
+
+  const prompt = `Você é uma IA especialista em inteligência estratégica, produtividade humana, gestão operacional, comportamento humano, psicologia comportamental, performance executiva, análise de rotina, gestão de energia, neuroprodutividade, tomada de decisão e planejamento estratégico.
+
+Sua função é atuar como um sistema de inteligência executiva completa para ${uName}, ${uRole}${uCity?", "+uCity:""}.
+
+Você funciona simultaneamente como:
+- Consultoria estratégica (nível McKinsey)
+- Psicólogo comportamental
+- Diretor comercial / COO
+- Mentor de alta performance
+- Analista operacional
+- Conselheiro executivo
+
+════════════════════
+DADOS COMPLETOS DA SEMANA
+════════════════════
+
+OPERACIONAL — TAREFAS:
+- Score de produtividade: ${score}/100
+- Total de tarefas: ${total} | Concluídas: ${done} (${taxaConclusao}%) | Em processo: ${proc} | Pendentes: ${pend}
+- Prazos vencidos: ${venc} | Urgentes resolvidas: ${urgDone}/${urgTot}
+- Por categoria: ${catStr}
+- Tarefas concluídas: ${tasksDone}
+- Pendentes importantes: ${tasksPend}
+- Tarefas com prazo vencido: ${tasksVenc}
+
+PROJETOS:
+${projSumm}
+
+METAS E OBJETIVOS:
+${goalsSumm}
+
+FINANCEIRO (mês atual):
+- Entradas: R$${totalEnt.toFixed(2)} | Despesas: R$${totalDesp.toFixed(2)} | Saldo: R$${saldoMes.toFixed(2)}
+- Top categorias de gasto: ${topCatsStr}
+- ${metaStatus}
+- Total de transações no mês: ${monthTxs.length}
+
+HÁBITOS:
+- Total de hábitos cadastrados: ${habTotal}
+- Completados hoje: ${habDoneHj}/${habTotal}
+- Detalhes: ${habSumm}
+
+GAMIFICAÇÃO E EVOLUÇÃO:
+- XP total: ${xpTotal} | Nível: ${xpLevel}
+
+REUNIÕES (analisadas pela IA):
+- Quantidade: ${meetAnalisadas}
+- Últimas análises: ${meetInsights}
+
+PRODUÇÃO DE CONTEÚDO:
+${contentStr}
+
+════════════════════
+MISSÃO
+════════════════════
+
+Analise com profundidade máxima e retorne APENAS JSON válido (sem markdown) neste formato exato:
 
 {
-  "resumo_executivo": "Resumo da semana em 2-3 frases diretas",
-  "pontos_positivos": ["conquista 1", "conquista 2", "conquista 3"],
-  "alertas": ["alerta 1", "alerta 2"],
-  "plano_proxima_semana": ["ação prioritária 1", "ação 2", "ação 3", "ação 4"],
-  "insight_comportamental": "Um insight sobre o padrão de trabalho do usuário nessa semana",
-  "frase_motivacional": "Uma frase bíblica ou motivacional personalizada para o cenário dele"
+  "resumo_executivo": "string 3-4 frases de alto impacto",
+  "scores": {
+    "foco": 7, "disciplina": 6, "clareza_estrategica": 7, "int_emocional": 6,
+    "produtividade_real": 5, "execucao": 6, "lideranca": 7, "estabilidade_mental": 6,
+    "consistencia": 5, "decisao": 7, "organizacao": 7, "evolucao_semanal": 6,
+    "gestao_energia": 5, "alinhamento": 6, "geral": 6.3
+  },
+  "indices": {
+    "risco_burnout": 35,
+    "nivel_evolucao": 62,
+    "procrastinacao": 28,
+    "clareza_mental": 70,
+    "indice_execucao": 58,
+    "maturidade_operacional": 65
+  },
+  "analise_operacional": {
+    "eficiencia": "string avaliação geral",
+    "gargalos": ["string"],
+    "ciclos_improdutivos": ["string"],
+    "sinais_burnout": ["string ou null se não houver"]
+  },
+  "analise_comportamental": {
+    "padroes": ["padrão psicológico 1", "padrão 2"],
+    "autossabotagem": "string ou null",
+    "motivacao": "alta|media|baixa",
+    "insight": "insight comportamental profundo e personalizado"
+  },
+  "analise_financeira": {
+    "saude": "string diagnóstico financeiro",
+    "comportamento": "string análise do padrão de consumo",
+    "alertas": ["string"],
+    "oportunidades": ["string"]
+  },
+  "analise_metas": {
+    "progresso_geral": "string diagnóstico",
+    "em_risco": ["metas em risco"],
+    "evoluindo": ["metas bem encaminhadas"],
+    "sabotagens": ["string"]
+  },
+  "maiores_erros": ["erro 1", "erro 2", "erro 3"],
+  "maiores_acertos": ["acerto 1", "acerto 2", "acerto 3"],
+  "o_que_ai_percebeu": "string — o que a IA percebeu que o usuário provavelmente não percebe",
+  "o_que_eliminar": ["string"],
+  "o_que_manter": ["string"],
+  "o_que_automatizar": ["string"],
+  "potencial_desperdicado": ["onde existe potencial não explorado"],
+  "padroes_repetindo": ["padrões recorrentes preocupantes ou positivos"],
+  "area_desalinhada": "qual área está mais desalinhada e por quê",
+  "area_evoluindo": "qual área está evoluindo mais rápido e por quê",
+  "prob_evolucao_30d": 65,
+  "prob_colapso": 20,
+  "decisoes_urgentes": ["decisão que precisa ser tomada agora 1", "decisão 2"],
+  "plano_semana": [
+    {"acao": "string ação concreta", "prioridade": "alta|media|baixa", "impacto": "string impacto esperado"}
+  ],
+  "correcoes_comportamentais": ["correção 1", "correção 2"],
+  "recomendacoes": ["recomendação estratégica 1", "recomendação 2"],
+  "diagnostico_honesto": "string diagnóstico brutalmente honesto sobre o estado real do usuário — sem filtro",
+  "frase_semana": "Uma frase bíblica ou de alta performance extremamente personalizada para o momento atual do usuário"
 }
 
-DADOS DA SEMANA:
-- Score de produtividade: ${score}/100
-- Tarefas total: ${total} | Concluídas: ${done} | Em processo: ${proc} | Pendentes: ${pend}
-- Prazos vencidos: ${venc}
-- Urgentes resolvidas: ${urgDone}/${urgTot}
-- Projetos: ${projSumm}
-- Reuniões analisadas: ${meetCount}
-- Tarefas concluídas: ${tasksDone}
-- Tarefas pendentes importantes: ${tasksPend}
-
+Seja brutalmente honesto. Faça inteligência executiva real, não apenas resumo. Transforme os dados em diagnóstico estratégico.
 Responda APENAS com o JSON.`;
 
   try{
@@ -6930,8 +7124,8 @@ Responda APENAS com o JSON.`;
       method:"POST",
       headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
       body:JSON.stringify({
-        model:"claude-haiku-4-5-20251001",
-        max_tokens:4096,
+        model:"claude-sonnet-4-5",
+        max_tokens:8192,
         messages:[{role:"user",content:prompt}]
       })
     });
@@ -6942,39 +7136,172 @@ Responda APENAS com o JSON.`;
     const r = JSON.parse(clean);
 
     const weekStr = new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"long",year:"numeric"});
+    const esc = s => (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
-    content.innerHTML=`
-      <div class="relatorio-card">
-        <div class="relatorio-section-title" style="color:var(--accent)">📋 Resumo Executivo — Semana até ${weekStr}</div>
-        <div class="relatorio-summary-box">${r.resumo_executivo||""}</div>
+    // Helpers
+    const scoreColor = v => v>=8?"var(--green)":v>=6?"var(--accent)":v>=4?"var(--orange)":"var(--red)";
+    const geralVal = r.scores?.geral||0;
+    const geralColor = scoreColor(geralVal);
+    const geralLabel = geralVal>=8?"Semana de Alta Performance":geralVal>=6?"Boa Semana":geralVal>=4?"Semana Regular":"Semana Crítica";
+
+    // Score grid
+    const scoreItems = [
+      {k:"foco",lbl:"Foco"},{k:"disciplina",lbl:"Disciplina"},{k:"clareza_estrategica",lbl:"Estratégia"},
+      {k:"int_emocional",lbl:"Emocional"},{k:"produtividade_real",lbl:"Produtividade"},
+      {k:"execucao",lbl:"Execução"},{k:"lideranca",lbl:"Liderança"},{k:"consistencia",lbl:"Consistência"},
+      {k:"decisao",lbl:"Decisão"},{k:"alinhamento",lbl:"Alinhamento"}
+    ];
+    const scoresHtml = scoreItems.map(s=>{
+      const v=r.scores?.[s.k]||0; const c=scoreColor(v);
+      return `<div class="rel-score-card">
+        <div class="rel-score-val" style="color:${c}">${v}</div>
+        <div class="rel-score-lbl">${s.lbl}</div>
+        <div class="rel-score-bar"><div class="rel-score-bar-fill" style="width:${v*10}%;background:${c}"></div></div>
+      </div>`;
+    }).join("");
+
+    // Índices
+    const idx = r.indices||{};
+    const indexItems = [
+      {k:"nivel_evolucao",lbl:"📈 Nível de Evolução",c:"var(--green)"},
+      {k:"indice_execucao",lbl:"⚡ Índice de Execução",c:"var(--blue)"},
+      {k:"clareza_mental",lbl:"🧠 Clareza Mental",c:"var(--accent)"},
+      {k:"maturidade_operacional",lbl:"🏛 Maturidade Operacional",c:"#5b9fff"},
+      {k:"procrastinacao",lbl:"⏳ Procrastinação",c:"var(--orange)"},
+      {k:"risco_burnout",lbl:"🔥 Risco de Burnout",c:"var(--red)"},
+    ];
+    const indicesHtml = indexItems.map(i=>{
+      const v=idx[i.k]||0;
+      return `<div class="rel-index-row">
+        <span class="rel-index-lbl">${i.lbl}</span>
+        <div class="rel-index-track"><div class="rel-index-fill" style="width:${v}%;background:${i.c}"></div></div>
+        <span class="rel-index-num" style="color:${i.c}">${v}%</span>
+      </div>`;
+    }).join("");
+
+    // Probabilidades
+    const probHtml = `
+      <div class="rel-prob-row">
+        <span class="rel-prob-lbl">🚀 Probabilidade de evolução em 30 dias</span>
+        <div class="rel-prob-track"><div class="rel-prob-fill" style="width:${r.prob_evolucao_30d||0}%;background:var(--green)"></div></div>
+        <span class="rel-prob-num" style="color:var(--green)">${r.prob_evolucao_30d||0}%</span>
       </div>
+      <div class="rel-prob-row">
+        <span class="rel-prob-lbl">⚠️ Risco de colapso operacional</span>
+        <div class="rel-prob-track"><div class="rel-prob-fill" style="width:${r.prob_colapso||0}%;background:var(--red)"></div></div>
+        <span class="rel-prob-num" style="color:var(--red)">${r.prob_colapso||0}%</span>
+      </div>`;
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-        <div class="relatorio-card" style="margin-bottom:0">
-          <div class="relatorio-section-title" style="color:var(--green)">✅ Pontos Positivos</div>
-          ${(r.pontos_positivos||[]).map(p=>`<div class="rel-item positivo">✅ ${p}</div>`).join("")}
-        </div>
-        <div class="relatorio-card" style="margin-bottom:0">
-          <div class="relatorio-section-title" style="color:var(--red)">🚨 Alertas</div>
-          ${(r.alertas||[]).map(a=>`<div class="rel-item alerta">🚨 ${a}</div>`).join("")}
-        </div>
-      </div>
-
-      <div class="relatorio-card">
-        <div class="relatorio-section-title" style="color:var(--blue)">📌 Plano para a Próxima Semana</div>
-        ${(r.plano_proxima_semana||[]).map((p,i)=>`<div class="rel-item plano">📌 ${i+1}. ${p}</div>`).join("")}
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="relatorio-card" style="margin-bottom:0">
-          <div class="relatorio-section-title" style="color:var(--purple)">🧠 Insight Comportamental</div>
-          <div class="rel-item insight">🧠 ${r.insight_comportamental||""}</div>
-        </div>
-        <div class="relatorio-card" style="margin-bottom:0">
-          <div class="relatorio-section-title" style="color:var(--accent)">✝️ Frase da Semana</div>
-          <div class="rel-item" style="background:var(--yellow-dim);border-left:3px solid var(--accent);font-style:italic;font-size:.88rem;line-height:1.75">"${r.frase_motivacional||""}"</div>
+    // Plano da semana
+    const planoHtml = (r.plano_semana||[]).map((p,i)=>{
+      const pc=p.prioridade==="alta"?"rel-plan-prio-alta":p.prioridade==="baixa"?"rel-plan-prio-baixa":"rel-plan-prio-media";
+      return `<div class="rel-plan-row">
+        <span class="rel-plan-prio ${pc}">${(p.prioridade||"").toUpperCase()}</span>
+        <div><div class="rel-plan-acao">${i+1}. ${esc(p.acao)}</div>
+        ${p.impacto?`<div class="rel-plan-impacto">💡 ${esc(p.impacto)}</div>`:""}
         </div>
       </div>`;
+    }).join("");
+
+    // Análise operacional
+    const opHtml = `
+      ${r.analise_operacional?.eficiencia?`<div class="rel-item insight" style="margin-bottom:10px">${esc(r.analise_operacional.eficiencia)}</div>`:""}
+      <div class="rel-two-col">
+        ${(r.analise_operacional?.gargalos||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--orange)">⛔ Gargalos</div>${r.analise_operacional.gargalos.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.analise_operacional?.ciclos_improdutivos||[]).filter(Boolean).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">🔄 Ciclos improdutivos</div>${r.analise_operacional.ciclos_improdutivos.filter(Boolean).map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      </div>
+      ${(r.analise_operacional?.sinais_burnout||[]).filter(Boolean).length?`<div style="margin-top:8px">${r.analise_operacional.sinais_burnout.filter(Boolean).map(s=>`<div class="rel-item alerta">🔥 ${esc(s)}</div>`).join("")}</div>`:""}`;
+
+    // Análise comportamental
+    const compHtml = `
+      ${r.analise_comportamental?.insight?`<div class="rel-insight-item">💡 ${esc(r.analise_comportamental.insight)}</div>`:""}
+      ${(r.analise_comportamental?.padroes||[]).map(p=>`<div class="rel-insight-item">🔁 ${esc(p)}</div>`).join("")}
+      ${r.analise_comportamental?.autossabotagem?`<div class="rel-item alerta">⚠️ Autossabotagem: ${esc(r.analise_comportamental.autossabotagem)}</div>`:""}`;
+
+    // Metas
+    const metasHtml = `
+      ${r.analise_metas?.progresso_geral?`<div class="rel-item insight" style="margin-bottom:8px">${esc(r.analise_metas.progresso_geral)}</div>`:""}
+      <div class="rel-two-col">
+        ${(r.analise_metas?.evoluindo||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">✅ Evoluindo</div>${r.analise_metas.evoluindo.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.analise_metas?.em_risco||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">⚠️ Em risco</div>${r.analise_metas.em_risco.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      </div>`;
+
+    // Financeiro
+    const finHtml = `
+      ${r.analise_financeira?.saude?`<div class="rel-item insight" style="margin-bottom:8px">${esc(r.analise_financeira.saude)}</div>`:""}
+      ${r.analise_financeira?.comportamento?`<div class="rel-item" style="background:var(--surface);border-left:2px solid var(--dim);margin-bottom:8px">${esc(r.analise_financeira.comportamento)}</div>`:""}
+      <div class="rel-two-col">
+        ${(r.analise_financeira?.alertas||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">🚨 Alertas</div>${r.analise_financeira.alertas.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.analise_financeira?.oportunidades||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">💡 Oportunidades</div>${r.analise_financeira.oportunidades.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      </div>`;
+
+    // Análise final
+    const finalHtml = `
+      ${r.o_que_ai_percebeu?`<div class="rel-col-card" style="margin-bottom:10px;border-color:var(--accent-border);background:var(--accent-dim)"><div class="rel-col-title" style="color:var(--accent)">🔮 O que a IA percebeu que você provavelmente não percebe</div><div style="font-size:.82rem;color:var(--text);line-height:1.65">${esc(r.o_que_ai_percebeu)}</div></div>`:""}
+      <div class="rel-two-col">
+        ${(r.maiores_acertos||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">✅ Maiores acertos</div>${r.maiores_acertos.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.maiores_erros||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">❌ Maiores erros</div>${r.maiores_erros.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      </div>
+      <div class="rel-two-col">
+        ${(r.o_que_manter||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--blue)">✅ Manter</div>${r.o_que_manter.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.o_que_eliminar||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">❌ Eliminar</div>${r.o_que_eliminar.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      </div>
+      ${(r.o_que_automatizar||[]).length?`<div class="rel-col-card" style="margin-bottom:10px"><div class="rel-col-title" style="color:var(--orange)">⚙️ Automatizar</div>${r.o_que_automatizar.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(r.potencial_desperdicado||[]).length?`<div class="rel-col-card" style="margin-bottom:10px"><div class="rel-col-title" style="color:var(--accent)">💎 Potencial desperdiçado</div>${r.potencial_desperdicado.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(r.padroes_repetindo||[]).length?`<div class="rel-col-card" style="margin-bottom:10px"><div class="rel-col-title" style="color:var(--orange)">🔁 Padrões se repetindo</div>${r.padroes_repetindo.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      <div class="rel-two-col">
+        ${r.area_desalinhada?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">📉 Área mais desalinhada</div><div style="font-size:.79rem;color:var(--text);line-height:1.5">${esc(r.area_desalinhada)}</div></div>`:""}
+        ${r.area_evoluindo?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">📈 Área evoluindo mais</div><div style="font-size:.79rem;color:var(--text);line-height:1.5">${esc(r.area_evoluindo)}</div></div>`:""}
+      </div>
+      ${(r.decisoes_urgentes||[]).length?`<div class="rel-col-card" style="border-color:rgba(255,77,109,.3);background:var(--red-dim)"><div class="rel-col-title" style="color:var(--red)">🚨 Decisões urgentes</div>${r.decisoes_urgentes.map(x=>`<div class="rel-col-item">→ ${esc(x)}</div>`).join("")}</div>`:""}`;
+
+    const sec = (title, html, color="var(--accent)") =>
+      `<div class="relatorio-card">
+        <div class="relatorio-section-title" style="color:${color}">${title}</div>
+        ${html}
+      </div>`;
+
+    content.innerHTML = `
+
+      ${sec("📋 Resumo Executivo — Semana até "+weekStr,
+        `<div class="relatorio-summary-box">${esc(r.resumo_executivo||"")}</div>`)}
+
+      <div class="relatorio-card">
+        <div class="rel-geral-block">
+          <div>
+            <div class="rel-geral-num" style="color:${geralColor}">${geralVal}</div>
+            <div style="font-size:.6rem;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Nota Geral</div>
+          </div>
+          <div style="flex:1">
+            <div class="rel-geral-label" style="color:${geralColor}">${geralLabel}</div>
+            <div class="rel-geral-sub">Gerado em ${weekStr} · Claude Sonnet</div>
+          </div>
+        </div>
+        <div class="relatorio-section-title" style="color:var(--accent)">📊 Scores da Semana</div>
+        <div class="rel-score-grid">${scoresHtml}</div>
+      </div>
+
+      ${sec("📈 Índices de Performance", indicesHtml, "var(--blue)")}
+      ${sec("🎯 Probabilidades de Evolução", probHtml, "var(--green)")}
+
+      ${r.diagnostico_honesto?sec("🔬 Diagnóstico Brutalmente Honesto",
+        `<div class="rel-diag-box">${esc(r.diagnostico_honesto)}</div>`):""}
+
+      ${sec("⚙️ Análise Operacional", opHtml, "var(--orange)")}
+      ${compHtml?sec("🧠 Análise Comportamental & Psicológica", compHtml, "var(--purple)"):""}
+      ${metasHtml?sec("🎯 Análise de Metas", metasHtml, "var(--blue)"):""}
+      ${finHtml?sec("💰 Análise Financeira", finHtml, "var(--green)"):""}
+      ${(r.correcoes_comportamentais||[]).length||((r.recomendacoes||[]).length)?
+        sec("💡 Recomendações Estratégicas",
+          `${(r.correcoes_comportamentais||[]).map(x=>`<div class="rel-item insight">🔧 ${esc(x)}</div>`).join("")}
+           ${(r.recomendacoes||[]).map(x=>`<div class="rel-item plano">📌 ${esc(x)}</div>`).join("")}`
+        ,"var(--accent)"):""}
+
+      ${planoHtml?sec("📌 Plano de Ação — Próxima Semana", planoHtml, "var(--blue)"):""}
+      ${sec("🏁 Análise Executiva Final", finalHtml)}
+
+      ${r.frase_semana?`<div class="relatorio-card"><div class="rel-frase">"${esc(r.frase_semana)}"</div></div>`:""}
+    `;
 
   }catch(e){
     content.innerHTML=`<div class="relatorio-card">
