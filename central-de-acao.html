@@ -1594,6 +1594,25 @@ textarea.form-input{border-radius:16px;resize:vertical}
 .rel-col-item{font-size:.77rem;line-height:1.55;color:var(--text);padding:3px 0;border-bottom:1px solid var(--border)}
 .rel-col-item:last-child{border-bottom:none}
 .rel-frase{background:linear-gradient(135deg,rgba(160,122,232,.1),rgba(91,143,238,.06));border:1px solid var(--accent-border);border-radius:14px;padding:18px 20px;text-align:center;font-size:.9rem;line-height:1.8;color:var(--text);font-style:italic;font-weight:500}
+/* ══ GERENCIADOR DE CATEGORIAS ══ */
+.cat-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.cat-modal-box{background:var(--card);backdrop-filter:var(--card-blur);border:1px solid var(--border);border-radius:22px;width:100%;max-width:480px;box-shadow:0 24px 80px rgba(0,0,0,.4);overflow:hidden;display:flex;flex-direction:column;max-height:90vh}
+.cat-modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);flex-shrink:0}
+.cat-modal-title{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;color:var(--text)}
+.cat-modal-body{flex:1;overflow-y:auto;padding:16px 22px}
+.cat-modal-footer{display:flex;gap:8px;padding:14px 22px;border-top:1px solid var(--border);flex-shrink:0}
+.cat-section-lbl{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin:12px 0 6px;display:block}
+.cat-section-lbl:first-child{margin-top:0}
+.cat-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:11px;background:var(--surface);border:1px solid var(--border);margin-bottom:4px}
+.cat-row-icon{width:30px;height:30px;border-radius:9px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.cat-row-label{flex:1;font-size:.82rem;font-weight:600;color:var(--text)}
+.cat-row-badge{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-border)}
+.cat-row-system{font-size:.58rem;background:rgba(52,197,122,.1);color:var(--green);border:1px solid rgba(52,197,122,.3);font-weight:700;padding:2px 8px;border-radius:5px}
+.cat-row-lock{font-size:.8rem;color:var(--dim);opacity:.5}
+.cat-del-btn{background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.2);color:var(--red);border-radius:7px;width:26px;height:26px;cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.cat-del-btn:hover{background:rgba(255,77,109,.25)}
+.cat-manage-btn{background:var(--surface);border:1px solid var(--border);color:var(--dim);border-radius:8px;padding:0 9px;height:28px;cursor:pointer;font-size:.8rem;display:inline-flex;align-items:center;gap:4px;transition:all .15s;flex-shrink:0}
+.cat-manage-btn:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ══════════════════════════════════════
    DASHBOARD EQUIPES
@@ -3037,14 +3056,16 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <option value="medio">Médio</option>
         <option value="pouco">Pouco Urgente</option>
       </select>
-      <select id="qi-cat" class="add-select">
-        <option value="allure">Allure</option>
+      <select id="qi-cat" class="add-select" onchange="onCatSelectChange('qi-cat')">
+        <option value="allure">✨ Allure</option>
         <option value="exacta">🏢 Exacta</option>
-        <option value="conteudo">Conteúdo</option>
-        <option value="financeiro">Financeiro</option>
+        <option value="conteudo">📲 Conteúdo</option>
+        <option value="financeiro">💰 Financeiro</option>
         <option value="posvenda">🤝 Pós-Venda</option>
+        <option value="ligacao">📞 Ligação Pendente</option>
         <option value="equipe">👥 Equipe</option>
-        <option value="outros">Outros</option>
+        <option value="outros">📋 Outros</option>
+        <option value="__manage__" style="color:var(--accent)">⚙ Gerenciar categorias...</option>
       </select>
       <input id="qi-date" type="date" class="add-select" style="color-scheme:dark">
       <input id="qi-time" type="time" class="add-select" style="color-scheme:dark;width:90px" title="Horário (opcional)">
@@ -3106,14 +3127,16 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <option value="medio">Médio</option>
         <option value="pouco">Pouco Urgente</option>
       </select>
-      <select id="all-cat" style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:.72rem;color:var(--dim);outline:none;cursor:pointer;color-scheme:dark">
-        <option value="allure">Allure</option>
+      <select id="all-cat" style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:.72rem;color:var(--dim);outline:none;cursor:pointer;color-scheme:dark" onchange="onCatSelectChange('all-cat')">
+        <option value="allure">✨ Allure</option>
         <option value="exacta">🏢 Exacta</option>
-        <option value="conteudo">Conteúdo</option>
-        <option value="financeiro">Financeiro</option>
+        <option value="conteudo">📲 Conteúdo</option>
+        <option value="financeiro">💰 Financeiro</option>
         <option value="posvenda">🤝 Pós-Venda</option>
+        <option value="ligacao">📞 Ligação Pendente</option>
         <option value="equipe">👥 Equipe</option>
-        <option value="outros">Outros</option>
+        <option value="outros">📋 Outros</option>
+        <option value="__manage__" style="color:var(--accent)">⚙ Gerenciar categorias...</option>
       </select>
       <input id="all-date" type="date" style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:.72rem;color:var(--dim);outline:none;cursor:pointer;color-scheme:dark">
       <button class="btn btn-primary" onclick="allAdd()">+ Adicionar</button>
@@ -3273,6 +3296,12 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <option value="quando">⚪ Quando possível</option>
       </select>
       <button class="btn btn-primary" onclick="addLigacao()">+ Adicionar</button>
+    </div>
+
+    <!-- Tarefas com categoria Ligação Pendente -->
+    <div id="lig-tasks-section" style="display:none;margin-bottom:16px">
+      <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:8px">📋 Tarefas categorizadas como Ligação Pendente</div>
+      <div id="lig-tasks-list"></div>
     </div>
 
     <!-- Lista -->
@@ -4657,14 +4686,16 @@ textarea.form-input{border-radius:16px;resize:vertical}
         </div>
         <div class="tp-prop">
           <span class="tp-prop-label">Categoria</span>
-          <select id="tp-cat">
-            <option value="allure">Allure</option>
+          <select id="tp-cat" onchange="onCatSelectChange('tp-cat')">
+            <option value="allure">✨ Allure</option>
             <option value="exacta">🏢 Exacta</option>
-            <option value="conteudo">Conteúdo</option>
-            <option value="financeiro">Financeiro</option>
+            <option value="conteudo">📲 Conteúdo</option>
+            <option value="financeiro">💰 Financeiro</option>
             <option value="posvenda">🤝 Pós-Venda</option>
+            <option value="ligacao">📞 Ligação Pendente</option>
             <option value="equipe">👥 Equipe</option>
-            <option value="outros">Outros</option>
+            <option value="outros">📋 Outros</option>
+            <option value="__manage__" style="color:var(--accent)">⚙ Gerenciar categorias...</option>
           </select>
         </div>
         <div class="tp-prop">
@@ -5111,14 +5142,118 @@ const URG_MAP = {
   pouco:   {label:"Pouco Urgente",  badge:"u-pouco",   icon:"⚪"},
 };
 const CAT_LABEL_MAP = {
-  allure:     {label:"Allure",     badge:"c-allure",    icon:"✨"},
-  conteudo:   {label:"Conteúdo",   badge:"c-conteudo",  icon:"📲"},
-  financeiro: {label:"Financeiro", badge:"c-financeiro",icon:"💰"},
-  posvenda:   {label:"Pós-Venda",  badge:"c-posvenda",  icon:"🤝"},
-  exacta:     {label:"Exacta",     badge:"c-exacta",    icon:"🏢"},
-  equipe:     {label:"Equipe",     badge:"c-equipe",    icon:"👥"},
-  outros:     {label:"Outros",     badge:"c-outros",    icon:"📋"},
+  allure:     {label:"Allure",           badge:"c-allure",    icon:"✨"},
+  conteudo:   {label:"Conteúdo",         badge:"c-conteudo",  icon:"📲", systemView:"conteudo"},
+  financeiro: {label:"Financeiro",       badge:"c-financeiro",icon:"💰", systemView:"financeiro"},
+  posvenda:   {label:"Pós-Venda",        badge:"c-posvenda",  icon:"🤝"},
+  exacta:     {label:"Exacta",           badge:"c-exacta",    icon:"🏢"},
+  equipe:     {label:"Equipe",           badge:"c-equipe",    icon:"👥"},
+  ligacao:    {label:"Ligação Pendente", badge:"c-outros",    icon:"📞", systemView:"ligacoes"},
+  outros:     {label:"Outros",           badge:"c-outros",    icon:"📋"},
 };
+
+// ── SISTEMA DE CATEGORIAS CUSTOMIZÁVEIS ──────────────────
+const NATIVE_CATS = [
+  {key:"allure",    label:"Allure",           icon:"✨", systemView:null},
+  {key:"exacta",    label:"Exacta",           icon:"🏢", systemView:null},
+  {key:"conteudo",  label:"Conteúdo",         icon:"📲", systemView:"conteudo"},
+  {key:"financeiro",label:"Financeiro",       icon:"💰", systemView:"financeiro"},
+  {key:"posvenda",  label:"Pós-Venda",        icon:"🤝", systemView:null},
+  {key:"ligacao",   label:"Ligação Pendente", icon:"📞", systemView:"ligacoes"},
+  {key:"equipe",    label:"Equipe",           icon:"👥", systemView:null},
+  {key:"outros",    label:"Outros",           icon:"📋", systemView:null},
+];
+let CUSTOM_CATS = []; // [{key, label, icon}]
+
+// Popula um <select> de categoria com as categorias customizadas
+function buildCatOptions(selectId){
+  const sel = document.getElementById(selectId);
+  if(!sel) return;
+  sel.querySelectorAll('[data-custom="1"]').forEach(o=>o.remove());
+  CUSTOM_CATS.forEach(c=>{
+    const opt = document.createElement("option");
+    opt.value = c.key;
+    opt.textContent = `${c.icon||"🏷"} ${c.label}`;
+    opt.dataset.custom = "1";
+    // Insert before __manage__ option
+    const manageOpt = sel.querySelector('[value="__manage__"]');
+    if(manageOpt) sel.insertBefore(opt, manageOpt);
+    else sel.appendChild(opt);
+  });
+}
+function buildAllCatSelects(){
+  ["qi-cat","all-cat","tp-cat"].forEach(buildCatOptions);
+}
+// Intercepta seleção de __manage__ nos selects
+function onCatSelectChange(selectId){
+  const sel = document.getElementById(selectId);
+  if(!sel) return;
+  if(sel.value === "__manage__"){
+    sel.value = sel.options[0].value; // reset to first option
+    openCatManager();
+  }
+}
+function openCatManager(){
+  const modal = document.getElementById("cat-manager-modal");
+  const body  = document.getElementById("cat-manager-body");
+  if(!modal||!body) return;
+  const nativeHtml = NATIVE_CATS.map(c=>`
+    <div class="cat-row">
+      <div class="cat-row-icon">${c.icon}</div>
+      <span class="cat-row-label">${c.label}</span>
+      ${c.systemView?`<span class="cat-row-system">→ ${c.systemView}</span>`:""}
+      <span class="cat-row-lock" title="Categoria nativa — não pode ser excluída">🔒</span>
+    </div>`).join("");
+  const customHtml = CUSTOM_CATS.length
+    ? CUSTOM_CATS.map(c=>`
+        <div class="cat-row">
+          <div class="cat-row-icon">${c.icon||"🏷"}</div>
+          <span class="cat-row-label">${c.label}</span>
+          <button class="cat-del-btn" onclick="deleteCustomCat('${c.key}')" title="Excluir categoria">✕</button>
+        </div>`).join("")
+    : `<div style="font-size:.77rem;color:var(--dim);padding:10px 0;text-align:center">Nenhuma categoria personalizada ainda.<br>Crie uma abaixo.</div>`;
+  body.innerHTML = `
+    <span class="cat-section-lbl">🔒 Categorias Nativas do Sistema</span>
+    ${nativeHtml}
+    <span class="cat-section-lbl" style="margin-top:14px">✨ Suas Categorias Personalizadas</span>
+    ${customHtml}`;
+  modal.style.display = "flex";
+}
+function closeCatManager(){
+  const m = document.getElementById("cat-manager-modal");
+  if(m) m.style.display = "none";
+}
+function addCustomCat(){
+  const nameEl = document.getElementById("new-cat-name");
+  const iconEl = document.getElementById("new-cat-icon");
+  const name = (nameEl?.value||"").trim();
+  if(!name){ alert("Digite um nome para a categoria."); return; }
+  const icon = (iconEl?.value||"🏷").trim()||"🏷";
+  const key  = "cat_" + Date.now().toString(36) + "_" + name.toLowerCase().replace(/\s+/g,"_").replace(/[^a-z0-9_]/g,"").slice(0,12);
+  CUSTOM_CATS.push({key, label:name, icon});
+  CAT_LABEL_MAP[key] = {label:name, badge:"c-outros", icon};
+  if(nameEl) nameEl.value="";
+  if(iconEl) iconEl.value="";
+  buildAllCatSelects();
+  saveData();
+  openCatManager();
+}
+function deleteCustomCat(key){
+  const cat = CUSTOM_CATS.find(c=>c.key===key);
+  if(!cat) return;
+  const hasTasks = TASKS.some(t=>t.cat===key);
+  const msg = hasTasks
+    ? `Excluir a categoria "${cat.label}"?\n\nAtenção: ${TASKS.filter(t=>t.cat===key).length} tarefa(s) associada(s) serão movidas para "Outros".`
+    : `Excluir a categoria "${cat.label}"?`;
+  if(!confirm(msg)) return;
+  TASKS.forEach(t=>{ if(t.cat===key) t.cat="outros"; });
+  CUSTOM_CATS = CUSTOM_CATS.filter(c=>c.key!==key);
+  delete CAT_LABEL_MAP[key];
+  buildAllCatSelects();
+  renderAll();
+  openCatManager();
+}
+// ─────────────────────────────────────────────────────────
 
 function mkRow(task){
   const s = getStatus(task.id);
@@ -5466,7 +5601,7 @@ function calNext(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCal
 // ══════════════════════════════════════
 //  QUICK ADD
 // ══════════════════════════════════════
-const CAT_ICONS={"allure":"✨","conteudo":"📲","financeiro":"💰","posvenda":"🤝","exacta":"🏢","equipe":"👥","outros":"📋"};
+const CAT_ICONS={"allure":"✨","conteudo":"📲","financeiro":"💰","posvenda":"🤝","exacta":"🏢","equipe":"👥","ligacao":"📞","outros":"📋"};
 function quickAdd(){
   const v=document.getElementById("qi-name").value.trim(); if(!v)return;
   const urg=document.getElementById("qi-urg").value;
@@ -6252,7 +6387,8 @@ function gotoView(name,el){
   if(name==="reunioes"){ switchMeetingTab(activeMeetingTab||"pipeline"); }
   if(name==="calendar")renderCalendar();
   if(name==="foco"){
-    currentQuote=Math.floor(Math.random()*QUOTES.length);
+    const _doy=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/86400000);
+    currentQuote=_doy%QUOTES.length;
     applyQuote();
     renderFoco();
   }
@@ -9546,6 +9682,7 @@ function saveData(){
       HABITS,
       HABITS_DONE,
       nextHabId,
+      CUSTOM_CATS,
       finYear,
       finMonth,
       nextFinId,
@@ -9635,6 +9772,11 @@ function loadData(){
     if(data.HABITS)              HABITS.splice(0,HABITS.length,...data.HABITS);
     if(data.HABITS_DONE)         Object.assign(HABITS_DONE, data.HABITS_DONE);
     if(data.nextHabId!=null)     nextHabId = data.nextHabId;
+    if(data.CUSTOM_CATS){
+      CUSTOM_CATS.splice(0,CUSTOM_CATS.length,...data.CUSTOM_CATS);
+      // Restaurar no CAT_LABEL_MAP
+      CUSTOM_CATS.forEach(c=>{ CAT_LABEL_MAP[c.key]={label:c.label,badge:"c-outros",icon:c.icon||"🏷"}; });
+    }
     // Restaurar meta fixada
     try{ const pg=localStorage.getItem("bsx_pinned_goal"); if(pg) pinnedGoalId=parseInt(pg)||null; }catch(e){}
 
@@ -9854,6 +9996,28 @@ function removerLigacao(id){
 function renderLigacoes(){
   const grid=document.getElementById("lig-grid");
   if(!grid) return;
+
+  // ── Tarefas categorizadas como Ligação Pendente ──
+  const ligTasksSec  = document.getElementById("lig-tasks-section");
+  const ligTasksList = document.getElementById("lig-tasks-list");
+  if(ligTasksSec && ligTasksList){
+    const ligTasks = TASKS.filter(t=>t.cat==="ligacao"&&!doneSet.has(t.id));
+    if(ligTasks.length){
+      ligTasksSec.style.display="block";
+      ligTasksList.innerHTML = ligTasks.map(t=>{
+        const isDone = doneSet.has(t.id);
+        const urgInfo = URG_MAP[t.urg]||URG_MAP["medio"];
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--border);margin-bottom:4px;cursor:pointer;transition:opacity .15s" onclick="cycleStatus(${t.id})" title="Clique para marcar como concluída">
+          <span style="font-size:.85rem">📞</span>
+          <span style="flex:1;font-size:.82rem;color:var(--text);${isDone?"text-decoration:line-through;opacity:.5":""}">${t.name}</span>
+          <span style="font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:5px;background:${urgInfo.bg};color:${urgInfo.color}">${urgInfo.label}</span>
+          ${t.date?`<span style="font-size:.65rem;color:var(--dim)">${t.date}</span>`:""}
+        </div>`;
+      }).join("");
+    } else {
+      ligTasksSec.style.display="none";
+    }
+  }
 
   const hoje=new Date(); hoje.setHours(0,0,0,0);
   const pendentes=LIGACOES.filter(l=>!l.done);
@@ -12049,6 +12213,7 @@ loadPomoConfig();
 seedContasFixas();
 checkRecurrenceAndCreate();
 try{ updateCatOptions(); }catch(e){}
+buildAllCatSelects();
 daysLeft();
 renderCalendar();
 renderAll();
@@ -12073,6 +12238,24 @@ switchDashView("dash");
       <span>↑↓ navegar</span>
       <span>↵ abrir</span>
       <span>ESC fechar</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL GERENCIAR CATEGORIAS ══ -->
+<div class="cat-modal-overlay" id="cat-manager-modal" onclick="closeCatManager()" style="display:none">
+  <div class="cat-modal-box" onclick="event.stopPropagation()">
+    <div class="cat-modal-head">
+      <div class="cat-modal-title">⚙️ Gerenciar Categorias</div>
+      <button onclick="closeCatManager()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;line-height:1">✕</button>
+    </div>
+    <div class="cat-modal-body" id="cat-manager-body">
+      <span class="cat-section-lbl">Carregando...</span>
+    </div>
+    <div class="cat-modal-footer">
+      <input id="new-cat-icon" placeholder="🏷" class="add-select" style="width:48px;text-align:center;font-size:1.1rem;padding:6px 4px">
+      <input id="new-cat-name" type="text" placeholder="Nome da nova categoria..." class="add-bar-input" style="flex:1;padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;outline:none">
+      <button class="btn btn-primary" onclick="addCustomCat()" style="flex-shrink:0">+ Criar</button>
     </div>
   </div>
 </div>
