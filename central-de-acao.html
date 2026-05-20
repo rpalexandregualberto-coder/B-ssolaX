@@ -3642,12 +3642,12 @@ textarea.form-input{border-radius:16px;resize:vertical}
       </div>
 
       <!-- Saúde + Donut (2 col) -->
-      <div class="fdash-row" style="grid-template-columns:260px 1fr">
+      <div class="fdash-row" style="grid-template-columns:minmax(280px,320px) 1fr">
         <!-- Gauge de Saúde -->
         <div class="fdash-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
           <div class="fdash-title">💚 Saúde Financeira</div>
           <div style="position:relative;margin:6px 0">
-            <svg class="fdash-gauge-svg" width="140" height="140" viewBox="0 0 140 140" id="fd-gauge-svg">
+            <svg class="fdash-gauge-svg" width="130" height="130" viewBox="0 0 140 140" id="fd-gauge-svg">
               <circle cx="70" cy="70" r="56" fill="none" stroke="var(--border)" stroke-width="12"/>
               <circle cx="70" cy="70" r="56" fill="none" stroke="var(--green)" stroke-width="12"
                 stroke-dasharray="351.86" stroke-dashoffset="351.86" stroke-linecap="butt"
@@ -3659,17 +3659,17 @@ textarea.form-input{border-radius:16px;resize:vertical}
             </div>
           </div>
           <div style="font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:800;margin-top:4px" id="fd-score-label">aguardando</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;width:100%">
-            <div style="text-align:center;padding:8px;background:var(--surface);border-radius:10px;border:1px solid var(--border)">
-              <div style="font-size:.62rem;color:var(--muted);font-weight:700">Comprometimento</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:14px;width:100%">
+            <div style="text-align:center;padding:8px 4px;background:var(--surface);border-radius:10px;border:1px solid var(--border)">
+              <div style="font-size:.56rem;color:var(--muted);font-weight:700;line-height:1.3;word-break:break-word">Compromet.</div>
               <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:900;color:var(--text);margin-top:2px" id="fd-s-comp">—</div>
             </div>
-            <div style="text-align:center;padding:8px;background:var(--surface);border-radius:10px;border:1px solid var(--border)">
-              <div style="font-size:.62rem;color:var(--muted);font-weight:700">Poupança</div>
+            <div style="text-align:center;padding:8px 4px;background:var(--surface);border-radius:10px;border:1px solid var(--border)">
+              <div style="font-size:.56rem;color:var(--muted);font-weight:700;line-height:1.3">Poupança</div>
               <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:900;color:var(--text);margin-top:2px" id="fd-s-poup">—</div>
             </div>
-            <div style="text-align:center;padding:8px;background:var(--surface);border-radius:10px;border:1px solid var(--border)">
-              <div style="font-size:.62rem;color:var(--muted);font-weight:700">Fixas/Renda</div>
+            <div style="text-align:center;padding:8px 4px;background:var(--surface);border-radius:10px;border:1px solid var(--border)">
+              <div style="font-size:.56rem;color:var(--muted);font-weight:700;line-height:1.3">Fixas/Renda</div>
               <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:900;color:var(--text);margin-top:2px" id="fd-s-fixas">—</div>
             </div>
           </div>
