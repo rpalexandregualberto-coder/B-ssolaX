@@ -23,6 +23,29 @@ export default async function handler(req) {
 
   try {
     const body = await req.json();
+
+    if (body.stream === true) {
+      // Streaming: pipe SSE diretamente — sem limite de tempo
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "anthropic-version": "2023-06-01",
+          "x-api-key": apiKey
+        },
+        body: JSON.stringify(body)
+      });
+      return new Response(response.body, {
+        status: response.status,
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          "X-Accel-Buffering": "no"
+        }
+      });
+    }
+
+    // Non-streaming (reuniões, relatórios curtos)
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -32,12 +55,12 @@ export default async function handler(req) {
       },
       body: JSON.stringify(body)
     });
-
     const data = await response.json();
     return new Response(JSON.stringify(data), {
       status: response.status,
       headers: { "Content-Type": "application/json" }
     });
+
   } catch (err) {
     return new Response(JSON.stringify({ error: { message: err.message } }), {
       status: 500, headers: { "Content-Type": "application/json" }
