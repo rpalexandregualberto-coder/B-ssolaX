@@ -2663,7 +2663,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
 .fdash-title{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px}
 /* Gauge circular */
 .fdash-gauge-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center}
-.fdash-gauge-svg{transform:rotate(-90deg)}
+.fdash-gauge-svg{transform:rotate(-90deg);transform-box:fill-box;transform-origin:center;display:block}
 .fdash-gauge-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-top:6px}
 /* Barras horizontais */
 .fdash-hbar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
@@ -3650,8 +3650,8 @@ textarea.form-input{border-radius:16px;resize:vertical}
             <svg class="fdash-gauge-svg" width="140" height="140" viewBox="0 0 140 140" id="fd-gauge-svg">
               <circle cx="70" cy="70" r="56" fill="none" stroke="var(--border)" stroke-width="12"/>
               <circle cx="70" cy="70" r="56" fill="none" stroke="var(--green)" stroke-width="12"
-                stroke-dasharray="351.86" stroke-dashoffset="351.86" stroke-linecap="round"
-                id="fd-gauge-circle" style="transition:stroke-dashoffset 1s ease"/>
+                stroke-dasharray="351.86" stroke-dashoffset="351.86" stroke-linecap="butt"
+                id="fd-gauge-circle" style="transition:stroke-dashoffset 1s ease,stroke .4s ease"/>
             </svg>
             <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
               <div class="fdash-score-ring" id="fd-score-num" style="color:var(--green)">—</div>
@@ -7944,9 +7944,10 @@ function renderFinDashboard(){
   // ── KPIs ──
   setEl("fd-entradas", fmtBRL(entradas));
   setEl("fd-despesas", fmtBRL(despesas));
-  setEl("fd-saldo", fmtBRL(saldo));
+  setEl("fd-saldo", (saldo < 0 ? "−" : "") + fmtBRL(saldo));
   setEl("fd-invest", fmtBRL(invest));
-  document.getElementById("fd-saldo").style.color = saldo >= 0 ? "var(--green)" : "var(--red)";
+  const saldoEl = document.getElementById("fd-saldo");
+  if(saldoEl) saldoEl.style.color = saldo >= 0 ? "var(--green)" : "var(--red)";
 
   const delta = (cur, prev, invertColors) => {
     if(!prev) return "";
@@ -7988,7 +7989,10 @@ function renderFinDashboard(){
     setEl("fd-s-fixas", Math.round(fixasPct)+"%");
   } else if(scoreEl) {
     scoreEl.textContent = "—";
-    if(scoreLbl) scoreLbl.textContent = "lance entradas";
+    scoreEl.style.color = "var(--muted)";
+    if(gaugeEl){ gaugeEl.style.strokeDashoffset = "351.86"; gaugeEl.style.stroke = "var(--border)"; }
+    if(scoreLbl){ scoreLbl.textContent = "lance entradas"; scoreLbl.style.color = "var(--dim)"; }
+    setEl("fd-s-comp","—"); setEl("fd-s-poup","—"); setEl("fd-s-fixas","—");
   }
 
   // ── Donut de categorias ──
@@ -8001,8 +8005,14 @@ function renderFinDashboard(){
     const catMap = {};
     despTx.forEach(t=>{ const c=t.categoria||t.category||"Outros"; catMap[c]=(catMap[c]||0)+t.valor; });
     const catEntries = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-    const totalCat = catEntries.reduce((s,[,v])=>s+v,0) || 1;
+    const totalCat = catEntries.reduce((s,[,v])=>s+v,0);
     const DONUT_COLORS = ["#a07ae8","#5b8fee","#34c57a","#f5a623","#ff6b6b","#00d2d3","#feca57","#ff9ff3","#54a0ff","#48dbfb"];
+    if(totalCat === 0 || catEntries.length === 0){
+      donutSvg.innerHTML = `<circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" stroke-width="10"/><circle cx="50" cy="50" r="33" fill="var(--card)"/>`;
+      if(donutTotal) donutTotal.textContent = "R$ 0,00";
+      if(donutCats)  donutCats.textContent  = "0 cat.";
+      if(donutLeg)   donutLeg.innerHTML = `<div style="font-size:.75rem;color:var(--dim);text-align:center;padding:10px 0">Lance despesas para ver</div>`;
+    } else {
     let offset = 0;
     const circumf = 2*Math.PI*38;
     donutSvg.innerHTML = catEntries.map(([cat,val],i)=>{
@@ -8022,8 +8032,9 @@ function renderFinDashboard(){
           <span style="flex:1;font-size:.72rem;color:var(--text);font-weight:600">${cat}</span>
           <span style="font-size:.68rem;color:var(--muted)">${fmtBRL(val)}</span>
           <span style="font-size:.6rem;color:var(--muted)">${Math.round(val/totalCat*100)}%</span>
-        </div>`).join("")||'<div style="font-size:.72rem;color:var(--muted)">Lance despesas para ver</div>';
+        </div>`).join("");
     }
+    } // end else (catEntries.length > 0)
   }
 
   // ── Comparativo mensal ──
@@ -8041,7 +8052,7 @@ function renderFinDashboard(){
       const arrowCor = (lbl==="Despesas"?(d<0?"var(--green)":"var(--red)"):(d>=0?"var(--green)":"var(--red)"));
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="font-size:.72rem;font-weight:700;color:var(--dim)">${lbl}</span>
-        <span style="font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:900;color:${cor}">${fmtBRL(cur)}</span>
+        <span style="font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:900;color:${cor}">${cur<0?"−":""}${fmtBRL(cur)}</span>
         <span style="font-size:.65rem;font-weight:700;color:${arrowCor}">${arrow} ${pct}%</span>
       </div>`;
     }).join("");
