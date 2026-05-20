@@ -6587,34 +6587,63 @@ const PROXY_SECRET = "bsx-7f3a9c2e1d4b8f0a6e5c3d2b1a9f8e7d";
 
 // ── Helper central para chamadas de IA ───────────────────────
 // Lê como texto primeiro, evitando erro em resp.json() quando proxy retorna texto puro
+// Helper: extrai e parseia JSON de resposta de IA (texto puro)
+function _parseAIResponse(raw){
+  if(!raw) throw new Error("Resposta vazia da IA — verifique sua API key em Configurações.");
+  let clean = raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+  if(!clean.startsWith("{")){
+    const m = clean.match(/\{[\s\S]*\}/);
+    if(m) clean = m[0];
+    else throw new Error("IA não retornou JSON. Recebido: "+raw.slice(0,120));
+  }
+  return JSON.parse(clean);
+}
+
+// ── Via Proxy Vercel (reuniões, relatórios — prompts menores) ──
 async function aiProxyCall(prompt, maxTokens=8192){
   const resp = await fetch("/api/ai-proxy",{
     method:"POST",
     headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
     body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:maxTokens,messages:[{role:"user",content:prompt}]})
   });
-  // Lê como texto independente do status
   const respText = await resp.text();
   if(!resp.ok){
     let errMsg = `Erro API ${resp.status}`;
     try{ errMsg = JSON.parse(respText)?.error?.message || errMsg; }catch(_){}
     throw new Error(errMsg);
   }
-  // Parse do JSON do proxy
   let proxyData;
   try{ proxyData = JSON.parse(respText); }
-  catch(_){ throw new Error("Proxy retornou resposta inválida: "+respText.slice(0,120)); }
-  // Extrai texto da resposta
+  catch(_){ throw new Error("Proxy inválido: "+respText.slice(0,120)); }
   const raw = (proxyData.content||[]).map(b=>b.text||"").join("").trim();
-  if(!raw) throw new Error("Resposta vazia da IA — verifique sua API key em Configurações.");
-  // Extrai JSON da resposta (remove fences markdown se existirem)
-  let clean = raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
-  if(!clean.startsWith("{")){
-    const m = clean.match(/\{[\s\S]*\}/);
-    if(m) clean = m[0];
-    else throw new Error("IA não retornou JSON. Resposta recebida: "+raw.slice(0,120));
+  return _parseAIResponse(raw);
+}
+
+// ── Direto no browser com API key do usuário (financeiro — sem timeout) ──
+async function aiDirectCall(prompt, maxTokens=4096){
+  const key = localStorage.getItem("central_acao_apikey")||"";
+  if(!key||!key.startsWith("sk-ant-"))
+    throw new Error("Configure sua API key da Anthropic em ⚙️ Configurações antes de usar a IA financeira.");
+  const resp = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "anthropic-version":"2023-06-01",
+      "anthropic-dangerous-direct-browser-access":"true",
+      "x-api-key": key
+    },
+    body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:maxTokens,messages:[{role:"user",content:prompt}]})
+  });
+  const respText = await resp.text();
+  if(!resp.ok){
+    let errMsg = `Erro Anthropic ${resp.status}`;
+    try{ errMsg = JSON.parse(respText)?.error?.message || errMsg; }catch(_){}
+    throw new Error(errMsg);
   }
-  return JSON.parse(clean);
+  let data;
+  try{ data = JSON.parse(respText); }catch(_){ throw new Error("Resposta inválida: "+respText.slice(0,120)); }
+  const raw = (data.content||[]).map(b=>b.text||"").join("").trim();
+  return _parseAIResponse(raw);
 }
 
 function saveApiKey(){
@@ -9460,7 +9489,7 @@ RESPONDA APENAS COM JSON VÁLIDO (sem markdown):
 
   try{
     if(statusText) statusText.textContent="🔍 Identificando e classificando transações...";
-    const result = await aiProxyCall(prompt, 4096);
+    const result = await aiDirectCall(prompt, 4096);
     let count=0;
     const importedIds = [];
     (result.transacoes||[]).forEach(tx=>{
@@ -10620,7 +10649,7 @@ RESPONDA APENAS COM JSON VÁLIDO:
 }`;
 
   try{
-    const result = await aiProxyCall(prompt, 4096);
+    const result = await aiDirectCall(prompt, 4096);
 
     // Import transactions
     const txIds=[];
