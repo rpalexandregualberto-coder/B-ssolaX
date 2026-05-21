@@ -4021,6 +4021,9 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="ai-spinner"></div>
         <span id="fin-ai-status-text">Analisando arquivo...</span>
       </div>
+      <div style="margin-top:12px;text-align:right">
+        <button onclick="limparTodasFaturas()" style="background:none;border:1px solid var(--red,#e05);border-radius:9px;color:var(--red,#e05);font-size:.7rem;font-weight:700;padding:5px 13px;cursor:pointer;opacity:.75;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.75'" title="Remove TODAS as transações de cartão e entradas importadas por IA para reimportação limpa">🗑️ Limpar e Reimportar</button>
+      </div>
     </div>
 
     <!-- ━━━━━━ CONTAS / CARTOES / ORCAMENTO ━━━━━━ -->
@@ -9531,9 +9534,11 @@ JSON SOMENTE:
     const importedIds=[], duplicados=[];
     nubankTxsRaw.forEach((tx,i)=>{
       // Deduplicação: pula se já existe tx com mesmo nome+valor+data
+      // Usa sinal exato: estorno tem valor negativo, compra tem positivo
+      const expectedValor = tx.estorno ? -Math.abs(tx.valor) : Math.abs(tx.valor);
       const jaExiste = FIN_TRANSACTIONS.some(e=>
         e.nome===tx.nome &&
-        Math.abs(e.valor)===Math.abs(tx.valor) &&
+        e.valor===expectedValor &&
         e.data===tx.data &&
         e.tipo==="cartao"
       );
@@ -9982,6 +9987,32 @@ function revertImport(batchId){
   toast.textContent=`✅ Importação revertida — ${count} transação${count!==1?"ões":""} removida${count!==1?"s":""}`;
   document.body.appendChild(toast);
   setTimeout(()=>toast.remove(),3500);
+}
+
+function limparTodasFaturas(){
+  const cartaoAll  = FIN_TRANSACTIONS.filter(t=>t.tipo==="cartao");
+  const receitaIA  = FIN_TRANSACTIONS.filter(t=>t.tipo==="receita"&&t.origem==="ia");
+  const total = cartaoAll.length + receitaIA.length;
+  if(!total){ alert("Nenhuma transação de cartão ou entrada importada por IA encontrada."); return; }
+  if(!confirm(
+    `⚠️ LIMPAR DADOS DE CARTÃO\n\n` +
+    `Serão removidas:\n` +
+    `• ${cartaoAll.length} transação${cartaoAll.length!==1?"ões":""} de cartão\n` +
+    `• ${receitaIA.length} entrada${receitaIA.length!==1?"s":""} importada${receitaIA.length!==1?"s":""} por IA\n\n` +
+    `O histórico de importações também será limpo.\n\n` +
+    `Após confirmar, reimporte seus CSVs para obter dados corretos.\n` +
+    `Esta ação não pode ser desfeita!`
+  )) return;
+  const ids = new Set([...cartaoAll,...receitaIA].map(t=>t.id));
+  FIN_TRANSACTIONS.splice(0, FIN_TRANSACTIONS.length, ...FIN_TRANSACTIONS.filter(t=>!ids.has(t.id)));
+  FIN_IMPORT_HISTORY.splice(0, FIN_IMPORT_HISTORY.length);
+  renderFinanceiro();
+  try{ saveData(); }catch(e){}
+  const toast = document.createElement("div");
+  toast.style.cssText="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 22px;font-size:.82rem;font-weight:700;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:9999;backdrop-filter:blur(12px)";
+  toast.textContent=`🗑️ ${total} transação${total!==1?"ões":""} removida${total!==1?"s":""} — reimporte seus CSVs`;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),4000);
 }
 
 // ══════════════════════════════════════
