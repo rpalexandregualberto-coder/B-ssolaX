@@ -8141,16 +8141,18 @@ function renderFinDashboard(){
   const prevMk = monthKey(prevY, prevM);
   const prevTx = FIN_TRANSACTIONS.filter(t => t.data && t.data.startsWith(prevMk));
 
-  const entradas  = tx.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0);
-  const despExtra = tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").reduce((s,t)=>s+t.valor,0);
-  const fixasCad  = getFixas().reduce((s,f)=>s+f.valor,0);
-  const despesas  = despExtra + fixasCad;
-  const invest    = tx.filter(t=>t.tipo==="investimento").reduce((s,t)=>s+t.valor,0);
-  const saldo     = entradas - despesas;
+  const entradas    = tx.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0);
+  const despExtra   = tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").reduce((s,t)=>s+t.valor,0);
+  const fixasCad    = getFixas().reduce((s,f)=>s+f.valor,0);
+  const cartaoPago  = tx.filter(t=>t.tipo==="cartao"&&!t.futuro).reduce((s,t)=>s+Math.abs(t.valor),0);
+  const despesas    = despExtra + fixasCad + cartaoPago;
+  const invest      = tx.filter(t=>t.tipo==="investimento").reduce((s,t)=>s+t.valor,0);
+  const saldo       = entradas - despesas;
 
-  const prevEnt   = prevTx.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0);
-  const prevDesp  = prevTx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").reduce((s,t)=>s+t.valor,0);
-  const prevSaldo = prevEnt - prevDesp;
+  const prevEnt     = prevTx.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0);
+  const prevCartao  = prevTx.filter(t=>t.tipo==="cartao"&&!t.futuro).reduce((s,t)=>s+Math.abs(t.valor),0);
+  const prevDesp    = prevTx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").reduce((s,t)=>s+t.valor,0) + prevCartao;
+  const prevSaldo   = prevEnt - prevDesp;
 
   const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
 
@@ -8214,7 +8216,7 @@ function renderFinDashboard(){
   const donutTotal = document.getElementById("fd-donut-total");
   const donutCats  = document.getElementById("fd-donut-cats");
   if(donutSvg){
-    const despTx = tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa");
+    const despTx = tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa"||(t.tipo==="cartao"&&!t.futuro));
     const catMap = {};
     despTx.forEach(t=>{ const c=t.categoria||t.category||"Outros"; catMap[c]=(catMap[c]||0)+t.valor; });
     const catEntries = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
@@ -8283,7 +8285,7 @@ function renderFinDashboard(){
       return {
         lbl:weeks[wi],
         ent:wTx.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0),
-        desp:wTx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").reduce((s,t)=>s+t.valor,0),
+        desp:wTx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa"||(t.tipo==="cartao"&&!t.futuro)).reduce((s,t)=>s+Math.abs(t.valor),0),
       };
     });
     const maxVal = Math.max(...weekData.flatMap(w=>[w.ent,w.desp]),1);
@@ -8373,7 +8375,7 @@ function renderFinDashboard(){
   const topEl = document.getElementById("fd-top-cat");
   if(topEl){
     const cats={};
-    tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").forEach(t=>{
+    tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa"||(t.tipo==="cartao"&&!t.futuro)).forEach(t=>{
       const c=t.categoria||t.category||"Outros";
       if(!cats[c])cats[c]={val:0,count:0};
       cats[c].val+=t.valor;cats[c].count++;
@@ -9176,7 +9178,8 @@ function renderComparativoMensal(recAtual, despAtual, saldoAtual){
 
   const recPrev  = txPrev.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0);
   const despPrev = txPrev.filter(t=>t.tipo!=="receita"&&t.tipo!=="investimento"&&t.tipo!=="cartao").reduce((s,t)=>s+t.valor,0)
-                   + fixasPrev.reduce((s,f)=>s+f.valor,0);
+                   + fixasPrev.reduce((s,f)=>s+f.valor,0)
+                   + txPrev.filter(t=>t.tipo==="cartao"&&!t.futuro).reduce((s,t)=>s+Math.abs(t.valor),0);
   const saldoPrev = recPrev - despPrev;
 
   const fmt = v => fmtBRL(v);
@@ -9216,6 +9219,7 @@ function renderFluxoSemanal(tx){
     const dia = parseInt((t.data||"").split("-")[2])||1;
     const sem = Math.min(Math.floor((dia-1)/7), 4);
     if(t.tipo==="receita") semanas[sem].rec += t.valor;
+    else if(t.tipo==="cartao"&&!t.futuro) semanas[sem].desp += Math.abs(t.valor);
     else if(t.tipo!=="cartao") semanas[sem].desp += t.valor;
   });
 
@@ -11631,7 +11635,7 @@ function renderTopCategoria(){
   if(!el) return;
   const mk = monthKey(finYear, finMonth);
   const cats = {};
-  FIN_TRANSACTIONS.filter(t=>(t.tipo==="despesa_extra"||t.tipo==="despesa_fixa")&&t.data&&t.data.startsWith(mk)).forEach(t=>{
+  FIN_TRANSACTIONS.filter(t=>(t.tipo==="despesa_extra"||t.tipo==="despesa_fixa"||(t.tipo==="cartao"&&!t.futuro))&&t.data&&t.data.startsWith(mk)).forEach(t=>{
     const c = t.categoria||t.category||"Outros";
     if(!cats[c]) cats[c]={val:0,count:0};
     cats[c].val += t.valor;
