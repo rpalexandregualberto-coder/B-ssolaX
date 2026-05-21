@@ -7889,6 +7889,44 @@ function saldoConta(contaId){
   return saldo;
 }
 
+// ── Ciclo de faturamento ─────────────────────────────────────────
+// Retorna a data de vencimento da fatura que contém a transação de 'dataStr'
+// Regra: se dia do gasto > diaFech → fatura do MÊS SEGUINTE; senão → fatura do MÊS ATUAL
+function getFaturaVencimento(dataStr, cartao){
+  if(!dataStr || !cartao) return null;
+  const d = new Date(dataStr + "T12:00:00");
+  if(isNaN(d)) return null;
+  const diaFech = cartao.dia_fechamento || 5;
+  const diaVenc = cartao.dia_vencimento || 12;
+  let invMes = d.getMonth();   // 0-indexed
+  let invAno = d.getFullYear();
+  if(d.getDate() > diaFech){
+    // Gasto após o fechamento → vai pra fatura do mês seguinte
+    invMes++;
+    if(invMes > 11){ invMes = 0; invAno++; }
+  }
+  return new Date(invAno, invMes, diaVenc, 23, 59, 59);
+}
+
+// Retorna true se a fatura que contém essa transação ainda NÃO venceu (= lançamento futuro)
+function calcTransacaoFuturo(dataStr, cartao){
+  const venc = getFaturaVencimento(dataStr, cartao);
+  if(!venc) return false;
+  return new Date() <= venc;
+}
+
+// Retorna label legível do mês da fatura de uma transação (ex: "Junho/2026")
+function getFaturaMesLabel(dataStr, cartao){
+  if(!dataStr || !cartao) return "";
+  const d = new Date(dataStr + "T12:00:00");
+  if(isNaN(d)) return "";
+  const diaFech = cartao.dia_fechamento || 5;
+  let invMes = d.getMonth();
+  let invAno = d.getFullYear();
+  if(d.getDate() > diaFech){ invMes++; if(invMes>11){invMes=0;invAno++;} }
+  return FIN_MONTHS[invMes]+"/"+invAno;
+}
+
 // Fatura ABERTA de um cartao = compras desde o ultimo fechamento ate o proximo
 function faturaAberta(cartaoId){
   const cartao = FIN_CARTOES.find(c=>c.id===cartaoId);
@@ -8650,10 +8688,11 @@ function renderFinanceiro(){
         return `<div class="fin-tx-item">
           <div class="fin-tx-cat-dot" style="background:${color}"></div>
           <div class="fin-tx-info">
-            <div class="fin-tx-name">${t.nome}${t.futuro?` <span style="font-size:.58rem;background:#f59e0b22;color:#f59e0b;border-radius:4px;padding:1px 5px;font-weight:700;vertical-align:middle">⏳ PENDENTE</span>`:""}</div>
+            <div class="fin-tx-name">${t.nome}${t.futuro?` <span style="font-size:.58rem;background:#f59e0b22;color:#f59e0b;border-radius:4px;padding:1px 5px;font-weight:700;vertical-align:middle">⏳ PENDENTE</span>`:""}${t.estorno?` <span style="font-size:.58rem;background:rgba(52,197,122,.15);color:var(--green);border-radius:4px;padding:1px 5px;font-weight:700;vertical-align:middle">↩ ESTORNO</span>`:""}</div>
             <div class="fin-tx-meta">
               <span>${t.categoria}</span>
               <span>📅 ${d}</span>
+              ${t.fatura_mes?`<span style="color:var(--orange);font-size:.65rem">🧾 Fatura ${t.fatura_mes}</span>`:""}
               ${t.origem==="ia"?`<span style="color:var(--purple)">✨ IA</span>`:""}
               <span style="background:${tipoBadge[t.tipo]}22;color:${tipoBadge[t.tipo]};border-radius:5px;padding:1px 6px;font-size:.6rem;font-weight:700">${tipoLabel[t.tipo]||t.tipo}</span>
             </div>
@@ -9459,12 +9498,20 @@ async function processFinFile(event, tipo){
   window._finImportVinculoId = vinculoId;
   window._finImportTipo = tipo;
 
-  // Pergunta se a fatura já foi paga (somente para fatura de cartão)
+  // futuro é calculado automaticamente por transação usando o ciclo do cartão.
+  // Fallback manual só se não houver cartão vinculado.
   let isFuturo = false;
+  let autoFuturo = false; // true = usará calcTransacaoFuturo() por tx
   if(tipo === "fatura"){
-    isFuturo = !confirm("Esta fatura já foi paga?\n\n✅ OK = Fatura paga (lançamentos normais)\n⏳ Cancelar = Fatura em aberto / futura");
+    const cartaoVinc = FIN_CARTOES.find(c=>c.id===vinculoId);
+    if(cartaoVinc){
+      autoFuturo = true; // futuro calculado por data de cada transação
+    } else {
+      isFuturo = !confirm("Esta fatura já foi paga?\n\n✅ OK = Fatura paga (lançamentos normais)\n⏳ Cancelar = Fatura em aberto / futura");
+    }
   }
   window._finImportFuturo = isFuturo;
+  window._finImportAutoFuturo = autoFuturo;
 
   if(statusEl) statusEl.style.display="flex";
   if(statusText) statusText.textContent=`Lendo ${tipo==="fatura"?"fatura do cartão":"extrato bancário"}...`;
@@ -9548,22 +9595,36 @@ JSON SOMENTE:
       if(jaExiste){ duplicados.push(tx.nome); return; }
 
       const newId=nextFinId++;
+      const _vId=(typeof vinculoId!=="undefined")?vinculoId:window._finImportVinculoId;
+      const _vTipo=(typeof tipo!=="undefined")?tipo:window._finImportTipo;
+      const cartaoObj = _vTipo==="fatura" ? FIN_CARTOES.find(c=>c.id===_vId) : null;
+      const _autoFuturo=(typeof autoFuturo!=="undefined")?autoFuturo:!!window._finImportAutoFuturo;
+      // futuro por transação (regime de competência): usa ciclo do cartão se disponível
+      let txFuturo = false;
+      if(_vTipo==="fatura"){
+        if(_autoFuturo && cartaoObj){
+          txFuturo = calcTransacaoFuturo(tx.data, cartaoObj);
+        } else {
+          txFuturo = (typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
+        }
+      }
       const newTx={
         id:newId, nome:tx.nome, nome_original:tx.nome,
         valor:Math.abs(tx.valor),
-        tipo: tx.estorno ? "cartao" : (tipo==="fatura"?"cartao":(tx.valor<0?"despesa_extra":"receita")),
+        tipo: tx.estorno ? "cartao" : (_vTipo==="fatura"?"cartao":(tx.valor<0?"despesa_extra":"receita")),
         categoria:catMap[i]||"Outros",
         data: tx.data,
         origem:"ia",
         estorno: tx.estorno||false,
+        futuro: txFuturo,
         importBatchId
       };
       if(tx.estorno) newTx.valor=-Math.abs(tx.valor);
-      const _futuro=(typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
-      if(_futuro) newTx.futuro=true;
-      const _vId=(typeof vinculoId!=="undefined")?vinculoId:window._finImportVinculoId;
-      const _vTipo=(typeof tipo!=="undefined")?tipo:window._finImportTipo;
       if(_vId!=null){ if(_vTipo==="fatura") newTx.cartao_id=_vId; else newTx.conta_id=_vId; }
+      // Armazena qual fatura essa tx pertence (para exibição)
+      if(cartaoObj && _vTipo==="fatura"){
+        newTx.fatura_mes = getFaturaMesLabel(tx.data, cartaoObj);
+      }
       FIN_TRANSACTIONS.push(newTx);
       importedIds.push(newId);
     });
@@ -9666,6 +9727,7 @@ JSON SOMENTE:
       };
       const _vId   = (typeof vinculoId !== "undefined") ? vinculoId : window._finImportVinculoId;
       const _vTipo = (typeof tipo !== "undefined") ? tipo : window._finImportTipo;
+      const _autoFuturo2=(typeof autoFuturo!=="undefined")?autoFuturo:!!window._finImportAutoFuturo;
       if(_vId != null){
         if(_vTipo === "fatura"){
           newTx.cartao_id = _vId;
@@ -9674,8 +9736,17 @@ JSON SOMENTE:
           newTx.conta_id = _vId;
         }
       }
-      const _futuro2=(typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
-      if(_futuro2) newTx.futuro=true;
+      // futuro por transação usando ciclo do cartão (regime de competência)
+      if(_vTipo === "fatura"){
+        const cartaoObj2 = FIN_CARTOES.find(c=>c.id===_vId);
+        if(_autoFuturo2 && cartaoObj2){
+          newTx.futuro = calcTransacaoFuturo(newTx.data, cartaoObj2);
+          newTx.fatura_mes = getFaturaMesLabel(newTx.data, cartaoObj2);
+        } else {
+          const _futuro2=(typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
+          if(_futuro2) newTx.futuro=true;
+        }
+      }
       if(v < 0) totalEstornosAI += Math.abs(v); else totalSaidasAI += v;
       FIN_TRANSACTIONS.push(newTx);
       importedIds.push(newId);
@@ -9964,7 +10035,18 @@ function renderImportHistory(){
   list.innerHTML = FIN_IMPORT_HISTORY.map(h=>{
     const dt = new Date(h.ts);
     const dtStr = dt.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"})+" "+dt.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-    const futBadge = h.futuro ? `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,.15);color:var(--orange);border:1px solid rgba(245,166,35,.3)">⏳ PENDENTE</span>` : `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(52,197,122,.12);color:var(--green);border:1px solid rgba(52,197,122,.25)">✅ PAGO</span>`;
+    // Conta quantas transações deste batch são futuro vs pagas (pode ter mix automático)
+    const batchTxs = FIN_TRANSACTIONS.filter(t=>t.importBatchId===h.id);
+    const cntFut = batchTxs.filter(t=>t.futuro).length;
+    const cntPago = batchTxs.filter(t=>!t.futuro).length;
+    let futBadge;
+    if(cntFut > 0 && cntPago > 0){
+      futBadge = `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,.12);color:var(--orange);border:1px solid rgba(245,166,35,.25)">⏳ ${cntFut} pendente${cntFut!==1?"s":""} · ✅ ${cntPago} pag${cntPago!==1?"os":"o"}</span>`;
+    } else if(cntFut > 0){
+      futBadge = `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,.15);color:var(--orange);border:1px solid rgba(245,166,35,.3)">⏳ PENDENTE</span>`;
+    } else {
+      futBadge = `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(52,197,122,.12);color:var(--green);border:1px solid rgba(52,197,122,.25)">✅ PAGO</span>`;
+    }
     const dupBadge = h.countDup>0 ? `<span style="font-size:.58rem;color:var(--muted)">${h.countDup} dup. ignorada${h.countDup!==1?"s":""}</span>` : "";
     const estornoBadge = h.totalEstornos>0 ? `<span style="font-size:.58rem;color:var(--green)">↩ ${fmtBRL(h.totalEstornos)} estorno${h.totalEstornos!==1?"s":""}</span>` : "";
     return `
