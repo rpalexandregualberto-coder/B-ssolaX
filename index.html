@@ -9582,16 +9582,22 @@ JSON SOMENTE:
 
     const importBatchId = "imp_" + Date.now();
     const importedIds=[], duplicados=[];
+    // Deduplicação por contagem de ocorrências (não apenas existência):
+    // Permite importar 2× iFood R$45 mesmo dia se o CSV tiver 2 entradas iguais
+    // e o DB ainda não tiver ambas. Evita duplicar ao reimportar CSV parcial + completo.
+    const existingMap={}; // chave→contagem no DB atual
+    FIN_TRANSACTIONS.filter(t=>t.tipo==="cartao").forEach(e=>{
+      const k=`${e.nome}|${e.valor}|${e.data}`;
+      existingMap[k]=(existingMap[k]||0)+1;
+    });
+    const batchMap={}; // chave→quantas vezes já vimos neste import
     nubankTxsRaw.forEach((tx,i)=>{
-      // Deduplicação: pula se já existe tx com mesmo nome+valor+data
       // Usa sinal exato: estorno tem valor negativo, compra tem positivo
       const expectedValor = tx.estorno ? -Math.abs(tx.valor) : Math.abs(tx.valor);
-      const jaExiste = FIN_TRANSACTIONS.some(e=>
-        e.nome===tx.nome &&
-        e.valor===expectedValor &&
-        e.data===tx.data &&
-        e.tipo==="cartao"
-      );
+      const k=`${tx.nome}|${expectedValor}|${tx.data}`;
+      batchMap[k]=(batchMap[k]||0)+1;
+      // Duplicata: este import já viu essa combinação tantas vezes quanto o DB tem
+      const jaExiste = batchMap[k] <= (existingMap[k]||0);
       if(jaExiste){ duplicados.push(tx.nome); return; }
 
       const newId=nextFinId++;
