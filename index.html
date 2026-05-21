@@ -9599,6 +9599,11 @@ JSON SOMENTE:
     };
     renderFinanceiro(); try{ saveData(); }catch(e){}
     setTimeout(()=>showImportReview(importedIds,resumoCSV),600);
+    // Detecta pares PIX/crédito após a revisão aparecer
+    setTimeout(()=>{
+      const pixPairs = detectPixCreditoDuplicates(importedIds);
+      if(pixPairs.length) showPixCreditoReview(pixPairs);
+    }, 1800);
     event.target.value=""; return;
   }
 
@@ -9692,6 +9697,11 @@ JSON SOMENTE:
     renderFinanceiro();
     try{ saveData(); }catch(e){}
     setTimeout(()=>showImportReview(importedIds, result.resumo), 600);
+    // Detecta pares PIX/crédito após a revisão aparecer
+    setTimeout(()=>{
+      const pixPairs = detectPixCreditoDuplicates(importedIds);
+      if(pixPairs.length) showPixCreditoReview(pixPairs);
+    }, 1800);
   }catch(e){
     console.error("processFinFile error:", e);
     const msg = e.message||"Erro desconhecido";
@@ -10013,6 +10023,119 @@ function limparTodasFaturas(){
   toast.textContent=`🗑️ ${total} transação${total!==1?"ões":""} removida${total!==1?"s":""} — reimporte seus CSVs`;
   document.body.appendChild(toast);
   setTimeout(()=>toast.remove(),4000);
+}
+
+// ── PIX via Crédito — detecção de duplicatas ─────────────────
+function _nomeSim(a, b){
+  const norm = s => (s||"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim().split(" ").filter(w=>w.length>3);
+  const wa = norm(a), wb = norm(b);
+  if(!wa.length||!wb.length) return 0;
+  const matches = wa.filter(w => wb.some(ww => ww.includes(w)||w.includes(ww)));
+  return matches.length / Math.max(wa.length, wb.length);
+}
+
+function detectPixCreditoDuplicates(recentIds){
+  const recentSet = new Set(recentIds||[]);
+  // Transações cartão que podem ser "PIX no crédito"
+  const cartaoPix = FIN_TRANSACTIONS.filter(t=>
+    t.tipo==="cartao" && !t.futuro && !t._pixIgnorado
+  );
+  // Transações bancárias que podem ser PIX saindo da conta
+  const extraPix = FIN_TRANSACTIONS.filter(t=>
+    (t.tipo==="despesa_extra"||t.tipo==="receita") && !t._pixIgnorado
+  );
+  const pairs=[], usedIds=new Set();
+  cartaoPix.forEach(c=>{
+    if(usedIds.has(c.id)) return;
+    extraPix.forEach(e=>{
+      if(usedIds.has(e.id)) return;
+      // Pelo menos um deve ser da importação recente
+      if(!recentSet.has(c.id) && !recentSet.has(e.id)) return;
+      // Data: até 2 dias de diferença
+      const dc=new Date(c.data||""), de=new Date(e.data||"");
+      if(isNaN(dc)||isNaN(de)) return;
+      if(Math.abs(dc-de) > 2*86400000) return;
+      // Valor: cartão deve ser >= extrato (juros), diferença máxima 30%
+      const vc=Math.abs(c.valor), ve=Math.abs(e.valor);
+      if(ve===0||vc===0) return;
+      const ratio = vc/ve;
+      if(ratio<0.85||ratio>1.35) return;
+      // Pelo menos um critério de nome: "pix" em algum, ou similaridade > 35%
+      const cN=(c.nome||"").toLowerCase(), eN=(e.nome||"").toLowerCase();
+      const temPix = cN.includes("pix")||eN.includes("pix");
+      const sim = _nomeSim(c.nome, e.nome);
+      if(!temPix && sim<0.35) return;
+      pairs.push({cartao:c, extra:e, ratio, sim});
+      usedIds.add(c.id);
+      usedIds.add(e.id);
+    });
+  });
+  return pairs;
+}
+
+function showPixCreditoReview(pairs){
+  if(!pairs||!pairs.length) return;
+  const fmtVal = v => `R$ ${Math.abs(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  const items = pairs.map((p,i)=>{
+    const juros = (Math.abs(p.cartao.valor)-Math.abs(p.extra.valor));
+    const pct = ((juros/Math.abs(p.extra.valor))*100).toFixed(1);
+    return `<div class="_pix-pair-card" style="background:var(--surface);border:1px solid var(--orange,#f90);border-radius:14px;padding:14px 16px;margin-bottom:12px">
+      <div style="font-size:.68rem;font-weight:800;color:var(--orange,#f90);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">⚠️ Possível duplicata ${i+1}/${pairs.length}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.75rem;margin-bottom:10px">
+        <div style="background:rgba(160,122,232,.08);border-radius:10px;padding:10px">
+          <div style="font-size:.6rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em">💳 Fatura Cartão</div>
+          <div style="font-weight:700;margin-bottom:2px">${p.cartao.nome}</div>
+          <div style="color:var(--red,#e05);font-weight:800">${fmtVal(p.cartao.valor)}</div>
+          <div style="color:var(--muted);font-size:.65rem;margin-top:2px">${p.cartao.data||""} · ${p.cartao.categoria||""}</div>
+        </div>
+        <div style="background:rgba(255,144,0,.06);border-radius:10px;padding:10px">
+          <div style="font-size:.6rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em">🏦 Extrato Bancário</div>
+          <div style="font-weight:700;margin-bottom:2px">${p.extra.nome}</div>
+          <div style="color:var(--red,#e05);font-weight:800">${fmtVal(p.extra.valor)}</div>
+          <div style="color:var(--muted);font-size:.65rem;margin-top:2px">${p.extra.data||""} · ${p.extra.categoria||""}</div>
+        </div>
+      </div>
+      ${juros>0?`<div style="font-size:.7rem;color:var(--muted);margin-bottom:10px;padding:6px 10px;background:rgba(255,144,0,.08);border-radius:8px">📊 Diferença: <strong>${fmtVal(juros)}</strong> (${pct}% de juros/taxa de PIX no crédito)</div>`:""}
+      <div style="display:flex;gap:8px">
+        <button onclick="_resolvePixDup(${p.extra.id},${p.cartao.id},'remover',this)" style="flex:2;padding:8px;border-radius:9px;border:none;background:rgba(220,50,50,.15);color:var(--red,#e05);font-size:.72rem;font-weight:700;cursor:pointer">🗑️ Remover extrato<br><span style="font-weight:400;opacity:.8">Manter apenas o cartão</span></button>
+        <button onclick="_resolvePixDup(${p.extra.id},${p.cartao.id},'manter',this)" style="flex:1;padding:8px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.7rem;cursor:pointer">Manter<br>ambos</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  const modal = document.createElement("div");
+  modal.id="_pix-credito-modal";
+  modal.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:9998;display:flex;align-items:center;justify-content:center;padding:16px";
+  modal.innerHTML=`
+    <div style="background:var(--card);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border:1px solid var(--purple-border);border-radius:22px;padding:24px 22px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:var(--card-shadow)">
+      <div style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;margin-bottom:6px">🔄 PIX via Cartão de Crédito</div>
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:18px;line-height:1.55">Detectamos transações que parecem ser o <strong>mesmo gasto duplicado</strong>: um PIX que saiu da conta bancária e depois foi cobrado no cartão com juros. Escolha como tratar cada par.</div>
+      ${items}
+      <button onclick="document.getElementById('_pix-credito-modal')?.remove()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:.8rem;font-weight:600;cursor:pointer;margin-top:4px">Fechar</button>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function _resolvePixDup(extraId, cartaoId, acao, btn){
+  const card = btn.closest("._pix-pair-card");
+  if(acao==="remover"){
+    // Remove a transação do extrato bancário (o cartão já tem o valor correto com juros)
+    FIN_TRANSACTIONS.splice(0,FIN_TRANSACTIONS.length,...FIN_TRANSACTIONS.filter(t=>t.id!==extraId));
+    // Marca o cartão como revisado
+    const tc = FIN_TRANSACTIONS.find(t=>t.id===cartaoId);
+    if(tc) tc._pixIgnorado=true;
+    try{saveData();}catch(e){}
+    renderFinanceiro();
+    if(card){ card.style.opacity=".4"; card.style.pointerEvents="none"; card.querySelectorAll("button").forEach(b=>{b.disabled=true;}); const p=card.querySelector("button"); if(p) p.textContent="✅ Extrato removido — cartão mantido"; }
+  } else {
+    // Mantém os dois mas marca como revisados pra não aparecer de novo
+    const te=FIN_TRANSACTIONS.find(t=>t.id===extraId);
+    const tc=FIN_TRANSACTIONS.find(t=>t.id===cartaoId);
+    if(te) te._pixIgnorado=true;
+    if(tc) tc._pixIgnorado=true;
+    try{saveData();}catch(e){}
+    if(card){ card.style.opacity=".4"; card.style.pointerEvents="none"; }
+  }
 }
 
 // ══════════════════════════════════════
