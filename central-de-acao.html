@@ -4207,6 +4207,19 @@ textarea.form-input{border-radius:16px;resize:vertical}
         </div>
       </div>
 
+      <!-- Histórico de Importações -->
+      <div class="fin-card" id="fin-import-history-card">
+        <div class="fin-card-head">
+          <span class="fin-card-title">📋 Histórico de Importações</span>
+          <span style="font-size:.7rem;color:var(--muted)" id="fin-import-history-count"></span>
+        </div>
+        <div class="fin-card-body" style="padding:0">
+          <div id="fin-import-history-list">
+            <div style="text-align:center;padding:20px;color:var(--muted);font-size:.75rem">Nenhuma importação registrada ainda.</div>
+          </div>
+        </div>
+      </div>
+
     </div>
     </div><!-- /fin-detail-panel -->
   </div><!-- /view-financeiro -->
@@ -7851,6 +7864,10 @@ let nextCartaoId = 1;
 // { "🍔 iFood": 200, "🛒 Mercado": 800, ... }
 let FIN_ORCAMENTO = {};
 
+// ── HISTÓRICO DE IMPORTAÇÕES ──────────────────────
+// [{id, ts, tipo, fonte, mes, count, totalSaidas, totalEstornos, futuro}]
+let FIN_IMPORT_HISTORY = [];
+
 // ── HELPERS ──────────────────────────────────────
 // Saldo atual de uma conta = saldo_inicial + receitas - despesas (todas as transações vinculadas)
 function saldoConta(contaId){
@@ -8932,6 +8949,9 @@ function renderFinanceiro(){
 
   // Projeção de Caixa
   renderProjecaoCaixa(totalEntradas, totalDespesas);
+
+  // Histórico de importações
+  renderImportHistory();
 }
 
 // ── MAPA DE CATEGORIAS FIXAS ────────────────────────────
@@ -9503,6 +9523,7 @@ JSON SOMENTE:
     const catMap={};
     (catResult.cats||[]).forEach(c=>{ catMap[c.i]=c.cat; });
 
+    const importBatchId = "imp_" + Date.now();
     const importedIds=[], duplicados=[];
     nubankTxsRaw.forEach((tx,i)=>{
       // Deduplicação: pula se já existe tx com mesmo nome+valor+data
@@ -9522,7 +9543,8 @@ JSON SOMENTE:
         categoria:catMap[i]||"Outros",
         data: tx.data,
         origem:"ia",
-        estorno: tx.estorno||false
+        estorno: tx.estorno||false,
+        importBatchId
       };
       if(tx.estorno) newTx.valor=-Math.abs(tx.valor);
       const _futuro=(typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
@@ -9542,16 +9564,31 @@ JSON SOMENTE:
     const msgExtra = duplicados.length>0 ? ` (${duplicados.length} duplicata${duplicados.length>1?"s":""} ignorada${duplicados.length>1?"s":""})` : "";
     if(statusText) statusText.textContent=`✅ ${importedIds.length}/${nubankTxsRaw.length} transações importadas${_fut2?" · pendentes":""}${msgExtra}`;
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },3500);
-    renderFinanceiro(); try{ saveData(); }catch(e){}
     const totalLiq=nubankTxsRaw.reduce((s,t)=>s+t.valor,0);
+    const totalSaidas=nubankTxsRaw.filter(t=>t.valor>0).reduce((s,t)=>s+t.valor,0);
+    const totalEstornos=nubankTxsRaw.filter(t=>t.valor<0).reduce((s,t)=>s+Math.abs(t.valor),0);
+    // Registra no histórico de importações
+    FIN_IMPORT_HISTORY.unshift({
+      id: importBatchId,
+      ts: new Date().toISOString(),
+      tipo: tipo||"fatura",
+      fonte: "CSV Nubank",
+      mes: mesLabel,
+      count: importedIds.length,
+      countDup: duplicados.length,
+      totalSaidas,
+      totalEstornos,
+      futuro: _fut2
+    });
     const resumoCSV={
       total_transacoes:importedIds.length,
       total_entradas:nubankTxsRaw.filter(t=>t.valor<0&&!t.estorno).reduce((s,t)=>s+Math.abs(t.valor),0),
-      total_saidas:nubankTxsRaw.filter(t=>t.valor>0).reduce((s,t)=>s+t.valor,0),
+      total_saidas:totalSaidas,
       saldo_periodo:totalLiq,
       periodo:mesLabel,
       observacoes:`CSV Nubank: ${nubankTxsRaw.length} lidas, ${importedIds.length} importadas, ${duplicados.length} duplicatas ignoradas. Total líquido: R$ ${totalLiq.toFixed(2)}`
     };
+    renderFinanceiro(); try{ saveData(); }catch(e){}
     setTimeout(()=>showImportReview(importedIds,resumoCSV),600);
     event.target.value=""; return;
   }
@@ -9588,15 +9625,18 @@ JSON SOMENTE:
     if(statusText) statusText.textContent="🔍 Classificando todas as transações...";
     const result = await aiProxyCallStream(aiPrompt, 8192);
     let count=0;
+    const importBatchIdAI = "imp_" + Date.now();
     const importedIds = [];
+    let totalSaidasAI=0, totalEstornosAI=0;
     (result.transacoes||[]).forEach(tx=>{
       if(!tx.nome||tx.valor==null) return;
       const newId = nextFinId++;
+      const v = parseAIValor(tx.valor);
       const newTx = {
         id: newId,
         nome: tx.nome,
         nome_original: tx.nome_original||tx.nome,
-        valor: parseAIValor(tx.valor),
+        valor: v,
         tipo: tx.tipo||"despesa_extra",
         categoria: tx.categoria||"Outros",
         data: tx.data||dataDefault,
@@ -9604,7 +9644,8 @@ JSON SOMENTE:
         confianca: tx.confianca||null,
         padrao: tx.padrao||null,
         needsReview: !!tx.needsReview,
-        motivoReview: tx.motivo_review||""
+        motivoReview: tx.motivo_review||"",
+        importBatchId: importBatchIdAI
       };
       const _vId   = (typeof vinculoId !== "undefined") ? vinculoId : window._finImportVinculoId;
       const _vTipo = (typeof tipo !== "undefined") ? tipo : window._finImportTipo;
@@ -9618,11 +9659,25 @@ JSON SOMENTE:
       }
       const _futuro2=(typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
       if(_futuro2) newTx.futuro=true;
+      if(v < 0) totalEstornosAI += Math.abs(v); else totalSaidasAI += v;
       FIN_TRANSACTIONS.push(newTx);
       importedIds.push(newId);
       count++;
     });
     matchFixasFromTransactions();
+    // Registra no histórico de importações
+    FIN_IMPORT_HISTORY.unshift({
+      id: importBatchIdAI,
+      ts: new Date().toISOString(),
+      tipo: tipo||"fatura",
+      fonte: "IA (PDF/TXT/OFX)",
+      mes: mesLabel,
+      count,
+      countDup: 0,
+      totalSaidas: totalSaidasAI,
+      totalEstornos: totalEstornosAI,
+      futuro: !!(typeof isFuturo!=="undefined" ? isFuturo : window._finImportFuturo)
+    });
     if(statusText) statusText.textContent=`✅ ${count} transações importadas com inteligência financeira!`;
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; }, 2500);
     renderFinanceiro();
@@ -9872,6 +9927,58 @@ function matchFixasFromTransactions(){
   });
 }
 
+
+// ── HISTÓRICO DE IMPORTAÇÕES ─────────────────────
+function renderImportHistory(){
+  const list = document.getElementById("fin-import-history-list");
+  const countEl = document.getElementById("fin-import-history-count");
+  if(!list) return;
+  if(!FIN_IMPORT_HISTORY || FIN_IMPORT_HISTORY.length === 0){
+    list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:.75rem">Nenhuma importação registrada ainda.</div>`;
+    if(countEl) countEl.textContent = "";
+    return;
+  }
+  if(countEl) countEl.textContent = FIN_IMPORT_HISTORY.length + " importação" + (FIN_IMPORT_HISTORY.length!==1?"ões":"");
+  list.innerHTML = FIN_IMPORT_HISTORY.map(h=>{
+    const dt = new Date(h.ts);
+    const dtStr = dt.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"})+" "+dt.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    const futBadge = h.futuro ? `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,.15);color:var(--orange);border:1px solid rgba(245,166,35,.3)">⏳ PENDENTE</span>` : `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(52,197,122,.12);color:var(--green);border:1px solid rgba(52,197,122,.25)">✅ PAGO</span>`;
+    const dupBadge = h.countDup>0 ? `<span style="font-size:.58rem;color:var(--muted)">${h.countDup} dup. ignorada${h.countDup!==1?"s":""}</span>` : "";
+    const estornoBadge = h.totalEstornos>0 ? `<span style="font-size:.58rem;color:var(--green)">↩ ${fmtBRL(h.totalEstornos)} estorno${h.totalEstornos!==1?"s":""}</span>` : "";
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+          <span style="font-size:.75rem;font-weight:700;color:var(--text)">${h.fonte}</span>
+          ${futBadge}
+          ${dupBadge}
+          ${estornoBadge}
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);line-height:1.5">
+          📅 ${dtStr} &nbsp;·&nbsp; 📆 Mês: ${h.mes} &nbsp;·&nbsp;
+          <strong style="color:var(--text)">${h.count}</strong> transaç${h.count!==1?"ões":"ão"} &nbsp;·&nbsp;
+          Saídas: <strong style="color:var(--red)">${fmtBRL(h.totalSaidas)}</strong>
+        </div>
+      </div>
+      <button onclick="revertImport('${h.id}')" title="Reverter esta importação" style="flex-shrink:0;padding:5px 12px;font-size:.68rem;font-weight:700;background:rgba(255,77,109,.1);color:var(--red);border:1px solid rgba(255,77,109,.3);border-radius:8px;cursor:pointer;white-space:nowrap">↩️ Reverter</button>
+    </div>`;
+  }).join("");
+}
+
+function revertImport(batchId){
+  const batch = FIN_IMPORT_HISTORY.find(h=>h.id===batchId);
+  const count = FIN_TRANSACTIONS.filter(t=>t.importBatchId===batchId).length;
+  if(!confirm(`⚠️ Reverter importação?\n\n"${batch?.fonte||"importação"}" — ${count} transação${count!==1?"ões":"ão"}\nMês: ${batch?.mes||""}\n\nTodas as transações deste lote serão removidas.\nEsta ação não pode ser desfeita.`)) return;
+  FIN_TRANSACTIONS.splice(0, FIN_TRANSACTIONS.length, ...FIN_TRANSACTIONS.filter(t=>t.importBatchId!==batchId));
+  FIN_IMPORT_HISTORY.splice(0, FIN_IMPORT_HISTORY.length, ...FIN_IMPORT_HISTORY.filter(h=>h.id!==batchId));
+  renderFinanceiro();
+  try{ saveData(); }catch(e){}
+  const toast = document.createElement("div");
+  toast.style.cssText="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 20px;font-size:.8rem;font-weight:700;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:9999;backdrop-filter:blur(12px)";
+  toast.textContent=`✅ Importação revertida — ${count} transação${count!==1?"ões":""} removida${count!==1?"s":""}`;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),3500);
+}
 
 // ══════════════════════════════════════
 //  BLOCO 2 — BUSCA GLOBAL (Ctrl+K)
@@ -10794,6 +10901,7 @@ function saveData(){
       nextPostId,
       FIN_COMISSOES,
       FIN_META_GASTOS,
+      FIN_IMPORT_HISTORY,
       HABITS,
       HABITS_DONE,
       nextHabId,
@@ -10886,6 +10994,7 @@ function loadData(){
     if(data.nextPostId!=null)    nextPostId = data.nextPostId;
     if(data.FIN_COMISSOES)       FIN_COMISSOES.splice(0,FIN_COMISSOES.length,...data.FIN_COMISSOES);
     if(data.FIN_META_GASTOS!=null) FIN_META_GASTOS = data.FIN_META_GASTOS;
+    if(data.FIN_IMPORT_HISTORY)  FIN_IMPORT_HISTORY.splice(0,FIN_IMPORT_HISTORY.length,...data.FIN_IMPORT_HISTORY);
     if(data.HABITS)              HABITS.splice(0,HABITS.length,...data.HABITS);
     if(data.HABITS_DONE)         Object.assign(HABITS_DONE, data.HABITS_DONE);
     if(data.nextHabId!=null)     nextHabId = data.nextHabId;
