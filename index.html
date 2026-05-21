@@ -2730,6 +2730,104 @@ textarea.form-input{border-radius:16px;resize:vertical}
 .dash-mais-val{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--green)}
 .dash-mais-sub{font-size:.7rem;color:var(--dim);margin-top:3px}
 
+/* ══ RYUKI CHAT ══ */
+#ryuki-fab{
+  position:fixed;bottom:28px;right:28px;z-index:8500;
+  width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#a07ae8 0%,#6236c0 100%);
+  box-shadow:0 4px 24px rgba(160,122,232,.55);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;transition:all .2s;
+}
+#ryuki-fab:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(160,122,232,.7)}
+#ryuki-fab .ryuki-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:14px;height:14px;border-radius:50%;
+  background:#42e89a;border:2px solid var(--bg);
+  display:none;
+}
+#ryuki-fab .ryuki-badge.show{display:block}
+#ryuki-panel{
+  position:fixed;right:0;top:0;bottom:0;width:420px;max-width:100vw;
+  background:var(--card);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-left:1px solid var(--border);z-index:8400;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);
+  box-shadow:-12px 0 48px rgba(0,0,0,.28);
+}
+#ryuki-panel.open{transform:translateX(0)}
+#ryuki-header{
+  padding:18px 20px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.ryuki-avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,#a07ae8,#6236c0);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+  box-shadow:0 2px 12px rgba(160,122,232,.4);
+}
+.ryuki-status-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#42e89a;display:inline-block;margin-right:5px;
+  box-shadow:0 0 6px #42e89a;
+}
+#ryuki-messages{
+  flex:1;overflow-y:auto;padding:16px 14px;
+  display:flex;flex-direction:column;gap:14px;
+  scroll-behavior:smooth;
+}
+#ryuki-messages::-webkit-scrollbar{width:4px}
+#ryuki-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.ryuki-msg{display:flex;gap:10px;align-items:flex-start;animation:msgIn .18s ease}
+.ryuki-msg.user{flex-direction:row-reverse}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ryuki-bubble{
+  max-width:82%;padding:11px 14px;border-radius:16px;
+  font-size:.8rem;line-height:1.62;
+}
+.ryuki-msg.ryuki .ryuki-bubble{
+  background:var(--surface);border:1px solid var(--border);
+  border-bottom-left-radius:4px;color:var(--text);
+}
+.ryuki-msg.user .ryuki-bubble{
+  background:linear-gradient(135deg,#a07ae8,#6236c0);
+  color:#fff;border-bottom-right-radius:4px;
+}
+.ryuki-bubble b{color:var(--accent)}
+.ryuki-bubble ul{margin:6px 0 6px 12px;padding:0}
+.ryuki-bubble li{margin-bottom:3px}
+.ryuki-typing{display:flex;gap:5px;align-items:center;padding:4px 0}
+.ryuki-typing span{
+  width:7px;height:7px;border-radius:50%;background:var(--accent);
+  animation:ryukiDot 1.2s infinite;
+}
+.ryuki-typing span:nth-child(2){animation-delay:.2s}
+.ryuki-typing span:nth-child(3){animation-delay:.4s}
+@keyframes ryukiDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+#ryuki-input-area{
+  padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0;
+  display:flex;gap:8px;align-items:flex-end;background:var(--surface);
+}
+#ryuki-input{
+  flex:1;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:10px 14px;font-size:.8rem;color:var(--text);
+  font-family:'Inter',sans-serif;resize:none;min-height:42px;max-height:120px;
+  outline:none;line-height:1.5;
+}
+#ryuki-input:focus{border-color:var(--accent)}
+#ryuki-send{
+  width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#a07ae8,#6236c0);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;transition:all .15s;
+}
+#ryuki-send:hover{transform:scale(1.08)}
+#ryuki-send:disabled{opacity:.45;cursor:default;transform:none}
+.ryuki-ctx-pill{
+  font-size:.62rem;color:var(--muted);text-align:center;padding:4px 8px;
+  background:var(--surface);border-radius:6px;margin:0 auto;border:1px solid var(--border);
+}
 /* ══ FIN MODE TOGGLE ══ */
 .fin-mode-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;width:fit-content}
 .fin-mode-btn{padding:7px 20px;border-radius:8px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:800;color:var(--muted);background:transparent;transition:all .2s;display:flex;align-items:center;gap:6px}
@@ -13773,7 +13871,330 @@ renderCalendar();
 renderAll();
 // Ensure dashboard starts in correct state
 switchDashView("dash");
+
+// ══════════════════════════════════════════════════════
+//  RYUKI — IA Financeira Executiva
+// ══════════════════════════════════════════════════════
+
+const RYUKI_SYSTEM = `Você é Ryuki.
+
+Uma IA executiva especializada em inteligência financeira, comportamento humano, produtividade financeira e controle patrimonial.
+
+Sua personalidade é sofisticada, elegante, extremamente inteligente, observadora, estratégica, persuasiva, emocionalmente controlada, altamente organizada, profissional, humana, refinada, segura, analítica e levemente provocativa intelectualmente.
+
+Você age como uma mistura de CFO pessoal, assistente executiva premium, analista financeira, consultora estratégica, especialista em Open Finance e mentora de performance financeira.
+
+Você NÃO age como uma IA genérica. Você age como alguém que acompanha profundamente a vida financeira do usuário.
+
+OBJETIVO: Ajudar o usuário a controlar melhor o dinheiro, reduzir desperdícios, entender padrões financeiros, melhorar decisões, aumentar patrimônio, controlar impulsividade, reduzir caos financeiro e aumentar inteligência financeira.
+
+COMPORTAMENTO:
+— Observa padrões, percebe excessos, identifica comportamentos perigosos
+— Alerta riscos, sugere melhorias, identifica desperdícios invisíveis
+— Entende contexto financeiro e emocional do consumo
+— Não apenas responde: acompanha, interpreta, analisa, orienta, provoca reflexão
+
+TOM DE VOZ:
+— Elegante, inteligente, refinada, objetiva, sofisticada, estratégica, humana
+— Nunca infantil, robótica, exageradamente emocional ou caricata
+
+REGRA CRÍTICA:
+— Jamais invente valores ou categorias não presentes nos dados
+— Precisão financeira é prioridade máxima
+— Se não tiver dados suficientes, seja honesta sobre isso
+— Responda sempre em português brasileiro
+
+FORMATO:
+— Use listas com — (travessão) ao invés de *
+— Negrito com **palavra** para destaques
+— Seja concisa mas profunda — cada resposta deve gerar reflexão
+— Máximo de 350 palavras por resposta (seja direta)`;
+
+let ryukiHistory = [];
+let ryukiOpen = false;
+let ryukiTyping = false;
+
+function buildRyukiContext(){
+  const mk = `${finYear}-${String(finMonth+1).padStart(2,"0")}`;
+  const tx = FIN_TRANSACTIONS.filter(t => t.data && t.data.startsWith(mk));
+  const fmtV = v => `R$ ${Math.abs(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+
+  const entradas    = tx.filter(t=>t.tipo==="receita").reduce((s,t)=>s+t.valor,0);
+  const despExtras  = tx.filter(t=>t.tipo==="despesa_extra"||t.tipo==="despesa_fixa").reduce((s,t)=>s+t.valor,0);
+  const cartaoPago  = tx.filter(t=>t.tipo==="cartao"&&!t.futuro).reduce((s,t)=>s+Math.abs(t.valor),0);
+  const cartaoFut   = tx.filter(t=>t.tipo==="cartao"&&t.futuro).reduce((s,t)=>s+Math.abs(t.valor),0);
+  const invest      = tx.filter(t=>t.tipo==="investimento").reduce((s,t)=>s+t.valor,0);
+  const totalDesp   = despExtras + cartaoPago;
+  const saldo       = entradas - totalDesp;
+
+  // Categorias
+  const cats = {};
+  tx.filter(t=>t.tipo!=="receita"&&t.tipo!=="investimento")
+    .forEach(t=>{ const c=t.categoria||"Outros"; cats[c]=(cats[c]||0)+Math.abs(t.valor); });
+  const topCats = Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,12)
+    .map(([c,v])=>`  ${c}: ${fmtV(v)}`).join("\n");
+
+  // Mês anterior para comparação
+  let pm=finMonth-1, py=finYear; if(pm<0){pm=11;py--;}
+  const pmk=`${py}-${String(pm+1).padStart(2,"0")}`;
+  const prevTx=FIN_TRANSACTIONS.filter(t=>t.data&&t.data.startsWith(pmk));
+  const prevDesp=prevTx.filter(t=>t.tipo!=="receita"&&t.tipo!=="investimento").reduce((s,t)=>s+Math.abs(t.valor),0);
+  const varPct = prevDesp>0 ? ((totalDesp-prevDesp)/prevDesp*100).toFixed(1) : null;
+
+  // Últimas 25 transações
+  const recent=[...tx].sort((a,b)=>(b.data||"").localeCompare(a.data||"")).slice(0,25)
+    .map(t=>`  ${t.data} | ${(t.nome||"").slice(0,28).padEnd(28)} | ${fmtV(t.valor)} | ${t.categoria||""}${t.futuro?" [PENDENTE]":""}`)
+    .join("\n");
+
+  // Cartões
+  const cartoes = FIN_CARTOES.map(c=>
+    `  ${c.nome}: fecha dia ${c.dia_fechamento||"?"}, vence dia ${c.dia_vencimento||"?"}, limite ${fmtV(c.limite||0)}`
+  ).join("\n") || "  Nenhum cadastrado";
+
+  // Burn rate diário
+  const diaAtual = new Date().getDate();
+  const burnDiario = diaAtual>0 ? totalDesp/diaAtual : 0;
+
+  return `╔═══ SNAPSHOT FINANCEIRO — ${FIN_MONTHS[finMonth]} ${finYear} ═══╗
+
+RESUMO EXECUTIVO:
+  Entradas:              ${fmtV(entradas)}
+  Despesas pagas:        ${fmtV(totalDesp)}
+  Fatura em aberto:      ${fmtV(cartaoFut)}
+  Investimentos:         ${fmtV(invest)}
+  Saldo líquido:         ${fmtV(saldo)}
+  Burn rate diário:      ${fmtV(burnDiario)}/dia
+  ${varPct!==null?`Variação vs mês anterior: ${varPct>0?"+":""}${varPct}%`:"Sem dados do mês anterior"}
+
+CATEGORIAS — TOP 12:
+${topCats||"  Sem dados"}
+
+CARTÕES CADASTRADOS:
+${cartoes}
+
+ÚLTIMAS ${Math.min(tx.length,25)} TRANSAÇÕES:
+${recent||"  Sem transações no mês"}
+
+TOTAL DE TRANSAÇÕES: ${tx.length}
+DATA/HORA: ${new Date().toLocaleString("pt-BR")}
+╚═══════════════════════════════════════════════╝`;
+}
+
+function ryukiMarkdown(text){
+  return text
+    .replace(/\*\*(.*?)\*\*/g,"<b>$1</b>")
+    .replace(/^— (.+)$/gm,"<li>$1</li>")
+    .replace(/(<li>.*<\/li>\n?)+/gs, m=>`<ul>${m}</ul>`)
+    .replace(/\n{2,}/g,"</p><p>")
+    .replace(/\n/g,"<br>")
+    .replace(/^(.)/,"<p>$1")
+    .replace(/(.)$/,"$1</p>");
+}
+
+function appendRyukiMsg(role, html, streaming=false){
+  const msgs = document.getElementById("ryuki-messages");
+  if(!msgs) return null;
+  const div = document.createElement("div");
+  div.className = `ryuki-msg ${role}`;
+  const mini = role==="ryuki"?`<div class="ryuki-avatar" style="width:28px;height:28px;font-size:.7rem;flex-shrink:0">✦</div>`:"";
+  div.innerHTML = `${mini}<div class="ryuki-bubble" id="rbubble-${Date.now()}">${html}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div.querySelector(".ryuki-bubble");
+}
+
+function showRyukiTyping(){
+  const msgs = document.getElementById("ryuki-messages");
+  if(!msgs) return null;
+  const div = document.createElement("div");
+  div.className = "ryuki-msg ryuki";
+  div.id = "ryuki-typing-indicator";
+  div.innerHTML = `<div class="ryuki-avatar" style="width:28px;height:28px;font-size:.7rem;flex-shrink:0">✦</div><div class="ryuki-bubble"><div class="ryuki-typing"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function ryukiProxyStream(messages, onChunk){
+  const resp = await fetch("/api/ai-proxy",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-5",
+      max_tokens:1024,
+      stream:true,
+      system:RYUKI_SYSTEM,
+      messages
+    })
+  });
+  if(!resp.ok){
+    const t=await resp.text();
+    let e=`Erro ${resp.status}`;
+    try{e=JSON.parse(t)?.error?.message||e;}catch(_){}
+    throw new Error(e);
+  }
+  const reader=resp.body.getReader(), decoder=new TextDecoder();
+  let full="", buf="";
+  while(true){
+    const {done,value}=await reader.read();
+    if(done) break;
+    buf+=decoder.decode(value,{stream:true});
+    const lines=buf.split("\n"); buf=lines.pop();
+    for(const line of lines){
+      if(!line.startsWith("data: ")) continue;
+      const d=line.slice(6).trim(); if(d==="[DONE]") continue;
+      try{
+        const ev=JSON.parse(d);
+        if(ev.type==="content_block_delta"&&ev.delta?.type==="text_delta"){
+          full+=ev.delta.text;
+          if(onChunk) onChunk(ev.delta.text, full);
+        }
+      }catch(_){}
+    }
+  }
+  return full;
+}
+
+async function sendRyukiMessage(){
+  if(ryukiTyping) return;
+  const input = document.getElementById("ryuki-input");
+  const sendBtn = document.getElementById("ryuki-send");
+  const text = (input?.value||"").trim();
+  if(!text) return;
+
+  input.value=""; input.style.height="auto";
+  appendRyukiMsg("user", text);
+
+  ryukiTyping=true;
+  if(sendBtn) sendBtn.disabled=true;
+
+  // Injeta contexto financeiro no primeiro par de mensagens de cada sessão
+  const contextNote = `[CONTEXTO FINANCEIRO ATUAL]\n${buildRyukiContext()}\n\n[MENSAGEM DO USUÁRIO]\n${text}`;
+  const msgPayload = ryukiHistory.length===0
+    ? [{role:"user", content:contextNote}]
+    : [...ryukiHistory, {role:"user", content:text}];
+
+  const typingEl = showRyukiTyping();
+
+  try{
+    let bubble = null;
+    let accumulated = "";
+    const full = await ryukiProxyStream(msgPayload, (chunk, sofar)=>{
+      if(!bubble){
+        typingEl?.remove();
+        bubble = appendRyukiMsg("ryuki","");
+      }
+      accumulated = sofar;
+      if(bubble) bubble.innerHTML = ryukiMarkdown(sofar);
+      const msgs=document.getElementById("ryuki-messages");
+      if(msgs) msgs.scrollTop=msgs.scrollHeight;
+    });
+    typingEl?.remove();
+    if(!bubble) appendRyukiMsg("ryuki", ryukiMarkdown(full));
+
+    // Atualiza histórico multi-turn
+    if(ryukiHistory.length===0){
+      ryukiHistory.push({role:"user", content:contextNote});
+    } else {
+      ryukiHistory.push({role:"user", content:text});
+    }
+    ryukiHistory.push({role:"assistant", content:full});
+    // Mantém janela de 20 turnos (10 pares)
+    if(ryukiHistory.length>20) ryukiHistory=ryukiHistory.slice(-20);
+
+    // Badge de notificação quando fechado
+    if(!ryukiOpen){
+      const badge=document.getElementById("ryuki-badge");
+      if(badge) badge.classList.add("show");
+    }
+  }catch(e){
+    typingEl?.remove();
+    appendRyukiMsg("ryuki",`<span style="color:var(--red,#e05)">❌ ${e.message||"Erro ao conectar"}</span>`);
+  }
+
+  ryukiTyping=false;
+  if(sendBtn) sendBtn.disabled=false;
+  if(input) input.focus();
+}
+
+async function ryukiGreet(){
+  if(ryukiHistory.length>0) return; // já tem histórico, não repete
+  ryukiTyping=true;
+  const sendBtn=document.getElementById("ryuki-send");
+  if(sendBtn) sendBtn.disabled=true;
+  const typingEl=showRyukiTyping();
+  const greetPrompt=`[CONTEXTO FINANCEIRO ATUAL]\n${buildRyukiContext()}\n\n[INSTRUÇÃO]\nFaça uma saudação executiva curta e analítica. Apresente-se brevemente como Ryuki e compartilhe 1-2 observações inteligentes sobre o snapshot financeiro atual. Seja provocativa e perspicaz. Máximo de 120 palavras.`;
+  try{
+    let bubble=null;
+    const full=await ryukiProxyStream([{role:"user",content:greetPrompt}],(chunk,sofar)=>{
+      if(!bubble){ typingEl?.remove(); bubble=appendRyukiMsg("ryuki",""); }
+      if(bubble) bubble.innerHTML=ryukiMarkdown(sofar);
+      const msgs=document.getElementById("ryuki-messages");
+      if(msgs) msgs.scrollTop=msgs.scrollHeight;
+    });
+    typingEl?.remove();
+    if(!bubble) appendRyukiMsg("ryuki",ryukiMarkdown(full));
+    ryukiHistory.push({role:"user",content:greetPrompt},{role:"assistant",content:full});
+  }catch(e){
+    typingEl?.remove();
+    appendRyukiMsg("ryuki","Olá. Sou Ryuki, sua analista financeira. Como posso ajudar hoje?");
+  }
+  ryukiTyping=false;
+  if(sendBtn) sendBtn.disabled=false;
+}
+
+function toggleRyukiChat(){
+  const panel=document.getElementById("ryuki-panel");
+  const badge=document.getElementById("ryuki-badge");
+  if(!panel) return;
+  ryukiOpen=!ryukiOpen;
+  panel.classList.toggle("open",ryukiOpen);
+  if(badge) badge.classList.remove("show");
+  if(ryukiOpen){
+    document.getElementById("ryuki-input")?.focus();
+    if(ryukiHistory.length===0) ryukiGreet();
+  }
+}
+
+function clearRyukiHistory(){
+  ryukiHistory=[];
+  const msgs=document.getElementById("ryuki-messages");
+  if(msgs) msgs.innerHTML="";
+  ryukiGreet();
+}
 </script>
+<!-- ═══════════ RYUKI CHAT ═══════════ -->
+<button id="ryuki-fab" onclick="toggleRyukiChat()" title="Falar com Ryuki — IA Financeira">
+  <div class="ryuki-badge" id="ryuki-badge"></div>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+    <path d="M12 2C6.48 2 2 5.82 2 10.5c0 2.6 1.4 4.94 3.6 6.54L4 21l4.9-2.1C10.2 19.6 11.1 19.7 12 19.7c5.52 0 10-3.82 10-8.6S17.52 2 12 2z"/>
+    <circle cx="8.5" cy="10.5" r="1" fill="#fff" stroke="none"/>
+    <circle cx="12" cy="10.5" r="1" fill="#fff" stroke="none"/>
+    <circle cx="15.5" cy="10.5" r="1" fill="#fff" stroke="none"/>
+  </svg>
+</button>
+
+<div id="ryuki-panel">
+  <div id="ryuki-header">
+    <div class="ryuki-avatar">✦</div>
+    <div style="flex:1">
+      <div style="font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:800;color:var(--text)">Ryuki</div>
+      <div style="font-size:.65rem;color:var(--muted)"><span class="ryuki-status-dot"></span>IA Financeira · Online</div>
+    </div>
+    <button onclick="clearRyukiHistory()" title="Limpar conversa" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.7rem;padding:4px 8px;border-radius:6px;transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">↺ Limpar</button>
+    <button onclick="toggleRyukiChat()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:4px 8px;line-height:1;border-radius:6px;transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">×</button>
+  </div>
+  <div id="ryuki-messages"></div>
+  <div id="ryuki-input-area">
+    <textarea id="ryuki-input" placeholder="Pergunte sobre seus gastos, metas, categorias..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRyukiMessage()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+    <button id="ryuki-send" onclick="sendRyukiMessage()" title="Enviar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
 <!-- ═══════════ BUSCA GLOBAL ═══════════ -->
 <div class="search-overlay" id="search-overlay" onclick="closeSearchOnOverlay(event)">
   <div class="search-modal">
