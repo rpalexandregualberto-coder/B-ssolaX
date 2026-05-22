@@ -14442,8 +14442,62 @@ FORMATO:
 — Máximo de 400 palavras por resposta (seja direta)`;
 
 let ryukiHistory = [];
+let ryukiMessages = []; // [{role, html}] para restaurar visual
 let ryukiOpen = false;
 let ryukiTyping = false;
+const RYUKI_STORAGE_KEY = "central_acao_ryuki_chat";
+
+function saveRyukiChat(){
+  try{
+    // Filtra base64 do histórico para não lotar o storage
+    const safeHistory = ryukiHistory.map(m=>{
+      if(typeof m.content === "string") return m;
+      // content é array (multi-part com arquivo)
+      const safeParts = m.content.map(p=>{
+        if(p.type==="image"||p.type==="document")
+          return {type:"text", text:`[arquivo enviado — conteúdo não salvo]`};
+        return p;
+      });
+      return {...m, content: safeParts};
+    });
+    localStorage.setItem(RYUKI_STORAGE_KEY, JSON.stringify({
+      history: safeHistory,
+      messages: ryukiMessages,
+      savedAt: new Date().toISOString()
+    }));
+  }catch(e){ console.warn("Ryuki save error:", e); }
+}
+
+function loadRyukiChat(){
+  try{
+    const raw = localStorage.getItem(RYUKI_STORAGE_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    if(!data.messages || !data.messages.length) return false;
+    // Restaura arrays
+    ryukiHistory = data.history || [];
+    ryukiMessages = data.messages || [];
+    // Renderiza mensagens no DOM
+    const msgs = document.getElementById("ryuki-messages");
+    if(msgs){
+      msgs.innerHTML = "";
+      ryukiMessages.forEach(m => {
+        const mini = m.role==="ryuki"?`<div class="ryuki-avatar" style="width:28px;height:28px;font-size:.7rem;flex-shrink:0">✦</div>`:"";
+        const div = document.createElement("div");
+        div.className = `ryuki-msg ${m.role}`;
+        div.innerHTML = `${mini}<div class="ryuki-bubble">${m.html}</div>`;
+        msgs.appendChild(div);
+      });
+      // Adiciona separador de sessão anterior
+      const sep = document.createElement("div");
+      sep.style.cssText="text-align:center;padding:8px;font-size:.62rem;color:var(--muted);opacity:.6";
+      sep.textContent="— histórico restaurado —";
+      msgs.insertBefore(sep, msgs.firstChild);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+    return true;
+  }catch(e){ return false; }
+}
 // Arquivo anexado pendente: {name, size, type, content} (content = string ou base64)
 let ryukiAttachment = null;
 
@@ -14717,9 +14771,16 @@ function appendRyukiMsg(role, html, streaming=false){
   const div = document.createElement("div");
   div.className = `ryuki-msg ${role}`;
   const mini = role==="ryuki"?`<div class="ryuki-avatar" style="width:28px;height:28px;font-size:.7rem;flex-shrink:0">✦</div>`:"";
-  div.innerHTML = `${mini}<div class="ryuki-bubble" id="rbubble-${Date.now()}">${html}</div>`;
+  const bubbleId = "rbubble-"+Date.now();
+  div.innerHTML = `${mini}<div class="ryuki-bubble" id="${bubbleId}">${html}</div>`;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
+  // Rastreia mensagem (não rastreia streaming — atualiza depois)
+  if(!streaming){
+    ryukiMessages.push({role, html});
+    // Limita a 60 mensagens visuais
+    if(ryukiMessages.length > 60) ryukiMessages = ryukiMessages.slice(-60);
+  }
   return div.querySelector(".ryuki-bubble");
 }
 
@@ -14840,7 +14901,13 @@ async function sendRyukiMessage(){
       if(msgs) msgs.scrollTop=msgs.scrollHeight;
     });
     typingEl?.remove();
-    if(!bubble) appendRyukiMsg("ryuki", ryukiMarkdown(full));
+    const finalHtml = ryukiMarkdown(full);
+    if(!bubble) appendRyukiMsg("ryuki", finalHtml);
+    else {
+      // Streaming terminou — registra mensagem final no tracker
+      ryukiMessages.push({role:"ryuki", html: finalHtml});
+      if(ryukiMessages.length > 60) ryukiMessages = ryukiMessages.slice(-60);
+    }
     // Verifica se há ações propostas
     const ryukiActs = parseRyukiActions(full);
     if(ryukiActs && ryukiActs.length) setTimeout(()=>showRyukiActionsModal(ryukiActs), 400);
@@ -14854,8 +14921,10 @@ async function sendRyukiMessage(){
       ryukiHistory.push({role:"user", content:histUserText});
     }
     ryukiHistory.push({role:"assistant", content:full});
-    // Mantém janela de 20 turnos (10 pares)
-    if(ryukiHistory.length>20) ryukiHistory=ryukiHistory.slice(-20);
+    // Mantém janela de 40 turnos (20 pares)
+    if(ryukiHistory.length>40) ryukiHistory=ryukiHistory.slice(-40);
+    // Persiste no localStorage
+    saveRyukiChat();
 
     // Badge de notificação quando fechado
     if(!ryukiOpen){
@@ -14888,8 +14957,11 @@ async function ryukiGreet(){
       if(msgs) msgs.scrollTop=msgs.scrollHeight;
     });
     typingEl?.remove();
-    if(!bubble) appendRyukiMsg("ryuki",ryukiMarkdown(full));
+    const greetHtml = ryukiMarkdown(full);
+    if(!bubble) appendRyukiMsg("ryuki", greetHtml);
+    else{ ryukiMessages.push({role:"ryuki", html: greetHtml}); }
     ryukiHistory.push({role:"user",content:greetPrompt},{role:"assistant",content:full});
+    saveRyukiChat();
   }catch(e){
     typingEl?.remove();
     appendRyukiMsg("ryuki","Olá. Sou Ryuki, sua analista financeira. Como posso ajudar hoje?");
@@ -14907,12 +14979,23 @@ function toggleRyukiChat(){
   if(badge) badge.classList.remove("show");
   if(ryukiOpen){
     document.getElementById("ryuki-input")?.focus();
-    if(ryukiHistory.length===0) ryukiGreet();
+    if(ryukiHistory.length===0){
+      // Tenta restaurar do localStorage primeiro
+      const restored = loadRyukiChat();
+      if(!restored) ryukiGreet();
+      else{
+        // Scroll para o fim
+        const m=document.getElementById("ryuki-messages");
+        if(m) m.scrollTop=m.scrollHeight;
+      }
+    }
   }
 }
 
 function clearRyukiHistory(){
   ryukiHistory=[];
+  ryukiMessages=[];
+  localStorage.removeItem(RYUKI_STORAGE_KEY);
   const msgs=document.getElementById("ryuki-messages");
   if(msgs) msgs.innerHTML="";
   ryukiGreet();
