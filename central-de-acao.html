@@ -9564,6 +9564,76 @@ function _parseNubankCSV(text, tipo, dataDefault){
   return txs.length>0 ? txs : null;
 }
 
+// ── Parser direto para extrato de conta Nubank (Data,Valor,Identificador,Descrição) ──
+// Formato: Data=DD/MM/YYYY, Valor=float (neg=saída, pos=entrada), Identificador=UUID
+function _parseNubankExtratoConta(text, dataDefault){
+  const lines = text.replace(/\r/g,"").trim().split("\n");
+  const header = (lines[0]||"").toLowerCase();
+  // Detecta pelo campo "identificador" (exclusivo do extrato de conta Nubank)
+  if(!header.includes("identificador")||!header.includes("valor")) return null;
+
+  // 1ª passagem: monta mapa por identificador para detectar pares PIX no crédito
+  const idMap = {};
+  const rawRows = [];
+  for(let i=1;i<lines.length;i++){
+    const line=lines[i].trim(); if(!line) continue;
+    // Divide nos 3 primeiros vírgulas (data,valor,id,desc — desc pode ter vírgulas)
+    const c1=line.indexOf(","), c2=line.indexOf(",",c1+1), c3=line.indexOf(",",c2+1);
+    if(c1<0||c2<0||c3<0) continue;
+    const dateBR=line.slice(0,c1).trim();
+    const valorStr=line.slice(c1+1,c2).trim();
+    const id=line.slice(c2+1,c3).trim();
+    let desc=line.slice(c3+1).trim();
+    if(desc.startsWith('"')&&desc.endsWith('"')) desc=desc.slice(1,-1);
+    desc=desc.replace(/""/g,'"').trim();
+    if(!/^\d{2}\/\d{2}\/\d{4}$/.test(dateBR)) continue;
+    const valor=parseFloat(valorStr); if(isNaN(valor)) continue;
+    const [d,mo,y]=dateBR.split("/");
+    const date=`${y}-${mo}-${d}`;
+    rawRows.push({date,valor,id,desc});
+    if(!idMap[id]) idMap[id]=[];
+    idMap[id].push({valor,desc});
+  }
+
+  // Identifica pares PIX no crédito: mesmo ID, valores opostos (net zero), um é "Valor adicionado para Pix"
+  const skipIds=new Set();
+  for(const [id,rows] of Object.entries(idMap)){
+    if(rows.length===2){
+      const hasPixCred=rows.some(r=>r.desc.toLowerCase().includes("valor adicionado para pix no cr"));
+      const netZero=Math.abs(rows[0].valor+rows[1].valor)<0.01;
+      if(hasPixCred&&netZero) skipIds.add(id);
+    }
+  }
+
+  const IGNORAR_DESCR=["pagamento de fatura"];
+
+  // Extrai nome limpo da descrição
+  const extractNome=desc=>{
+    let m;
+    if((m=desc.match(/Transferência enviada pelo Pix - ([^-\(]+)/i))) return m[1].trim().replace(/\s+/g," ").slice(0,52);
+    if((m=desc.match(/Transferência [Rr]ecebida(?: pelo Pix)? - ([^-]+)/i))) return m[1].trim().replace(/\s+/g," ").slice(0,52);
+    if((m=desc.match(/Pagamento de boleto efetuado - (.+)/i))) return m[1].trim().slice(0,52);
+    if((m=desc.match(/Compra no débito - (.+)/i))) return m[1].trim().slice(0,52);
+    return desc.slice(0,52).trim();
+  };
+
+  const txs=[];
+  for(const row of rawRows){
+    if(skipIds.has(row.id)) continue; // pula par PIX no crédito
+    const dl=row.desc.toLowerCase();
+    if(IGNORAR_DESCR.some(ig=>dl.includes(ig))) continue; // pula pagamento de fatura
+    txs.push({
+      nome:extractNome(row.desc),
+      valor:row.valor,
+      data:row.date||dataDefault,
+      nubank_id:row.id,
+      isReceita:row.valor>=0,
+      estorno:false
+    });
+  }
+  return txs.length>0 ? txs : null;
+}
+
 // ── IMPORT IA ────────────────────────────────────
 async function processFinFile(event, tipo){
   const file=event.target.files[0]; if(!file) return;
@@ -9787,6 +9857,137 @@ JSON SOMENTE:
       if(pixPairs.length) showPixCreditoReview(pixPairs);
     }, 1800);
     event.target.value=""; return;
+  }
+
+  // ── Detecta extrato de conta Nubank (Data,Valor,Identificador,Descrição) ──
+  if(tipo==="extrato"){
+    const extratoRows = _parseNubankExtratoConta(text, dataDefault);
+    if(extratoRows){
+      if(statusText) statusText.textContent=`🧠 Categorizando ${extratoRows.length} transações do extrato...`;
+
+      // Histórico de categorias para contextualizar
+      const histCats={};
+      FIN_TRANSACTIONS.slice(-200).forEach(t=>{ const k=(t.nome||"").toLowerCase().slice(0,18); if(k) histCats[k]=t.categoria; });
+      const histStr=Object.entries(histCats).slice(0,30).map(([k,v])=>`"${k}"→${v}`).join("; ");
+
+      // Envia nome+sinal para IA categorizar
+      const nomes=extratoRows.map((t,i)=>`${i}|${t.nome}|${t.isReceita?"receita":"despesa"}`).join("\n");
+      const catPrompt=`Categorize cada transação de extrato bancário. Retorne JSON {"cats":[{"i":0,"cat":"categoria"},...]}
+
+CATEGORIAS RECEITA (positivo): 💼 Salário / Comissão, 💰 Entrada Extra, 📨 PIX Recebido, 🏦 Transferência Recebida, 💡 Outros
+
+CATEGORIAS DESPESA (negativo): 🍔 iFood, 🥖 Padaria, 🛒 Mercado, 🍽️ Restaurante, 🏪 Conveniência, 🚗 Uber / Transporte, ⛽ Gasolina / Carro, 💊 Farmácia / Saúde, 🎒 Escola, 🐾 Pets, 🛍️ Compras / Roupas, ✈️ Viagens, 🎯 Lazer, 🔁 PIX Aleatório, 📱 Assinaturas, 🏢 Gastos Allure, 🧑‍🍼 Babá / Funcionário, 🏡 Casa / Imóvel, Outros
+
+CATEGORIAS INVESTIMENTO: 📈 RDB / CDB, 💰 Aporte Nubank, 🏘️ Consórcio EVOY, 📊 Outros Investimentos
+
+REGRAS (prioridade máxima):
+ALLURE CREDITO INTEL/ALLURE → 💼 Salário / Comissão (comissão de representante de consórcio)
+EVOY ADMINISTRADORA DE CONSORCIO/EVOY → 🏘️ Consórcio EVOY
+ADMINISTRADORA DE CONSORCIO GAZIN → 🏘️ Consórcio EVOY
+Raimundo Alves Silva Junior → 🏢 Gastos Allure
+REAL ASSESSORIA DE VENDAS → 🏢 Gastos Allure
+CAPITAL FINANCAS → 🏢 Gastos Allure
+ALLPARK/ESTACIONAMENTO MERCADAO → 🚗 Uber / Transporte
+YURI ESTILOS → 💊 Farmácia / Saúde
+ISAAC TECNOLOGIA SERVICOS → 🎒 Escola
+TERANET SERVICOS → 📱 Assinaturas
+NETFIND → 📱 Assinaturas
+ARENA LITORAL ESPORTE → 🎯 Lazer
+COMPANHIA DE ELETRICIDADE/COELBA → 🏡 Casa / Imóvel
+BOM NEGOCIO ATIVIDADES → 🔁 PIX Aleatório
+MERCADO PAGO (como boleto) → 🔁 PIX Aleatório
+Transferência para pessoa física (nome de pessoa) → 🔁 PIX Aleatório
+Transferência recebida de pessoa física → 📨 PIX Recebido
+Crédito em conta genérico → 💰 Entrada Extra
+Débito em conta genérico → Outros
+BANCO DAYCOVAL (pagamento boleto) → Outros
+${histStr?`\nHistórico do usuário (máxima prioridade): ${histStr}`:""}
+
+TRANSAÇÕES (índice|nome|tipo):
+${nomes}
+
+JSON SOMENTE:`;
+
+      const catResult=await aiProxyCallStream(catPrompt,3000);
+      const catMap={};
+      (catResult.cats||[]).forEach(c=>{ catMap[c.i]=c.cat; });
+
+      const importBatchId="imp_"+Date.now();
+      const importedIds=[], duplicados=[];
+      const INVEST_CATS=new Set(["📈 RDB / CDB","💰 Aporte Nubank","🏘️ Consórcio EVOY","📊 Outros Investimentos"]);
+
+      // Mapa de nubank_id existentes para dedup confiável
+      const existingNubankIds=new Set(FIN_TRANSACTIONS.filter(t=>t.nubank_id).map(t=>t.nubank_id));
+      // Fallback: mapa nome+valor+data para tx sem nubank_id
+      const existingMap={};
+      FIN_TRANSACTIONS.filter(t=>!t.nubank_id).forEach(e=>{
+        const k=`${e.nome}|${e.valor}|${e.data}`; existingMap[k]=(existingMap[k]||0)+1;
+      });
+      const batchMap={};
+
+      extratoRows.forEach((tx,i)=>{
+        // Dedup por UUID Nubank (mais confiável)
+        if(tx.nubank_id&&existingNubankIds.has(tx.nubank_id)){ duplicados.push(tx.nome); return; }
+        // Fallback: nome+|valor|+data
+        const absV=Math.abs(tx.valor);
+        const k=`${tx.nome}|${absV}|${tx.data}`;
+        batchMap[k]=(batchMap[k]||0)+1;
+        if(batchMap[k]<=(existingMap[k]||0)){ duplicados.push(tx.nome); return; }
+
+        const cat=catMap[i]||"Outros";
+        const tipo_tx = tx.isReceita ? "receita" : (INVEST_CATS.has(cat) ? "investimento" : "despesa_extra");
+        const newId=nextFinId++;
+        const newTx={
+          id:newId, nome:tx.nome, nome_original:tx.nome,
+          valor:Math.abs(tx.valor),
+          tipo:tipo_tx,
+          categoria:cat,
+          data:tx.data,
+          origem:"ia",
+          nubank_id:tx.nubank_id,
+          importBatchId
+        };
+        if(vinculoId!=null) newTx.conta_id=vinculoId;
+        FIN_TRANSACTIONS.push(newTx);
+        importedIds.push(newId);
+      });
+
+      matchFixasFromTransactions();
+      const totalSaidasEx=extratoRows.filter(t=>!t.isReceita).reduce((s,t)=>s+Math.abs(t.valor),0);
+      const totalEntradasEx=extratoRows.filter(t=>t.isReceita).reduce((s,t)=>s+t.valor,0);
+      const msgDup=duplicados.length>0?` (${duplicados.length} duplicata${duplicados.length!==1?"s":""} ignorada${duplicados.length!==1?"s":""})` :"";
+      if(statusText) statusText.textContent=`✅ ${importedIds.length}/${extratoRows.length} transações importadas${msgDup}`;
+      setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },3500);
+
+      FIN_IMPORT_HISTORY.unshift({
+        id:importBatchId,
+        ts:new Date().toISOString(),
+        tipo:"extrato",
+        fonte:"CSV Nubank Conta",
+        mes:mesLabel,
+        count:importedIds.length,
+        countDup:duplicados.length,
+        totalSaidas:totalSaidasEx,
+        totalEstornos:0,
+        futuro:false
+      });
+
+      const resumoEx={
+        total_transacoes:importedIds.length,
+        total_entradas:totalEntradasEx,
+        total_saidas:totalSaidasEx,
+        periodo:mesLabel,
+        observacoes:`CSV Nubank Conta: ${extratoRows.length} transações lidas (excluiu pares PIX no crédito + pagamento de fatura), ${importedIds.length} importadas, ${duplicados.length} duplicatas ignoradas`
+      };
+      renderFinanceiro();
+      try{saveData();}catch(e){}
+      setTimeout(()=>showImportReview(importedIds,resumoEx),600);
+      setTimeout(()=>{
+        const pixPairs=detectPixCreditoDuplicates(importedIds);
+        if(pixPairs.length) showPixCreditoReview(pixPairs);
+      },1800);
+      event.target.value=""; return;
+    }
   }
 
   // ── Fallback: IA extrai as transações (PDF/OFX/TXT) ──
