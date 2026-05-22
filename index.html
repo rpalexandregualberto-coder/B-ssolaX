@@ -8804,10 +8804,11 @@ function renderFinanceiro(){
   setEl("fin-receitas-count",entradas.length+" lançamento"+(entradas.length!==1?"s":""));
   setEl("fin-burn",burnRate>0?fmtBRL(burnRate)+"/dia":"—");
   setEl("fin-invest-total",fmtBRL(totalInvest));
-  setEl("fin-fixas-total",fmtBRL(totalFixasCad));
-  setEl("fin-fixas-pct",totalDespesas>0?Math.round(totalFixasCad/totalDespesas*100)+"% das despesas":"—");
+  const totalFixasAll = totalFixasCad + totalFixasTx;
+  setEl("fin-fixas-total",fmtBRL(totalFixasAll));
+  setEl("fin-fixas-pct",totalDespesas>0?Math.round(totalFixasAll/totalDespesas*100)+"% das despesas":"—");
   setEl("fin-vars-total",fmtBRL(totalExtras));
-  setEl("fin-fixas-pagas",fixasPagas+"/"+fixasMes.length);
+  setEl("fin-fixas-pagas",(fixasPagas+despFixasTx.length)+"/"+(fixasMes.length+despFixasTx.length));
 
   const saldoEl=document.getElementById("fin-saldo");
   if(saldoEl) saldoEl.style.color=saldo>=0?"var(--green)":"var(--red)";
@@ -9156,7 +9157,9 @@ function renderFinanceiro(){
   const fixasList=document.getElementById("fin-fixas-list");
   if(fixasList){
     const fixasAtual = getFixas();
-    if(!fixasAtual.length){
+    // Transações importadas marcadas como despesa_fixa no mês atual
+    const txFixas = tx.filter(t=>t.tipo==="despesa_fixa");
+    if(!fixasAtual.length && !txFixas.length){
       const anteriores = Object.keys(FIN_FIXAS_BY_MONTH).filter(k=>k<monthKey() && FIN_FIXAS_BY_MONTH[k].length>0).sort();
       const ultimo = anteriores.pop();
       let copyBtn = "";
@@ -9167,7 +9170,7 @@ function renderFinanceiro(){
       }
       fixasList.innerHTML=`<div style="text-align:center;padding:14px;color:var(--muted);font-size:.75rem">Sem contas fixas pra <strong style="color:var(--accent)">${FIN_MONTHS[finMonth]}/${finYear}</strong>.${copyBtn}</div>`;
     } else {
-      renderFixasCards(fixasAtual);
+      renderFixasCards(fixasAtual, txFixas);
     }
   }
 
@@ -9196,14 +9199,17 @@ const FIXA_CAT_MAP = {
   outros:        {icon:"📋", label:"Outros",          bg:"var(--surface)",        color:"var(--dim)"},
 };
 
-function renderFixasCards(fixas){
+function renderFixasCards(fixas, txFixas=[]){
   const el = document.getElementById("fin-fixas-list");
   if(!el) return;
   const today = new Date();
   const todayDay = today.getDate();
-  const fixTotal = fixas.reduce((s,f)=>s+f.valor,0);
-  const fixPagas = fixas.filter(f=>f.paga).length;
-  const fixPagasVal = fixas.filter(f=>f.paga).reduce((s,f)=>s+f.valor,0);
+  // Combina fixas cadastradas + transações importadas (sem duplicar pelo nome)
+  const fixasNomes = new Set(fixas.map(f=>(f.nome||"").toLowerCase()));
+  const txFixasFiltradas = txFixas.filter(t=>!fixasNomes.has((t.nome||"").toLowerCase()));
+  const fixTotal = fixas.reduce((s,f)=>s+f.valor,0) + txFixasFiltradas.reduce((s,t)=>s+t.valor,0);
+  const fixPagas = fixas.filter(f=>f.paga).length + txFixasFiltradas.length; // tx importadas = já pagas
+  const fixPagasVal = fixas.filter(f=>f.paga).reduce((s,f)=>s+f.valor,0) + txFixasFiltradas.reduce((s,t)=>s+t.valor,0);
   const pct = fixTotal > 0 ? Math.round(fixPagasVal/fixTotal*100) : 0;
   const corBarra = pct >= 80 ? "var(--green)" : pct >= 50 ? "var(--orange)" : "var(--red)";
 
@@ -9216,7 +9222,7 @@ function renderFixasCards(fixas){
       </div>
       <div style="text-align:right">
         <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700">Pagas</div>
-        <div style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:900;color:var(--green)">${fixPagas}/${fixas.length}</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:900;color:var(--green)">${fixPagas}/${fixas.length + txFixasFiltradas.length}</div>
       </div>
     </div>
     <div class="fixas-progress-wrap">
@@ -9273,7 +9279,32 @@ function renderFixasCards(fixas){
     </div>`;
   }).join("");
 
-  el.innerHTML = header + `<div class="fixas-grid">${cards}</div>`;
+  // Cards de transações importadas como despesa_fixa
+  const txCards = txFixasFiltradas.map(t=>{
+    const d = t.data ? new Date(t.data+"T12:00:00").toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}) : "—";
+    return `<div class="fixa-card paga" style="border-left:3px solid var(--accent)">
+      <div class="fixa-card-top">
+        <div class="fixa-cat-icon" style="background:rgba(160,122,232,.15)">📌</div>
+        <div class="fixa-card-info">
+          <div class="fixa-card-nome" title="${escHtml(t.nome||"")}">${escHtml((t.nome||"").slice(0,30))}</div>
+          <div class="fixa-card-sub" style="color:var(--accent);font-size:.58rem">✨ Importada · ${t.categoria||""}</div>
+        </div>
+        <div>
+          <div class="fixa-card-valor paga">${fmtBRL(t.valor||0)}</div>
+        </div>
+      </div>
+      <div class="fixa-card-foot">
+        <span class="fixa-venc-badge fixa-venc-paga">✓ Paga ${d}</span>
+        <button onclick="openEditTx(${t.id})" title="Editar" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:.72rem;padding:2px 4px">✏️</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  const txSection = txFixasFiltradas.length > 0
+    ? `<div style="margin-top:10px;padding:6px 0 2px;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700">Pagas este mês (importadas)</div><div class="fixas-grid">${txCards}</div>`
+    : "";
+
+  el.innerHTML = header + `<div class="fixas-grid">${cards}</div>` + txSection;
 }
 
 // ── PROJEÇÃO DE CAIXA 30 DIAS ────────────────────────────
@@ -14431,6 +14462,8 @@ Você pode propor alterações diretas no banco de dados. Ao final da resposta, 
 Ações disponíveis:
 — edit_tx: edita uma transação (campos opcionais: categoria, tipo, nome). Use o ID do contexto.
 — create_rule: cria regra de aprendizado para futuros imports (keyword=texto que aparece no nome).
+— add_fixa: adiciona uma conta fixa ao registro mensal (campos: nome, valor, dia, cat). cat pode ser: moradia, energia, agua, internet, telefone, alimentacao, transporte, saude, financiamento, seguro, outros.
+— delete_tx: remove uma transação do histórico (campo: id).
 
 Tipos válidos: receita | despesa_extra | despesa_fixa | investimento | cartao
 Só proponha ações quando o usuário pedir explicitamente. Explique cada mudança antes do bloco.
@@ -14710,6 +14743,24 @@ function showRyukiActionsModal(actions){
           <div style="font-size:.68rem;color:var(--muted)">${tipoLabel[a.tipo_tx]||""} ${a.tipo_match?`· apenas ${a.tipo_match}`:""}</div>
         </div>
       </label>`;
+    } else if(a.action==="add_fixa"){
+      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
+        <input type="checkbox" data-idx="${i}" checked style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.75rem;font-weight:700;color:var(--green);margin-bottom:2px">➕ Fixa: ${escHtml(a.nome||"?")} — ${fmtBRL(Number(a.valor)||0)}</div>
+          <div style="font-size:.68rem;color:var(--muted)">Vence dia ${a.dia||"?"} · categoria: ${a.cat||"outros"}</div>
+        </div>
+      </label>`;
+    } else if(a.action==="delete_tx"){
+      const tx = FIN_TRANSACTIONS.find(t=>t.id===a.id);
+      const txName = tx ? tx.nome : `ID ${a.id}`;
+      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
+        <input type="checkbox" data-idx="${i}" checked style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.75rem;font-weight:700;color:var(--red);margin-bottom:2px">🗑️ Remover: ${escHtml(txName).slice(0,40)}</div>
+          <div style="font-size:.68rem;color:var(--muted)">${tx ? fmtBRL(tx.valor||0) : ""}</div>
+        </div>
+      </label>`;
     }
     return "";
   }).join("");
@@ -14738,7 +14789,7 @@ function applyRyukiActions(actions){
   const modal = document.getElementById("_ryuki-actions-modal");
   const checked = new Set([...modal.querySelectorAll("input[type=checkbox]:checked")].map(el=>parseInt(el.dataset.idx)));
   modal.remove();
-  let editCount=0, ruleCount=0;
+  let editCount=0, ruleCount=0, fixaCount=0, deleteCount=0;
   actions.forEach((a,i)=>{
     if(!checked.has(i)) return;
     if(a.action==="edit_tx"){
@@ -14755,13 +14806,35 @@ function applyRyukiActions(actions){
       if(existe){ existe.categoria=a.categoria; if(a.tipo_tx) existe.tipo_tx=a.tipo_tx; }
       else FIN_CAT_RULES.unshift({id:"rule_"+Date.now()+"_"+i,keyword:a.keyword,categoria:a.categoria,tipo_tx:a.tipo_tx||null,tipo_match:a.tipo_match||null,label:a.keyword,vezes:0,criadoEm:new Date().toISOString()});
       ruleCount++;
+    } else if(a.action==="add_fixa"){
+      if(!a.nome||!a.valor) return;
+      const mk = monthKey();
+      if(!FIN_FIXAS_BY_MONTH[mk]) FIN_FIXAS_BY_MONTH[mk]=[];
+      const jaExiste = FIN_FIXAS_BY_MONTH[mk].some(f=>(f.nome||"").toLowerCase()===(a.nome||"").toLowerCase());
+      if(!jaExiste){
+        FIN_FIXAS_BY_MONTH[mk].push({
+          id: Date.now()+i,
+          nome: a.nome,
+          valor: Number(a.valor)||0,
+          dia: Number(a.dia)||1,
+          cat: a.cat||"outros",
+          paga: a.paga||false,
+          criadoEm: new Date().toISOString()
+        });
+        fixaCount++;
+      }
+    } else if(a.action==="delete_tx"){
+      const idx = FIN_TRANSACTIONS.findIndex(t=>t.id===a.id);
+      if(idx!==-1){ FIN_TRANSACTIONS.splice(idx,1); deleteCount++; }
     }
   });
   renderFinanceiro();
   try{saveData();}catch(e){}
   const parts=[];
-  if(editCount) parts.push(`${editCount} transação${editCount!==1?"ões":""} atualizada${editCount!==1?"s":""}`);
-  if(ruleCount) parts.push(`${ruleCount} regra${ruleCount!==1?"s":""} criada${ruleCount!==1?"s":""}`);
+  if(editCount)  parts.push(`${editCount} transação${editCount!==1?"ões":""} atualizada${editCount!==1?"s":""}`);
+  if(ruleCount)  parts.push(`${ruleCount} regra${ruleCount!==1?"s":""} criada${ruleCount!==1?"s":""}`);
+  if(fixaCount)  parts.push(`${fixaCount} fixa${fixaCount!==1?"s":""} registrada${fixaCount!==1?"s":""}`);
+  if(deleteCount) parts.push(`${deleteCount} transação${deleteCount!==1?"ões":""} removida${deleteCount!==1?"s":""}`);
   appendRyukiMsg("ryuki",`<span style="color:var(--green)">✅ ${parts.join(" · ")}</span>`);
 }
 
