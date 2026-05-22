@@ -13624,8 +13624,8 @@ function addTaskToProject(projId){
   modal.addEventListener("click", e=>{ if(e.target===modal) modal.remove(); });
   document.body.appendChild(modal);
 
-  // Normaliza projId para número uma vez só
-  const pid = typeof projId === "string" ? parseInt(projId, 10) : projId;
+  // projId é string tipo "p1", "p2" — não converter para número
+  const pid = projId;
 
   // Listeners: abas
   document.getElementById("_atp-tab-nova").addEventListener("click", ()=> _atpTab("nova"));
@@ -13671,8 +13671,8 @@ function _atpFiltrar(projId){
   const lista = document.getElementById("_atp-lista");
   if(!lista) return;
 
-  // Normaliza projId para número (vem como string do HTML onclick)
-  const pid = typeof projId === "string" ? parseInt(projId, 10) : projId;
+  // projId é string tipo "p1", "p2" — manter como está
+  const pid = projId;
 
   const tarefasDoProjeto = new Set(
     TASKS.filter(t => String(t.project_id) === String(pid)).map(t=>t.id)
