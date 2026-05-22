@@ -4332,6 +4332,23 @@ textarea.form-input{border-radius:16px;resize:vertical}
         </div>
       </div>
 
+      <!-- Regras de Aprendizado da IA -->
+      <div class="fin-card" id="fin-rules-card">
+        <div class="fin-card-head">
+          <span class="fin-card-title">🧠 Regras de Aprendizado</span>
+          <span style="font-size:.7rem;color:var(--muted)" id="fin-rules-count"></span>
+        </div>
+        <div style="padding:8px 16px 12px;font-size:.7rem;color:var(--muted);line-height:1.5;border-bottom:1px solid var(--border)">
+          A IA aplica estas regras automaticamente antes de categorizar — sem precisar de IA para transações conhecidas.
+          <br>Para criar: clique em <strong style="color:var(--accent)">✏️</strong> em qualquer transação e marque "Salvar como regra".
+        </div>
+        <div class="fin-card-body" style="padding:0">
+          <div id="fin-rules-list">
+            <div style="text-align:center;padding:20px;color:var(--muted);font-size:.75rem">Nenhuma regra criada ainda.</div>
+          </div>
+        </div>
+      </div>
+
     </div>
     </div><!-- /fin-detail-panel -->
   </div><!-- /view-financeiro -->
@@ -7980,6 +7997,13 @@ let FIN_ORCAMENTO = {};
 // [{id, ts, tipo, fonte, mes, count, totalSaidas, totalEstornos, futuro}]
 let FIN_IMPORT_HISTORY = [];
 
+// ── REGRAS DE APRENDIZADO ─────────────────────────
+// [{id, keyword, categoria, tipo_tx, tipo_match, label, vezes, criadoEm}]
+// keyword: texto que deve aparecer no nome da transação (case insensitive)
+// tipo_match: "receita" | "despesa" | null (qualquer)
+// tipo_tx: "receita" | "despesa_extra" | "despesa_fixa" | "investimento" (null = só muda categoria)
+let FIN_CAT_RULES = [];
+
 // ── HELPERS ──────────────────────────────────────
 // Saldo atual de uma conta = saldo_inicial + receitas - despesas (todas as transações vinculadas)
 function saldoConta(contaId){
@@ -8805,6 +8829,7 @@ function renderFinanceiro(){
             </div>
           </div>
           <div class="fin-tx-val" style="color:${valColor}">${sign} ${fmtBRL(t.valor)}</div>
+          <button onclick="openEditTx(${t.id})" title="Editar transação" style="flex-shrink:0;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.72rem;background:rgba(160,122,232,.1);color:var(--accent);border:1px solid rgba(160,122,232,.2);border-radius:50%;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(160,122,232,.25)'" onmouseout="this.style.background='rgba(160,122,232,.1)'">✏️</button>
           <button class="fin-tx-del" onclick="deleteTransaction(${t.id})">✕</button>
         </div>`;
       }).join("");
@@ -9109,6 +9134,8 @@ function renderFinanceiro(){
 
   // Histórico de importações
   renderImportHistory();
+  // Regras de aprendizado
+  renderCatRules();
 }
 
 // ── MAPA DE CATEGORIAS FIXAS ────────────────────────────
@@ -9795,11 +9822,13 @@ JSON SOMENTE:
           txFuturo = (typeof isFuturo!=="undefined")?isFuturo:!!window._finImportFuturo;
         }
       }
+      // Aplica regra de aprendizado (só sobrescreve categoria para fatura; tipo é sempre cartao)
+      const _ruleF = _vTipo!=="fatura" ? applyRuleToTx(tx.nome, tx.valor>0) : applyRuleToTx(tx.nome, false);
       const newTx={
         id:newId, nome:tx.nome, nome_original:tx.nome,
         valor:Math.abs(tx.valor),
-        tipo: tx.estorno ? "cartao" : (_vTipo==="fatura"?"cartao":(tx.valor<0?"despesa_extra":"receita")),
-        categoria:catMap[i]||"Outros",
+        tipo: tx.estorno ? "cartao" : (_vTipo==="fatura"?"cartao":(_ruleF?.tipo_tx||(tx.valor<0?"despesa_extra":"receita"))),
+        categoria:_ruleF?.categoria||catMap[i]||"Outros",
         data: tx.data,
         origem:"ia",
         estorno: tx.estorno||false,
@@ -9933,8 +9962,9 @@ JSON SOMENTE:`;
         batchMap[k]=(batchMap[k]||0)+1;
         if(batchMap[k]<=(existingMap[k]||0)){ duplicados.push(tx.nome); return; }
 
-        const cat=catMap[i]||"Outros";
-        const tipo_tx = tx.isReceita ? "receita" : (INVEST_CATS.has(cat) ? "investimento" : "despesa_extra");
+        const _ruleE = applyRuleToTx(tx.nome, tx.isReceita);
+        const cat = _ruleE?.categoria || catMap[i] || "Outros";
+        const tipo_tx = _ruleE?.tipo_tx || (tx.isReceita ? "receita" : (INVEST_CATS.has(cat) ? "investimento" : "despesa_extra"));
         const newId=nextFinId++;
         const newTx={
           id:newId, nome:tx.nome, nome_original:tx.nome,
@@ -10480,6 +10510,201 @@ function revertImport(batchId){
   const toast = document.createElement("div");
   toast.style.cssText="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 20px;font-size:.8rem;font-weight:700;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:9999;backdrop-filter:blur(12px)";
   toast.textContent=`✅ Importação excluída — ${count} transação${count!==1?"ões":""} removida${count!==1?"s":""}`;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),3500);
+}
+
+// ── MOTOR DE REGRAS DE APRENDIZADO ───────────────
+// Retorna {categoria, tipo_tx} se uma regra bater, senão null
+function applyRuleToTx(nome, isReceita){
+  if(!FIN_CAT_RULES||!FIN_CAT_RULES.length) return null;
+  const nomeLow=(nome||"").toLowerCase();
+  for(const rule of FIN_CAT_RULES){
+    if(!rule.keyword) continue;
+    if(!nomeLow.includes(rule.keyword.toLowerCase())) continue;
+    if(rule.tipo_match==="receita"&&!isReceita) continue;
+    if(rule.tipo_match==="despesa"&&isReceita) continue;
+    rule.vezes=(rule.vezes||0)+1;
+    return {categoria:rule.categoria, tipo_tx:rule.tipo_tx||null};
+  }
+  return null;
+}
+
+// ── RENDERIZAR REGRAS ─────────────────────────────
+function renderCatRules(){
+  const el=document.getElementById("fin-rules-list");
+  if(!el) return;
+  const countEl=document.getElementById("fin-rules-count");
+  if(!FIN_CAT_RULES||!FIN_CAT_RULES.length){
+    el.innerHTML=`<div style="text-align:center;padding:20px 16px;color:var(--muted);font-size:.76rem">Nenhuma regra criada ainda.<br><span style="font-size:.68rem;opacity:.6">Edite uma transação e salve como regra para a IA aprender.</span></div>`;
+    if(countEl) countEl.textContent="";
+    return;
+  }
+  if(countEl) countEl.textContent=FIN_CAT_RULES.length+" regra"+(FIN_CAT_RULES.length!==1?"s":"");
+  const tipoTxLabel={receita:"💰 Receita",despesa_extra:"💸 Despesa",despesa_fixa:"📌 Fixa",investimento:"📈 Investimento"};
+  el.innerHTML=FIN_CAT_RULES.map(r=>{
+    const tipoMatchBadge=r.tipo_match==="receita"?`<span style="font-size:.58rem;padding:1px 6px;background:rgba(52,197,122,.12);color:var(--green);border-radius:4px;border:1px solid rgba(52,197,122,.25)">Entrada</span>`:
+      r.tipo_match==="despesa"?`<span style="font-size:.58rem;padding:1px 6px;background:rgba(255,77,109,.1);color:var(--red);border-radius:4px;border:1px solid rgba(255,77,109,.25)">Saída</span>`:
+      `<span style="font-size:.58rem;padding:1px 6px;background:rgba(255,255,255,.06);color:var(--muted);border-radius:4px;border:1px solid var(--border)">Qualquer</span>`;
+    const vezesStr=r.vezes>0?`<span style="font-size:.6rem;color:var(--muted)">aplicada ${r.vezes}× </span>`:"";
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px">
+          <span style="font-size:.76rem;font-weight:700;color:var(--text);font-family:monospace;background:rgba(255,255,255,.04);padding:1px 6px;border-radius:4px">${r.keyword}</span>
+          ${tipoMatchBadge}
+          ${vezesStr}
+        </div>
+        <div style="font-size:.68rem;color:var(--muted)">
+          → <strong style="color:var(--text)">${r.categoria}</strong>
+          ${r.tipo_tx?` · ${tipoTxLabel[r.tipo_tx]||r.tipo_tx}`:""}
+        </div>
+      </div>
+      <button onclick="deleteRule('${r.id}')" title="Excluir regra" style="flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:.85rem;background:rgba(255,77,109,.08);color:var(--red);border:1px solid rgba(255,77,109,.2);border-radius:50%;cursor:pointer" onmouseover="this.style.background='rgba(255,77,109,.2)'" onmouseout="this.style.background='rgba(255,77,109,.08)'">✕</button>
+    </div>`;
+  }).join("");
+}
+
+function deleteRule(ruleId){
+  FIN_CAT_RULES.splice(0,FIN_CAT_RULES.length,...FIN_CAT_RULES.filter(r=>r.id!==ruleId));
+  renderCatRules();
+  try{saveData();}catch(e){}
+}
+
+// ── EDITAR TRANSAÇÃO ──────────────────────────────
+function openEditTx(id){
+  const tx=FIN_TRANSACTIONS.find(t=>t.id===id);
+  if(!tx) return;
+  // Monta lista de categorias combinadas
+  const allCats=[...new Set([
+    ...FIN_CATS.receita,...FIN_CATS.despesa_extra,...FIN_CATS.cartao,...FIN_CATS.investimento,
+    ...Object.keys(FIN_CAT_COLORS)
+  ])].filter(Boolean).sort();
+  const tipoOpts=[
+    {v:"receita",l:"💰 Receita"},
+    {v:"despesa_extra",l:"💸 Despesa variável"},
+    {v:"despesa_fixa",l:"📌 Despesa fixa"},
+    {v:"investimento",l:"📈 Investimento"},
+    {v:"cartao",l:"💳 Cartão"}
+  ];
+  const catOptsHtml=allCats.map(c=>`<option value="${c}" ${tx.categoria===c?"selected":""}>${c}</option>`).join("");
+  const tipoOptsHtml=tipoOpts.map(o=>`<option value="${o.v}" ${tx.tipo===o.v?"selected":""}>${o.l}</option>`).join("");
+  // Keyword sugerida: primeiros 3 tokens do nome
+  const kwSugest=(tx.nome_original||tx.nome||"").split(/[\s\-,]+/).slice(0,3).join(" ");
+  document.getElementById("_edit-tx-modal")?.remove();
+  const m=document.createElement("div");
+  m.id="_edit-tx-modal";
+  m.style.cssText="position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(6px)";
+  m.innerHTML=`
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(440px,95vw);box-shadow:0 24px 64px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h3 style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;margin:0">✏️ Editar Transação</h3>
+      <button onclick="document.getElementById('_edit-tx-modal').remove()" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;line-height:1">✕</button>
+    </div>
+    <div style="font-size:.72rem;color:var(--muted);margin-bottom:16px;background:rgba(255,255,255,.04);padding:8px 12px;border-radius:10px;line-height:1.5">
+      <strong style="color:var(--text)">${tx.nome}</strong><br>
+      📅 ${tx.data} &nbsp;·&nbsp; ${(tx.valor>0?"+":"")}R$ ${tx.valor.toFixed(2).replace(".",",")}
+    </div>
+
+    <label style="display:block;margin-bottom:14px">
+      <span style="font-size:.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">NOME DE EXIBIÇÃO</span>
+      <input id="_etx-nome" value="${(tx.nome||"").replace(/"/g,"&quot;")}" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:.82rem;color:var(--text);font-family:inherit">
+    </label>
+
+    <label style="display:block;margin-bottom:14px">
+      <span style="font-size:.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">CATEGORIA</span>
+      <select id="_etx-cat" style="width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:.82rem;color:var(--text);font-family:inherit">
+        ${catOptsHtml}
+      </select>
+    </label>
+
+    <label style="display:block;margin-bottom:20px">
+      <span style="font-size:.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">TIPO</span>
+      <select id="_etx-tipo" style="width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:.82rem;color:var(--text);font-family:inherit">
+        ${tipoOptsHtml}
+      </select>
+    </label>
+
+    <!-- BLOCO DE APRENDIZADO -->
+    <div style="border:1px solid rgba(160,122,232,.3);border-radius:14px;padding:16px;margin-bottom:20px;background:rgba(160,122,232,.05)">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:12px">
+        <input type="checkbox" id="_etx-salvar-regra" style="width:16px;height:16px;accent-color:var(--accent)">
+        <span style="font-size:.8rem;font-weight:700;color:var(--text)">🧠 Salvar como regra de aprendizado</span>
+      </label>
+      <div id="_etx-regra-campos" style="display:none">
+        <p style="font-size:.68rem;color:var(--muted);margin:0 0 10px">A IA vai aplicar esta regra automaticamente nas próximas importações.</p>
+        <label style="display:block;margin-bottom:10px">
+          <span style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">PALAVRA-CHAVE (nome contém...)</span>
+          <input id="_etx-kw" value="${kwSugest.replace(/"/g,"&quot;")}" placeholder="ex: Raimundo Alves" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:.8rem;color:var(--text);font-family:inherit">
+        </label>
+        <label style="display:block">
+          <span style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">APLICAR PARA</span>
+          <select id="_etx-tipo-match" style="width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:.8rem;color:var(--text);font-family:inherit">
+            <option value="">Qualquer transação</option>
+            <option value="despesa">Apenas saídas (despesas)</option>
+            <option value="receita">Apenas entradas (receitas)</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('_edit-tx-modal').remove()" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer">Cancelar</button>
+      <button onclick="saveEditTx(${id})" style="flex:2;padding:10px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Salvar alterações</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+  m.addEventListener("click",e=>{ if(e.target===m) m.remove(); });
+  // Toggle campos de regra
+  document.getElementById("_etx-salvar-regra").addEventListener("change",function(){
+    document.getElementById("_etx-regra-campos").style.display=this.checked?"block":"none";
+  });
+}
+
+function saveEditTx(id){
+  const tx=FIN_TRANSACTIONS.find(t=>t.id===id);
+  if(!tx){ alert("Transação não encontrada."); return; }
+  const novoNome=document.getElementById("_etx-nome")?.value?.trim()||tx.nome;
+  const novaCat=document.getElementById("_etx-cat")?.value||tx.categoria;
+  const novoTipo=document.getElementById("_etx-tipo")?.value||tx.tipo;
+  const salvarRegra=document.getElementById("_etx-salvar-regra")?.checked;
+  const kw=document.getElementById("_etx-kw")?.value?.trim();
+  const tipoMatch=document.getElementById("_etx-tipo-match")?.value||"";
+
+  // Aplica edição
+  tx.nome=novoNome;
+  tx.categoria=novaCat;
+  tx.tipo=novoTipo;
+  tx.editado=true;
+
+  // Salva regra
+  if(salvarRegra&&kw){
+    // Evita duplicar regra com mesmo keyword
+    const jaTem=FIN_CAT_RULES.find(r=>r.keyword.toLowerCase()===kw.toLowerCase()&&r.tipo_match===(tipoMatch||null));
+    if(jaTem){
+      jaTem.categoria=novaCat;
+      jaTem.tipo_tx=novoTipo==="cartao"?null:novoTipo;
+      jaTem.label=novoNome;
+    } else {
+      FIN_CAT_RULES.unshift({
+        id:"rule_"+Date.now(),
+        keyword:kw,
+        categoria:novaCat,
+        tipo_tx:novoTipo==="cartao"?null:novoTipo,
+        tipo_match:tipoMatch||null,
+        label:novoNome,
+        vezes:0,
+        criadoEm:new Date().toISOString()
+      });
+    }
+    renderCatRules();
+  }
+  document.getElementById("_edit-tx-modal")?.remove();
+  renderFinanceiro();
+  try{saveData();}catch(e){}
+  // Toast
+  const toast=document.createElement("div");
+  toast.style.cssText="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 20px;font-size:.8rem;font-weight:700;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:9999;backdrop-filter:blur(12px)";
+  toast.textContent=salvarRegra&&kw?`✅ Transação atualizada · Regra "${kw}" salva`:"✅ Transação atualizada";
   document.body.appendChild(toast);
   setTimeout(()=>toast.remove(),3500);
 }
@@ -11570,6 +11795,7 @@ function saveData(){
       FIN_COMISSOES,
       FIN_META_GASTOS,
       FIN_IMPORT_HISTORY,
+      FIN_CAT_RULES,
       HABITS,
       HABITS_DONE,
       nextHabId,
@@ -11663,6 +11889,7 @@ function loadData(){
     if(data.FIN_COMISSOES)       FIN_COMISSOES.splice(0,FIN_COMISSOES.length,...data.FIN_COMISSOES);
     if(data.FIN_META_GASTOS!=null) FIN_META_GASTOS = data.FIN_META_GASTOS;
     if(data.FIN_IMPORT_HISTORY)  FIN_IMPORT_HISTORY.splice(0,FIN_IMPORT_HISTORY.length,...data.FIN_IMPORT_HISTORY);
+    if(data.FIN_CAT_RULES)       FIN_CAT_RULES.splice(0,FIN_CAT_RULES.length,...data.FIN_CAT_RULES);
     if(data.HABITS)              HABITS.splice(0,HABITS.length,...data.HABITS);
     if(data.HABITS_DONE)         Object.assign(HABITS_DONE, data.HABITS_DONE);
     if(data.nextHabId!=null)     nextHabId = data.nextHabId;
