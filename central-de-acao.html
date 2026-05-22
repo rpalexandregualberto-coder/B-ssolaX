@@ -14729,8 +14729,16 @@ function parseRyukiActions(text){
   try{ return JSON.parse(m[1].trim()); }catch(e){ return null; }
 }
 
+// showRyukiActionsModal removido — Ryuki agora aplica com autonomia total (sem modal)
+
+function applyRyukiActionsLEGACY_UNUSED(actions){ /* removido */ }
+
 function showRyukiActionsModal(actions){
-  document.getElementById("_ryuki-actions-modal")?.remove();
+  // Mantido como alias para não quebrar chamadas antigas
+  applyRyukiActions(actions);
+}
+
+function _ryukiModalRows_unused(actions){
   const tipoLabel={receita:"💰 Receita",despesa_extra:"💸 Despesa variável",despesa_fixa:"📌 Despesa fixa",investimento:"📈 Investimento",cartao:"💳 Cartão"};
   const rows = actions.map((a,i)=>{
     if(a.action==="edit_tx"){
@@ -14741,13 +14749,7 @@ function showRyukiActionsModal(actions){
         a.tipo      ? `tipo → <b>${tipoLabel[a.tipo]||a.tipo}</b>` : "",
         a.nome      ? `nome → <b>${a.nome}</b>` : ""
       ].filter(Boolean).join(" · ");
-      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
-        <input type="checkbox" data-idx="${i}" checked style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0">
-        <div style="flex:1;min-width:0">
-          <div style="font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:2px">✏️ ${(txName).slice(0,40)}</div>
-          <div style="font-size:.68rem;color:var(--muted)">${changes}</div>
-        </div>
-      </label>`;
+      return ``;
     } else if(a.action==="create_rule"){
       return `<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
         <input type="checkbox" data-idx="${i}" checked style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0">
@@ -14806,13 +14808,12 @@ function showRyukiActionsModal(actions){
   m2.addEventListener("click",e=>{ if(e.target===m2) m2.remove(); });
 }
 
+// ── AUTONOMIA TOTAL: Ryuki aplica ações sem modal ──────────
 function applyRyukiActions(actions){
-  const modal = document.getElementById("_ryuki-actions-modal");
-  const checked = new Set([...modal.querySelectorAll("input[type=checkbox]:checked")].map(el=>parseInt(el.dataset.idx)));
-  modal.remove();
-  let editCount=0, ruleCount=0, fixaCount=0, deleteCount=0, kpiCount=0;
+  let editCount=0, ruleCount=0, fixaCount=0, kpiCount=0;
+  const toDelete=[];
+
   actions.forEach((a,i)=>{
-    if(!checked.has(i)) return;
     if(a.action==="edit_tx"){
       const tx=FIN_TRANSACTIONS.find(t=>t.id===a.id);
       if(!tx) return;
@@ -14829,7 +14830,8 @@ function applyRyukiActions(actions){
       ruleCount++;
     } else if(a.action==="add_fixa"){
       if(!a.nome||!a.valor) return;
-      const mk = monthKey();
+      // Usa o mês sendo visualizado no painel financeiro (não o mês atual do sistema)
+      const mk = monthKey(finYear, finMonth);
       if(!FIN_FIXAS_BY_MONTH[mk]) FIN_FIXAS_BY_MONTH[mk]=[];
       const jaExiste = FIN_FIXAS_BY_MONTH[mk].some(f=>(f.nome||"").toLowerCase()===(a.nome||"").toLowerCase());
       if(!jaExiste){
@@ -14844,33 +14846,53 @@ function applyRyukiActions(actions){
         });
         fixaCount++;
       }
-    } else if(a.action==="delete_tx"){
-      const idx = FIN_TRANSACTIONS.findIndex(t=>t.id===a.id);
-      if(idx!==-1){ FIN_TRANSACTIONS.splice(idx,1); deleteCount++; }
     } else if(a.action==="add_kpi"){
       if(!a.label||!a.cat||!a.meta) return;
       const jaExiste = FIN_KPIS.some(k=>k.cat.toLowerCase()===a.cat.toLowerCase());
       if(!jaExiste){
-        FIN_KPIS.push({
-          id: "kpi_"+Date.now()+"_"+i,
-          label: a.label,
-          cat: a.cat,
-          meta: Number(a.meta)||100,
-          period: a.period||"semana"
-        });
+        FIN_KPIS.push({id:"kpi_"+Date.now()+"_"+i, label:a.label, cat:a.cat, meta:Number(a.meta)||100, period:a.period||"semana"});
         kpiCount++;
       }
+    } else if(a.action==="delete_tx"){
+      toDelete.push(a); // destrutivo: pede confirmação inline
     }
   });
-  renderFinanceiro();
-  try{saveData();}catch(e){}
-  const parts=[];
-  if(editCount)  parts.push(`${editCount} transação${editCount!==1?"ões":""} atualizada${editCount!==1?"s":""}`);
-  if(ruleCount)  parts.push(`${ruleCount} regra${ruleCount!==1?"s":""} criada${ruleCount!==1?"s":""}`);
-  if(fixaCount)  parts.push(`${fixaCount} fixa${fixaCount!==1?"s":""} registrada${fixaCount!==1?"s":""}`);
-  if(deleteCount) parts.push(`${deleteCount} transação${deleteCount!==1?"ões":""} removida${deleteCount!==1?"s":""}`);
-  if(kpiCount)   parts.push(`${kpiCount} KPI${kpiCount!==1?"s":""} criado${kpiCount!==1?"s":""}`);
-  appendRyukiMsg("ryuki",`<span style="color:var(--green)">✅ ${parts.join(" · ")}</span>`);
+
+  const total = editCount+ruleCount+fixaCount+kpiCount;
+  if(total > 0){
+    renderFinanceiro();
+    try{saveData();}catch(e){}
+    const parts=[];
+    if(editCount) parts.push(`${editCount} transação${editCount!==1?"ões":""} atualizada${editCount!==1?"s":""}`);
+    if(ruleCount) parts.push(`${ruleCount} regra${ruleCount!==1?"s":""} criada${ruleCount!==1?"s":""}`);
+    if(fixaCount) parts.push(`${fixaCount} conta${fixaCount!==1?"s":""} fixa${fixaCount!==1?"s":""} adicionada${fixaCount!==1?"s":""} ao painel`);
+    if(kpiCount)  parts.push(`${kpiCount} KPI${kpiCount!==1?"s":""} criado${kpiCount!==1?"s":""}`);
+    appendRyukiMsg("ryuki",`<span style="color:var(--green)">✅ Aplicado automaticamente: ${parts.join(" · ")}</span>`);
+  }
+
+  // delete_tx é destrutivo — pede confirmação diretamente no chat
+  if(toDelete.length > 0){
+    const idArr = JSON.stringify(toDelete.map(a=>a.id));
+    const nomes = toDelete.map(a=>{ const t=FIN_TRANSACTIONS.find(x=>x.id===a.id); return t?escHtml(t.nome.slice(0,28)):`ID ${a.id}`; }).join(", ");
+    appendRyukiMsg("ryuki",
+      `<div style="background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);border-radius:10px;padding:10px;font-size:.75rem">
+        ⚠️ Confirma exclusão de <b>${toDelete.length}</b> transação${toDelete.length!==1?"ões":""}?<br>
+        <span style="color:var(--muted);font-size:.68rem">${nomes}</span><br>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button onclick="confirmDeleteTxs(${idArr.replace(/"/g,"'")})" style="padding:5px 14px;border-radius:8px;border:none;background:var(--red,#e05);color:#fff;font-size:.72rem;font-weight:700;cursor:pointer">🗑️ Confirmar</button>
+          <button onclick="this.parentElement.parentElement.style.display='none'" style="padding:5px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.72rem;cursor:pointer">Cancelar</button>
+        </div>
+      </div>`
+    );
+  }
+}
+
+function confirmDeleteTxs(ids){
+  const idArr = Array.isArray(ids) ? ids : [ids];
+  let count=0;
+  idArr.forEach(id=>{ const i=FIN_TRANSACTIONS.findIndex(t=>t.id==id); if(i!==-1){FIN_TRANSACTIONS.splice(i,1);count++;} });
+  if(count>0){ renderFinanceiro(); try{saveData();}catch(e){} }
+  appendRyukiMsg("ryuki",`<span style="color:var(--green)">🗑️ ${count} transação${count!==1?"ões":""} removida${count!==1?"s":""}.</span>`);
 }
 
 function appendRyukiMsg(role, html, streaming=false){
@@ -15018,7 +15040,8 @@ async function sendRyukiMessage(){
     }
     // Verifica se há ações propostas
     const ryukiActs = parseRyukiActions(full);
-    if(ryukiActs && ryukiActs.length) setTimeout(()=>showRyukiActionsModal(ryukiActs), 400);
+    // Autonomia total: aplica ações automaticamente sem modal de confirmação
+    if(ryukiActs && ryukiActs.length) setTimeout(()=>applyRyukiActions(ryukiActs), 400);
 
     // Atualiza histórico multi-turn (sempre texto simples para turnos seguintes)
     const histUserText = ryukiHistory.length===0 ? contextNote : (text||"[arquivo enviado]");
