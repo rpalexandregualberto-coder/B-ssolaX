@@ -3766,10 +3766,6 @@ textarea.form-input{border-radius:16px;resize:vertical}
           Dashboard
         </button>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button onclick="limparFaturasCartao()" style="background:none;border:1px solid rgba(220,50,50,.5);border-radius:9px;color:rgba(220,50,50,.8);font-size:.68rem;font-weight:700;padding:5px 12px;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(220,50,50,1)';this.style.color='rgba(220,50,50,1)'" onmouseout="this.style.borderColor='rgba(220,50,50,.5)';this.style.color='rgba(220,50,50,.8)'" title="Remove APENAS as transações de fatura do cartão — extrato bancário não é afetado">🗑️ Limpar Cartão</button>
-        <button onclick="limparExtratoBancario()" style="background:none;border:1px solid rgba(245,166,35,.5);border-radius:9px;color:rgba(245,166,35,.9);font-size:.68rem;font-weight:700;padding:5px 12px;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(245,166,35,1)';this.style.color='rgba(245,166,35,1)'" onmouseout="this.style.borderColor='rgba(245,166,35,.5)';this.style.color='rgba(245,166,35,.9)'" title="Remove APENAS as transações do extrato bancário — fatura do cartão não é afetada">🗑️ Limpar Extrato</button>
-      </div>
     </div>
 
     <!-- HERO: Resumo Executivo + Navegação (compartilhado pelos dois modos) -->
@@ -10413,7 +10409,7 @@ function renderImportHistory(){
   const countEl = document.getElementById("fin-import-history-count");
   if(!list) return;
   if(!FIN_IMPORT_HISTORY || FIN_IMPORT_HISTORY.length === 0){
-    list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:.75rem">Nenhuma importação registrada ainda.</div>`;
+    list.innerHTML = `<div style="text-align:center;padding:24px 16px;color:var(--muted);font-size:.76rem">Nenhuma importação registrada ainda.<br><span style="font-size:.68rem;opacity:.6">Importe uma fatura ou extrato para ver o histórico aqui.</span></div>`;
     if(countEl) countEl.textContent = "";
     return;
   }
@@ -10421,36 +10417,53 @@ function renderImportHistory(){
   list.innerHTML = FIN_IMPORT_HISTORY.map(h=>{
     const dt = new Date(h.ts);
     const dtStr = dt.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"})+" "+dt.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-    // Conta quantas transações deste batch são futuro vs pagas (pode ter mix automático)
+
+    // Tipo badge (💳 Fatura | 🏦 Extrato)
+    const isFatura = h.tipo==="fatura";
+    const tipoBadge = isFatura
+      ? `<span style="font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:5px;background:rgba(160,122,232,.15);color:var(--accent);border:1px solid rgba(160,122,232,.3)">💳 FATURA</span>`
+      : `<span style="font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:5px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3)">🏦 EXTRATO</span>`;
+
+    // Futuro badge
     const batchTxs = FIN_TRANSACTIONS.filter(t=>t.importBatchId===h.id);
     const cntFut = batchTxs.filter(t=>t.futuro).length;
     const cntPago = batchTxs.filter(t=>!t.futuro).length;
-    let futBadge;
-    if(cntFut > 0 && cntPago > 0){
-      futBadge = `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,.12);color:var(--orange);border:1px solid rgba(245,166,35,.25)">⏳ ${cntFut} pendente${cntFut!==1?"s":""} · ✅ ${cntPago} pag${cntPago!==1?"os":"o"}</span>`;
-    } else if(cntFut > 0){
-      futBadge = `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,.15);color:var(--orange);border:1px solid rgba(245,166,35,.3)">⏳ PENDENTE</span>`;
-    } else {
-      futBadge = `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(52,197,122,.12);color:var(--green);border:1px solid rgba(52,197,122,.25)">✅ PAGO</span>`;
+    let futBadge = "";
+    if(isFatura){
+      if(cntFut > 0 && cntPago > 0){
+        futBadge = `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,.12);color:var(--orange);border:1px solid rgba(245,166,35,.25)">⏳ ${cntFut} pend. · ✅ ${cntPago} pag.</span>`;
+      } else if(cntFut > 0){
+        futBadge = `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,.15);color:var(--orange);border:1px solid rgba(245,166,35,.3)">⏳ PENDENTE</span>`;
+      } else {
+        futBadge = `<span style="font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(52,197,122,.12);color:var(--green);border:1px solid rgba(52,197,122,.25)">✅ PAGA</span>`;
+      }
     }
-    const dupBadge = h.countDup>0 ? `<span style="font-size:.58rem;color:var(--muted)">${h.countDup} dup. ignorada${h.countDup!==1?"s":""}</span>` : "";
-    const estornoBadge = h.totalEstornos>0 ? `<span style="font-size:.58rem;color:var(--green)">↩ ${fmtBRL(h.totalEstornos)} estorno${h.totalEstornos!==1?"s":""}</span>` : "";
+
+    const dupBadge = h.countDup>0 ? `<span style="font-size:.58rem;color:var(--muted)">${h.countDup} dup.</span>` : "";
+    const estornoBadge = h.totalEstornos>0 ? `<span style="font-size:.58rem;color:var(--green)">↩ ${fmtBRL(h.totalEstornos)}</span>` : "";
+
+    // Número real de transações ainda presentes no DB
+    const realCount = batchTxs.length;
+    const removida = realCount === 0 && h.count > 0;
+
     return `
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap">
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
-          <span style="font-size:.75rem;font-weight:700;color:var(--text)">${h.fonte}</span>
+    <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border);${removida?"opacity:.45":""}">
+      <div style="flex:1;min-width:0;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px">
+          ${tipoBadge}
           ${futBadge}
           ${dupBadge}
           ${estornoBadge}
+          ${removida ? `<span style="font-size:.58rem;color:var(--muted);font-style:italic">removida</span>` : ""}
         </div>
-        <div style="font-size:.68rem;color:var(--muted);line-height:1.5">
-          📅 ${dtStr} &nbsp;·&nbsp; 📆 Mês: ${h.mes} &nbsp;·&nbsp;
-          <strong style="color:var(--text)">${h.count}</strong> transaç${h.count!==1?"ões":"ão"} &nbsp;·&nbsp;
-          Saídas: <strong style="color:var(--red)">${fmtBRL(h.totalSaidas)}</strong>
+        <div style="font-size:.74rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">${h.fonte}</div>
+        <div style="font-size:.65rem;color:var(--muted);line-height:1.5">
+          📅 ${dtStr} &nbsp;·&nbsp; 📆 ${h.mes} &nbsp;·&nbsp;
+          <strong style="color:var(--text)">${realCount}</strong>/${h.count} tx &nbsp;·&nbsp;
+          <strong style="color:var(--red)">${fmtBRL(h.totalSaidas)}</strong>
         </div>
       </div>
-      <button onclick="revertImport('${h.id}')" title="Reverter esta importação" style="flex-shrink:0;padding:5px 12px;font-size:.68rem;font-weight:700;background:rgba(255,77,109,.1);color:var(--red);border:1px solid rgba(255,77,109,.3);border-radius:8px;cursor:pointer;white-space:nowrap">↩️ Reverter</button>
+      ${!removida ? `<button onclick="revertImport('${h.id}')" title="Excluir esta importação" style="flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:rgba(255,77,109,.08);color:var(--red);border:1px solid rgba(255,77,109,.25);border-radius:50%;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,77,109,.2)';this.style.borderColor='rgba(255,77,109,.6)'" onmouseout="this.style.background='rgba(255,77,109,.08)';this.style.borderColor='rgba(255,77,109,.25)'">✕</button>` : `<button disabled style="flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:.7rem;background:none;color:var(--muted);border:1px solid var(--border);border-radius:50%;cursor:default;opacity:.4">✓</button>`}
     </div>`;
   }).join("");
 }
@@ -10458,14 +10471,15 @@ function renderImportHistory(){
 function revertImport(batchId){
   const batch = FIN_IMPORT_HISTORY.find(h=>h.id===batchId);
   const count = FIN_TRANSACTIONS.filter(t=>t.importBatchId===batchId).length;
-  if(!confirm(`⚠️ Reverter importação?\n\n"${batch?.fonte||"importação"}" — ${count} transação${count!==1?"ões":"ão"}\nMês: ${batch?.mes||""}\n\nTodas as transações deste lote serão removidas.\nEsta ação não pode ser desfeita.`)) return;
+  const tipoLabel = batch?.tipo==="extrato" ? "🏦 Extrato bancário" : "💳 Fatura do cartão";
+  if(!confirm(`Excluir importação?\n\n${tipoLabel}\n"${batch?.fonte||"importação"}"\n${count} transação${count!==1?"ões":"ão"} · Mês: ${batch?.mes||""}\n\nTodas as transações deste lote serão removidas.\nEsta ação não pode ser desfeita.`)) return;
   FIN_TRANSACTIONS.splice(0, FIN_TRANSACTIONS.length, ...FIN_TRANSACTIONS.filter(t=>t.importBatchId!==batchId));
   FIN_IMPORT_HISTORY.splice(0, FIN_IMPORT_HISTORY.length, ...FIN_IMPORT_HISTORY.filter(h=>h.id!==batchId));
   renderFinanceiro();
   try{ saveData(); }catch(e){}
   const toast = document.createElement("div");
   toast.style.cssText="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 20px;font-size:.8rem;font-weight:700;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:9999;backdrop-filter:blur(12px)";
-  toast.textContent=`✅ Importação revertida — ${count} transação${count!==1?"ões":""} removida${count!==1?"s":""}`;
+  toast.textContent=`✅ Importação excluída — ${count} transação${count!==1?"ões":""} removida${count!==1?"s":""}`;
   document.body.appendChild(toast);
   setTimeout(()=>toast.remove(),3500);
 }
