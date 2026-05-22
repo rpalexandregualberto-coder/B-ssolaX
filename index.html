@@ -2806,9 +2806,26 @@ textarea.form-input{border-radius:16px;resize:vertical}
 .ryuki-typing span:nth-child(3){animation-delay:.4s}
 @keyframes ryukiDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 #ryuki-input-area{
-  padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0;
-  display:flex;gap:8px;align-items:flex-end;background:var(--surface);
+  padding:8px 14px 12px;border-top:1px solid var(--border);flex-shrink:0;
+  display:flex;flex-direction:column;gap:6px;background:var(--surface);
 }
+#ryuki-input-row{display:flex;gap:8px;align-items:flex-end}
+#ryuki-attach-btn{
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--border);
+  background:rgba(255,255,255,.05);color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;
+  flex-shrink:0;transition:all .15s;
+}
+#ryuki-attach-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(160,122,232,.1)}
+#ryuki-attach-pill{
+  display:flex;align-items:center;gap:6px;padding:5px 10px;
+  background:rgba(160,122,232,.1);border:1px solid rgba(160,122,232,.3);
+  border-radius:8px;font-size:.7rem;color:var(--text);animation:msgIn .15s ease;
+}
+#ryuki-attach-pill .apill-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+#ryuki-attach-pill .apill-size{color:var(--muted);white-space:nowrap}
+#ryuki-attach-pill .apill-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:0 2px;line-height:1;flex-shrink:0}
+#ryuki-attach-pill .apill-x:hover{color:var(--red)}
 #ryuki-input{
   flex:1;background:var(--card);border:1px solid var(--border);
   border-radius:12px;padding:10px 14px;font-size:.8rem;color:var(--text);
@@ -14389,6 +14406,61 @@ FORMATO:
 let ryukiHistory = [];
 let ryukiOpen = false;
 let ryukiTyping = false;
+// Arquivo anexado pendente: {name, size, type, content} (content = string ou base64)
+let ryukiAttachment = null;
+
+// ── UPLOAD DE ARQUIVO NO CHAT ─────────────────────
+function handleRyukiFile(input){
+  const file = input.files[0];
+  if(!file){ return; }
+  input.value = ""; // reset para permitir selecionar o mesmo arquivo novamente
+
+  const maxMB = 10;
+  if(file.size > maxMB * 1024 * 1024){
+    alert(`Arquivo muito grande (máx ${maxMB} MB).`); return;
+  }
+
+  const ext = file.name.split(".").pop().toLowerCase();
+  const isImage = ["png","jpg","jpeg","webp","gif"].includes(ext);
+  const isPDF   = ext === "pdf";
+  const isText  = ["csv","txt","json","xlsx"].includes(ext);
+
+  const fmtSize = file.size < 1024 ? file.size+"B"
+    : file.size < 1024*1024 ? (file.size/1024).toFixed(1)+"KB"
+    : (file.size/1024/1024).toFixed(1)+"MB";
+
+  const icon = isImage ? "🖼️" : isPDF ? "📕" : ext==="csv" ? "📊" : ext==="xlsx" ? "📗" : "📄";
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    let content, mediaType;
+    if(isImage || isPDF){
+      // base64 puro (sem prefixo data:...)
+      content = e.result.split(",")[1];
+      mediaType = file.type || (isImage ? "image/png" : "application/pdf");
+    } else {
+      content = e.result; // texto puro
+    }
+    ryukiAttachment = { name: file.name, size: fmtSize, type: isImage?"image": isPDF?"pdf":"text", content, mediaType, ext, icon };
+    // Mostra pill
+    const pill = document.getElementById("ryuki-attach-pill");
+    if(pill){
+      document.getElementById("ryuki-attach-icon").textContent = icon;
+      document.getElementById("ryuki-attach-name").textContent = file.name;
+      document.getElementById("ryuki-attach-size").textContent = fmtSize;
+      pill.style.display = "flex";
+    }
+    document.getElementById("ryuki-input")?.focus();
+  };
+  if(isImage || isPDF) reader.readAsDataURL(file);
+  else reader.readAsText(file, "UTF-8");
+}
+
+function clearRyukiAttachment(){
+  ryukiAttachment = null;
+  const pill = document.getElementById("ryuki-attach-pill");
+  if(pill) pill.style.display = "none";
+}
 
 function buildRyukiContext(){
   const mk = `${finYear}-${String(finMonth+1).padStart(2,"0")}`;
@@ -14536,19 +14608,49 @@ async function sendRyukiMessage(){
   const input = document.getElementById("ryuki-input");
   const sendBtn = document.getElementById("ryuki-send");
   const text = (input?.value||"").trim();
-  if(!text) return;
+  const att = ryukiAttachment;
+  if(!text && !att) return;
 
   input.value=""; input.style.height="auto";
-  appendRyukiMsg("user", text);
+
+  // Monta texto exibido na bolha do usuário
+  const displayText = att
+    ? (text ? `${att.icon} **${att.name}** (${att.size})\n\n${text}` : `${att.icon} **${att.name}** (${att.size})`)
+    : text;
+  appendRyukiMsg("user", ryukiMarkdown(displayText));
+
+  // Limpa pill após capturar
+  clearRyukiAttachment();
 
   ryukiTyping=true;
   if(sendBtn) sendBtn.disabled=true;
 
+  // Monta content do user (pode ser multi-part se tiver arquivo)
+  function buildUserContent(msgText){
+    if(!att) return msgText;
+    const parts = [];
+    if(att.type === "image"){
+      parts.push({type:"image", source:{type:"base64", media_type:att.mediaType, data:att.content}});
+    } else if(att.type === "pdf"){
+      parts.push({type:"document", source:{type:"base64", media_type:"application/pdf", data:att.content}});
+    } else {
+      // Texto (CSV, TXT, JSON, etc)
+      const truncated = att.content.length > 40000 ? att.content.slice(0,40000)+"\n...[truncado]" : att.content;
+      parts.push({type:"text", text:`[ARQUIVO: ${att.name}]\n\`\`\`\n${truncated}\n\`\`\``});
+    }
+    parts.push({type:"text", text: msgText || "Analise este arquivo."});
+    return parts;
+  }
+
   // Injeta contexto financeiro no primeiro par de mensagens de cada sessão
-  const contextNote = `[CONTEXTO FINANCEIRO ATUAL]\n${buildRyukiContext()}\n\n[MENSAGEM DO USUÁRIO]\n${text}`;
+  const contextNote = `[CONTEXTO FINANCEIRO ATUAL]\n${buildRyukiContext()}\n\n[MENSAGEM DO USUÁRIO]\n${text||"Analise este arquivo."}`;
+  const userContent = ryukiHistory.length===0
+    ? buildUserContent(contextNote)
+    : buildUserContent(text||"Analise este arquivo.");
+
   const msgPayload = ryukiHistory.length===0
-    ? [{role:"user", content:contextNote}]
-    : [...ryukiHistory, {role:"user", content:text}];
+    ? [{role:"user", content:userContent}]
+    : [...ryukiHistory, {role:"user", content:userContent}];
 
   const typingEl = showRyukiTyping();
 
@@ -14568,11 +14670,13 @@ async function sendRyukiMessage(){
     typingEl?.remove();
     if(!bubble) appendRyukiMsg("ryuki", ryukiMarkdown(full));
 
-    // Atualiza histórico multi-turn
+    // Atualiza histórico multi-turn (sempre texto simples para turnos seguintes)
+    const histUserText = ryukiHistory.length===0 ? contextNote : (text||"[arquivo enviado]");
     if(ryukiHistory.length===0){
-      ryukiHistory.push({role:"user", content:contextNote});
+      // Primeiro turno: guarda o content original (pode ser array se tinha arquivo)
+      ryukiHistory.push({role:"user", content:userContent});
     } else {
-      ryukiHistory.push({role:"user", content:text});
+      ryukiHistory.push({role:"user", content:histUserText});
     }
     ryukiHistory.push({role:"assistant", content:full});
     // Mantém janela de 20 turnos (10 pares)
@@ -14662,12 +14766,28 @@ function clearRyukiHistory(){
   </div>
   <div id="ryuki-messages"></div>
   <div id="ryuki-input-area">
-    <textarea id="ryuki-input" placeholder="Pergunte sobre seus gastos, metas, categorias..." rows="1"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRyukiMessage()}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-    <button id="ryuki-send" onclick="sendRyukiMessage()" title="Enviar">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
+    <!-- Pill do arquivo anexado (oculto por padrão) -->
+    <div id="ryuki-attach-pill" style="display:none">
+      <span style="font-size:.85rem" id="ryuki-attach-icon">📄</span>
+      <span class="apill-name" id="ryuki-attach-name"></span>
+      <span class="apill-size" id="ryuki-attach-size"></span>
+      <button class="apill-x" onclick="clearRyukiAttachment()" title="Remover arquivo">✕</button>
+    </div>
+    <div id="ryuki-input-row">
+      <!-- Input file oculto -->
+      <input type="file" id="ryuki-file-input" style="display:none"
+        accept=".csv,.txt,.pdf,.png,.jpg,.jpeg,.webp,.gif,.xlsx,.json"
+        onchange="handleRyukiFile(this)">
+      <button id="ryuki-attach-btn" onclick="document.getElementById('ryuki-file-input').click()" title="Anexar arquivo (CSV, PDF, imagem...)">
+        📎
+      </button>
+      <textarea id="ryuki-input" placeholder="Pergunte sobre seus gastos, metas, categorias..." rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRyukiMessage()}"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+      <button id="ryuki-send" onclick="sendRyukiMessage()" title="Enviar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
   </div>
 </div>
 
