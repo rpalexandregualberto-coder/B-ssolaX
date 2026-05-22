@@ -24,15 +24,23 @@ export default async function handler(req) {
   try {
     const body = await req.json();
 
+    // Detecta se há bloco document (PDF) em qualquer mensagem
+    const hasDocument = (body.messages || []).some(m =>
+      Array.isArray(m.content) && m.content.some(c => c.type === "document")
+    );
+
+    const baseHeaders = {
+      "Content-Type": "application/json",
+      "anthropic-version": "2023-06-01",
+      "x-api-key": apiKey,
+      ...(hasDocument ? { "anthropic-beta": "pdfs-2024-09-25" } : {})
+    };
+
     if (body.stream === true) {
       // Streaming: pipe SSE diretamente — sem limite de tempo
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "anthropic-version": "2023-06-01",
-          "x-api-key": apiKey
-        },
+        headers: baseHeaders,
         body: JSON.stringify(body)
       });
       return new Response(response.body, {
@@ -48,11 +56,7 @@ export default async function handler(req) {
     // Non-streaming (reuniões, relatórios curtos)
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "anthropic-version": "2023-06-01",
-        "x-api-key": apiKey
-      },
+      headers: baseHeaders,
       body: JSON.stringify(body)
     });
     const data = await response.json();
