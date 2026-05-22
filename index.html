@@ -13584,8 +13584,8 @@ function addTaskToProject(projId){
 
     <!-- Tabs -->
     <div style="display:flex;gap:4px;margin-bottom:16px;background:var(--surface);border-radius:10px;padding:3px">
-      <button id="_atp-tab-nova" onclick="_atpTab('nova')" style="flex:1;padding:7px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s">✨ Nova tarefa</button>
-      <button id="_atp-tab-vincular" onclick="_atpTab('vincular')" style="flex:1;padding:7px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s">🔗 Vincular existente</button>
+      <button id="_atp-tab-nova" style="flex:1;padding:7px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s">✨ Nova tarefa</button>
+      <button id="_atp-tab-vincular" style="flex:1;padding:7px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s">🔗 Vincular existente</button>
     </div>
 
     <!-- Painel Nova -->
@@ -13608,12 +13608,12 @@ function addTaskToProject(projId){
         </select>
       </div>
       <input id="_atp-data" type="date" style="padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.78rem;outline:none" />
-      <button onclick="_atpCriarNova(${projId})" style="padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;margin-top:4px">✨ Criar e vincular</button>
+      <button id="_atp-btn-criar" style="padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;margin-top:4px">✨ Criar e vincular</button>
     </div>
 
     <!-- Painel Vincular -->
     <div id="_atp-vincular" style="display:none;flex-direction:column;gap:8px;flex:1;min-height:0">
-      <input id="_atp-busca" oninput="_atpFiltrar(${projId})" placeholder="Buscar tarefa..." style="padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.8rem;outline:none;flex-shrink:0" />
+      <input id="_atp-busca" placeholder="Buscar tarefa..." style="padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.8rem;outline:none;flex-shrink:0" />
       <div style="font-size:.62rem;color:var(--muted);flex-shrink:0">Clique para vincular ao projeto</div>
       <div id="_atp-lista" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px;max-height:320px;padding-right:2px"></div>
     </div>
@@ -13623,8 +13623,36 @@ function addTaskToProject(projId){
 
   modal.addEventListener("click", e=>{ if(e.target===modal) modal.remove(); });
   document.body.appendChild(modal);
+
+  // Normaliza projId para número uma vez só
+  const pid = typeof projId === "string" ? parseInt(projId, 10) : projId;
+
+  // Listeners: abas
+  document.getElementById("_atp-tab-nova").addEventListener("click", ()=> _atpTab("nova"));
+  document.getElementById("_atp-tab-vincular").addEventListener("click", ()=>{ _atpTab("vincular"); _atpFiltrar(pid); });
+
+  // Listener: Criar e vincular
+  document.getElementById("_atp-btn-criar").addEventListener("click", ()=>{
+    const nome = (document.getElementById("_atp-nome")?.value||"").trim();
+    if(!nome){ document.getElementById("_atp-nome")?.focus(); return; }
+    const urg  = document.getElementById("_atp-urg")?.value||"medio";
+    const cat  = document.getElementById("_atp-cat")?.value||"outros";
+    const data = document.getElementById("_atp-data")?.value||"";
+    TASKS.push({ id:nextId++, name:nome, urg, cat, icon:CAT_ICONS?.[cat]||"📋", date:data, project_id:pid });
+    modal.remove();
+    renderAll();
+  });
+
+  // Listener: busca em tempo real
+  document.getElementById("_atp-busca").addEventListener("input", ()=> _atpFiltrar(pid));
+
+  // Listener: Enter no campo nome = criar
+  document.getElementById("_atp-nome").addEventListener("keydown", e=>{
+    if(e.key==="Enter") document.getElementById("_atp-btn-criar")?.click();
+  });
+
   document.getElementById("_atp-nome")?.focus();
-  _atpFiltrar(projId);
+  _atpFiltrar(pid);
 }
 
 function _atpTab(tab){
@@ -13637,16 +13665,6 @@ function _atpTab(tab){
   if(btnVinc){ btnVinc.style.background=isNova?"transparent":"var(--accent)"; btnVinc.style.color=isNova?"var(--muted)":"#fff"; }
 }
 
-function _atpCriarNova(projId){
-  const nome = (document.getElementById("_atp-nome")?.value||"").trim();
-  if(!nome){ document.getElementById("_atp-nome")?.focus(); return; }
-  const urg  = document.getElementById("_atp-urg")?.value||"medio";
-  const cat  = document.getElementById("_atp-cat")?.value||"outros";
-  const data = document.getElementById("_atp-data")?.value||"";
-  TASKS.push({ id:nextId++, name:nome, urg, cat, icon:"📋", date:data, project_id:projId });
-  document.getElementById("_add-task-proj-modal")?.remove();
-  renderAll();
-}
 
 function _atpFiltrar(projId){
   const busca = (document.getElementById("_atp-busca")?.value||"").toLowerCase();
