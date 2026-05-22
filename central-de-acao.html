@@ -3766,7 +3766,10 @@ textarea.form-input{border-radius:16px;resize:vertical}
           Dashboard
         </button>
       </div>
-      <button onclick="limparTodasFaturas()" style="background:none;border:1px solid rgba(220,50,50,.5);border-radius:9px;color:rgba(220,50,50,.8);font-size:.7rem;font-weight:700;padding:6px 14px;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(220,50,50,1)';this.style.color='rgba(220,50,50,1)'" onmouseout="this.style.borderColor='rgba(220,50,50,.5)';this.style.color='rgba(220,50,50,.8)'" title="Remove TODAS as transações de cartão e entradas importadas por IA para reimportação limpa">🗑️ Limpar e Reimportar</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="limparFaturasCartao()" style="background:none;border:1px solid rgba(220,50,50,.5);border-radius:9px;color:rgba(220,50,50,.8);font-size:.68rem;font-weight:700;padding:5px 12px;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(220,50,50,1)';this.style.color='rgba(220,50,50,1)'" onmouseout="this.style.borderColor='rgba(220,50,50,.5)';this.style.color='rgba(220,50,50,.8)'" title="Remove APENAS as transações de fatura do cartão — extrato bancário não é afetado">🗑️ Limpar Cartão</button>
+        <button onclick="limparExtratoBancario()" style="background:none;border:1px solid rgba(245,166,35,.5);border-radius:9px;color:rgba(245,166,35,.9);font-size:.68rem;font-weight:700;padding:5px 12px;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(245,166,35,1)';this.style.color='rgba(245,166,35,1)'" onmouseout="this.style.borderColor='rgba(245,166,35,.5)';this.style.color='rgba(245,166,35,.9)'" title="Remove APENAS as transações do extrato bancário — fatura do cartão não é afetada">🗑️ Limpar Extrato</button>
+      </div>
     </div>
 
     <!-- HERO: Resumo Executivo + Navegação (compartilhado pelos dois modos) -->
@@ -10467,31 +10470,56 @@ function revertImport(batchId){
   setTimeout(()=>toast.remove(),3500);
 }
 
-function limparTodasFaturas(){
-  const cartaoAll  = FIN_TRANSACTIONS.filter(t=>t.tipo==="cartao");
-  const receitaIA  = FIN_TRANSACTIONS.filter(t=>t.tipo==="receita"&&t.origem==="ia");
-  const total = cartaoAll.length + receitaIA.length;
-  if(!total){ alert("Nenhuma transação de cartão ou entrada importada por IA encontrada."); return; }
+function _showLimparToast(msg){
+  const t=document.createElement("div");
+  t.style.cssText="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 22px;font-size:.82rem;font-weight:700;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:9999;backdrop-filter:blur(12px)";
+  t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),4000);
+}
+
+// Remove APENAS transações de fatura do cartão (não toca no extrato bancário)
+function limparFaturasCartao(){
+  const cartaoAll = FIN_TRANSACTIONS.filter(t=>t.tipo==="cartao");
+  if(!cartaoAll.length){ alert("Nenhuma transação de cartão encontrada."); return; }
+  const faturaBatchIds = new Set(FIN_IMPORT_HISTORY.filter(h=>h.tipo==="fatura").map(h=>h.id));
   if(!confirm(
-    `⚠️ LIMPAR DADOS DE CARTÃO\n\n` +
-    `Serão removidas:\n` +
-    `• ${cartaoAll.length} transação${cartaoAll.length!==1?"ões":""} de cartão\n` +
-    `• ${receitaIA.length} entrada${receitaIA.length!==1?"s":""} importada${receitaIA.length!==1?"s":""} por IA\n\n` +
-    `O histórico de importações também será limpo.\n\n` +
-    `Após confirmar, reimporte seus CSVs para obter dados corretos.\n` +
+    `⚠️ LIMPAR FATURAS DO CARTÃO\n\n` +
+    `Serão removidas: ${cartaoAll.length} transação${cartaoAll.length!==1?"ões":""} de cartão\n` +
+    `O extrato bancário NÃO será afetado.\n\n` +
+    `Após confirmar, reimporte o CSV da fatura do cartão.\n` +
     `Esta ação não pode ser desfeita!`
   )) return;
-  const ids = new Set([...cartaoAll,...receitaIA].map(t=>t.id));
-  FIN_TRANSACTIONS.splice(0, FIN_TRANSACTIONS.length, ...FIN_TRANSACTIONS.filter(t=>!ids.has(t.id)));
-  FIN_IMPORT_HISTORY.splice(0, FIN_IMPORT_HISTORY.length);
-  renderFinanceiro();
-  try{ saveData(); }catch(e){}
-  const toast = document.createElement("div");
-  toast.style.cssText="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 22px;font-size:.82rem;font-weight:700;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:9999;backdrop-filter:blur(12px)";
-  toast.textContent=`🗑️ ${total} transação${total!==1?"ões":""} removida${total!==1?"s":""} — reimporte seus CSVs`;
-  document.body.appendChild(toast);
-  setTimeout(()=>toast.remove(),4000);
+  const ids=new Set(cartaoAll.map(t=>t.id));
+  FIN_TRANSACTIONS.splice(0,FIN_TRANSACTIONS.length,...FIN_TRANSACTIONS.filter(t=>!ids.has(t.id)));
+  FIN_IMPORT_HISTORY.splice(0,FIN_IMPORT_HISTORY.length,...FIN_IMPORT_HISTORY.filter(h=>!faturaBatchIds.has(h.id)));
+  renderFinanceiro(); try{saveData();}catch(e){}
+  _showLimparToast(`🗑️ ${cartaoAll.length} transação${cartaoAll.length!==1?"ões":""} de cartão removidas — reimporte o CSV da fatura`);
 }
+
+// Remove APENAS transações do extrato bancário (não toca no cartão)
+function limparExtratoBancario(){
+  const extratoBatchIds=new Set(FIN_IMPORT_HISTORY.filter(h=>h.tipo==="extrato").map(h=>h.id));
+  // Pega transações de extrato (por batchId) + legado sem batchId que não são cartão
+  const extratoTx=FIN_TRANSACTIONS.filter(t=>
+    (t.importBatchId && extratoBatchIds.has(t.importBatchId)) ||
+    (t.tipo!=="cartao" && t.origem==="ia" && !t.importBatchId)
+  );
+  if(!extratoTx.length){ alert("Nenhum dado de extrato bancário encontrado."); return; }
+  if(!confirm(
+    `⚠️ LIMPAR EXTRATO BANCÁRIO\n\n` +
+    `Serão removidas: ${extratoTx.length} transação${extratoTx.length!==1?"ões":""} do extrato\n` +
+    `As faturas do cartão NÃO serão afetadas.\n\n` +
+    `Após confirmar, reimporte o CSV do extrato.\n` +
+    `Esta ação não pode ser desfeita!`
+  )) return;
+  const ids=new Set(extratoTx.map(t=>t.id));
+  FIN_TRANSACTIONS.splice(0,FIN_TRANSACTIONS.length,...FIN_TRANSACTIONS.filter(t=>!ids.has(t.id)));
+  FIN_IMPORT_HISTORY.splice(0,FIN_IMPORT_HISTORY.length,...FIN_IMPORT_HISTORY.filter(h=>!extratoBatchIds.has(h.id)));
+  renderFinanceiro(); try{saveData();}catch(e){}
+  _showLimparToast(`🗑️ ${extratoTx.length} transação${extratoTx.length!==1?"ões":""} do extrato removidas — reimporte o CSV quando quiser`);
+}
+
+// Compatibilidade: mantém o nome antigo chamando a nova versão
+function limparTodasFaturas(){ limparFaturasCartao(); }
 
 // ── PIX via Crédito — detecção de duplicatas ─────────────────
 function _nomeSim(a, b){
