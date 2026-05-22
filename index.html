@@ -14421,6 +14421,7 @@ loadData();
 loadTheme();
 loadApiKey();
 loadUserProfile();
+loadRyukiFiles();
 loadPomoConfig();
 seedContasFixas();
 checkRecurrenceAndCreate();
@@ -14492,16 +14493,101 @@ let ryukiMessages = []; // [{role, html}] para restaurar visual
 let ryukiOpen = false;
 let ryukiTyping = false;
 const RYUKI_STORAGE_KEY = "central_acao_ryuki_chat";
+const RYUKI_FILES_KEY   = "central_acao_ryuki_files";
+
+// ── ARQUIVO PERSISTENTE ─────────────────────────────────
+// Guarda os últimos 5 arquivos enviados (texto + base64) para Ryuki sempre ter acesso
+let RYUKI_FILES = [];
+
+function saveRyukiFiles(){
+  try{
+    // Limita a 5 arquivos mais recentes; texto até 120KB; base64 até 600KB
+    const trimmed = RYUKI_FILES.slice(0,5).map(f=>{
+      const maxLen = f.tipo==="text" ? 120000 : 600000;
+      return f.content.length > maxLen
+        ? {...f, content: f.content.slice(0, maxLen), truncated: true}
+        : f;
+    });
+    localStorage.setItem(RYUKI_FILES_KEY, JSON.stringify(trimmed));
+  }catch(e){ console.warn("Ryuki files save error:", e); }
+}
+
+function loadRyukiFiles(){
+  try{
+    const raw = localStorage.getItem(RYUKI_FILES_KEY);
+    if(raw){ RYUKI_FILES = JSON.parse(raw); }
+  }catch(e){}
+  setTimeout(updateRyukiFilesBadge, 800); // após DOM pronto
+}
+
+function updateRyukiFilesBadge(){
+  const badge = document.getElementById("ryuki-files-badge");
+  if(!badge) return;
+  if(RYUKI_FILES.length === 0){ badge.style.display="none"; return; }
+  badge.style.display="inline";
+  badge.textContent = `📎 ${RYUKI_FILES.length} arquivo${RYUKI_FILES.length!==1?"s":""}`;
+}
+
+function showRyukiFilesList(){
+  const list = RYUKI_FILES.map(f=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:1rem">${f.tipo==="pdf"?"📕":f.tipo==="image"?"🖼️":"📊"}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.75rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(f.nome)}</div>
+        <div style="font-size:.62rem;color:var(--muted)">${f.size} · ${new Date(f.uploadedAt).toLocaleDateString("pt-BR")} ${f.truncated?"· ⚠️ truncado":""}</div>
+      </div>
+      <button onclick="deleteRyukiFile('${f.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.7rem;padding:2px 5px" title="Remover">✕</button>
+    </div>`).join("");
+
+  const modal = document.createElement("div");
+  modal.style.cssText="position:fixed;inset:0;z-index:10002;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);padding:20px";
+  modal.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;width:min(380px,95vw);max-height:70vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.5)">
+    <div style="font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:800;margin-bottom:4px">📎 Arquivos salvos</div>
+    <div style="font-size:.68rem;color:var(--muted);margin-bottom:12px">Ryuki tem acesso a esses arquivos em qualquer turno da conversa, mesmo após atualizar a página.</div>
+    <div style="overflow-y:auto;flex:1">${list}</div>
+    <button onclick="this.closest('[style*=fixed]').remove()" style="margin-top:14px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer">Fechar</button>
+  </div>`;
+  modal.addEventListener("click",e=>{ if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+function deleteRyukiFile(id){
+  RYUKI_FILES = RYUKI_FILES.filter(f=>f.id!==id);
+  saveRyukiFiles();
+  updateRyukiFilesBadge();
+  // Fecha e reabre o modal atualizado
+  document.querySelector("[style*='z-index: 10002'], [style*='z-index:10002']")?.remove();
+  if(RYUKI_FILES.length > 0) showRyukiFilesList();
+}
+
+// Dado o histórico com file_refs, reconstrói blocos reais para a API
+function resolveHistoryForApi(history){
+  return history.map(m=>{
+    if(typeof m.content === "string") return m;
+    const parts = m.content.map(p=>{
+      if(p.type !== "file_ref") return p;
+      const f = RYUKI_FILES.find(x=>x.id===p.fileId);
+      if(!f) return {type:"text", text:`[${p.nome||"arquivo"} — não disponível no cache]`};
+      if(p.originalType==="document")
+        return {type:"document", source:{type:"base64", media_type:f.mediaType||"application/pdf", data:f.content}};
+      if(p.originalType==="image")
+        return {type:"image", source:{type:"base64", media_type:f.mediaType||"image/png", data:f.content}};
+      // Texto
+      return {type:"text", text:`[ARQUIVO: ${f.nome}]\n\`\`\`\n${f.content}\n\`\`\``};
+    });
+    return {...m, content:parts};
+  });
+}
 
 function saveRyukiChat(){
   try{
-    // Filtra base64 do histórico para não lotar o storage
+    // Histórico já usa file_ref (sem base64 inline) — pode salvar direto
+    // Garante que nenhum base64 vazou (segurança extra)
     const safeHistory = ryukiHistory.map(m=>{
       if(typeof m.content === "string") return m;
-      // content é array (multi-part com arquivo)
       const safeParts = m.content.map(p=>{
-        if(p.type==="image"||p.type==="document")
-          return {type:"text", text:`[arquivo enviado — conteúdo não salvo]`};
+        if((p.type==="image"||p.type==="document") && p.source?.data)
+          return {type:"text", text:`[arquivo enviado]`}; // fallback se base64 escapou
         return p;
       });
       return {...m, content: safeParts};
@@ -14580,7 +14666,20 @@ function handleRyukiFile(input){
     } else {
       content = result; // texto puro
     }
-    ryukiAttachment = { name: file.name, size: fmtSize, type: isImage?"image": isPDF?"pdf":"text", content, mediaType, ext, icon };
+    // Persiste arquivo no RYUKI_FILES para acesso futuro (mesmo após refresh)
+    const fileId = "rfile_" + Date.now();
+    const fileEntry = {
+      id: fileId,
+      nome: file.name,
+      tipo: isImage?"image": isPDF?"pdf":"text",
+      ext, content, mediaType: mediaType||"text/plain",
+      size: fmtSize, uploadedAt: new Date().toISOString()
+    };
+    RYUKI_FILES.unshift(fileEntry);
+    if(RYUKI_FILES.length > 5) RYUKI_FILES = RYUKI_FILES.slice(0,5);
+    saveRyukiFiles();
+    updateRyukiFilesBadge();
+    ryukiAttachment = { name: file.name, size: fmtSize, type: isImage?"image": isPDF?"pdf":"text", content, mediaType, ext, icon, fileId };
     // Mostra pill
     const pill = document.getElementById("ryuki-attach-pill");
     if(pill){
@@ -14684,6 +14783,16 @@ function buildRyukiContext(){
   const diaAtual = new Date().getDate();
   const burnDiario = diaAtual>0 ? totalDesp/diaAtual : 0;
 
+  // Arquivos de texto (OFX/CSV/extrato) salvos — injetados direto no contexto
+  const textFiles = RYUKI_FILES.filter(f=>f.tipo==="text").slice(0,2);
+  const filesContext = textFiles.length > 0
+    ? "\n\nARQUIVOS DE EXTRATO/FATURA DISPONÍVEIS (consulte sempre que precisar de dados brutos):\n"
+      + textFiles.map(f=>{
+          const content = f.content.length > 35000 ? f.content.slice(0,35000)+"\n...[truncado]" : f.content;
+          return `\n--- ${f.nome} (enviado em ${f.uploadedAt.slice(0,10)}) ---\n${content}\n---`;
+        }).join("\n")
+    : "";
+
   return `╔═══ SNAPSHOT FINANCEIRO — ${FIN_MONTHS[finMonth]} ${finYear} ═══╗
 
 RESUMO EXECUTIVO:
@@ -14706,7 +14815,7 @@ ${recent||"  Sem transações no mês"}
 
 TOTAL DE TRANSAÇÕES: ${tx.length}
 DATA/HORA: ${new Date().toLocaleString("pt-BR")}
-╚═══════════════════════════════════════════════╝`;
+╚═══════════════════════════════════════════════╝${filesContext}`;
 }
 
 function ryukiMarkdown(text){
@@ -14988,7 +15097,7 @@ async function sendRyukiMessage(){
   ryukiTyping=true;
   if(sendBtn) sendBtn.disabled=true;
 
-  // Monta content do user (pode ser multi-part se tiver arquivo)
+  // Monta content REAL para API (base64 ou texto inline)
   function buildUserContent(msgText){
     if(!att) return msgText;
     const parts = [];
@@ -14997,12 +15106,21 @@ async function sendRyukiMessage(){
     } else if(att.type === "pdf"){
       parts.push({type:"document", source:{type:"base64", media_type:"application/pdf", data:att.content}});
     } else {
-      // Texto (CSV, TXT, JSON, etc)
       const truncated = att.content.length > 40000 ? att.content.slice(0,40000)+"\n...[truncado]" : att.content;
       parts.push({type:"text", text:`[ARQUIVO: ${att.name}]\n\`\`\`\n${truncated}\n\`\`\``});
     }
     parts.push({type:"text", text: msgText || "Analise este arquivo."});
     return parts;
+  }
+
+  // Monta content com file_ref para o HISTÓRICO (sem base64 — economia de storage)
+  function buildHistoryContent(msgText){
+    if(!att || !att.fileId) return msgText;
+    const originalType = att.type==="image" ? "image" : att.type==="pdf" ? "document" : "text";
+    return [
+      {type:"file_ref", fileId:att.fileId, originalType, nome:att.name},
+      {type:"text", text: msgText || "Analise este arquivo."}
+    ];
   }
 
   // Injeta contexto financeiro no primeiro par de mensagens de cada sessão
@@ -15011,9 +15129,11 @@ async function sendRyukiMessage(){
     ? buildUserContent(contextNote)
     : buildUserContent(text||"Analise este arquivo.");
 
-  const msgPayload = ryukiHistory.length===0
+  // Para a API: reconstrói file_refs do histórico como conteúdo real
+  const resolvedHistory = resolveHistoryForApi(ryukiHistory);
+  const msgPayload = resolvedHistory.length===0
     ? [{role:"user", content:userContent}]
-    : [...ryukiHistory, {role:"user", content:userContent}];
+    : [...resolvedHistory, {role:"user", content:userContent}];
 
   const typingEl = showRyukiTyping();
 
@@ -15043,14 +15163,9 @@ async function sendRyukiMessage(){
     // Autonomia total: aplica ações automaticamente sem modal de confirmação
     if(ryukiActs && ryukiActs.length) setTimeout(()=>applyRyukiActions(ryukiActs), 400);
 
-    // Atualiza histórico multi-turn (sempre texto simples para turnos seguintes)
+    // Atualiza histórico multi-turn com file_ref (sem base64 — reconstrói na API)
     const histUserText = ryukiHistory.length===0 ? contextNote : (text||"[arquivo enviado]");
-    if(ryukiHistory.length===0){
-      // Primeiro turno: guarda o content original (pode ser array se tinha arquivo)
-      ryukiHistory.push({role:"user", content:userContent});
-    } else {
-      ryukiHistory.push({role:"user", content:histUserText});
-    }
+    ryukiHistory.push({role:"user", content: buildHistoryContent(histUserText)});
     ryukiHistory.push({role:"assistant", content:full});
     // Mantém janela de 40 turnos (20 pares)
     if(ryukiHistory.length>40) ryukiHistory=ryukiHistory.slice(-40);
@@ -15147,7 +15262,10 @@ function clearRyukiHistory(){
   <div id="ryuki-header">
     <div class="ryuki-avatar">✦</div>
     <div style="flex:1">
-      <div style="font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:800;color:var(--text)">Ryuki</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:800;color:var(--text)">Ryuki</span>
+        <span id="ryuki-files-badge" style="display:none;font-size:.58rem;background:rgba(160,122,232,.2);color:var(--accent);border:1px solid rgba(160,122,232,.4);border-radius:99px;padding:1px 7px;font-weight:700;cursor:pointer" title="Arquivos salvos — Ryuki tem acesso mesmo após refresh" onclick="showRyukiFilesList()"></span>
+      </div>
       <div style="font-size:.65rem;color:var(--muted)"><span class="ryuki-status-dot"></span>IA Financeira · Online</div>
     </div>
     <button onclick="clearRyukiHistory()" title="Limpar conversa" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.7rem;padding:4px 8px;border-radius:6px;transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">↺ Limpar</button>
