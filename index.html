@@ -13567,13 +13567,128 @@ function toggleProjectTasks(projId){
 }
 
 function addTaskToProject(projId){
-  const name = prompt("Nome da nova tarefa:");
-  if(!name||!name.trim()) return;
-  TASKS.push({
-    id:nextId++, name:name.trim(),
-    urg:"medio", cat:"outros", icon:"📋",
-    date:"", project_id:projId
+  const proj = PROJECTS.find(p=>p.id===projId);
+  const projName = proj ? `${proj.icon||"📁"} ${proj.name}` : "Projeto";
+
+  // Remove modal anterior se existir
+  document.getElementById("_add-task-proj-modal")?.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "_add-task-proj-modal";
+  modal.style.cssText = "position:fixed;inset:0;z-index:10010;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);padding:20px";
+
+  modal.innerHTML = `
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;width:min(480px,96vw);max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.5)">
+    <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;margin-bottom:2px">Adicionar Tarefa</div>
+    <div style="font-size:.68rem;color:var(--muted);margin-bottom:14px">${projName}</div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:4px;margin-bottom:16px;background:var(--surface);border-radius:10px;padding:3px">
+      <button id="_atp-tab-nova" onclick="_atpTab('nova')" style="flex:1;padding:7px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s">✨ Nova tarefa</button>
+      <button id="_atp-tab-vincular" onclick="_atpTab('vincular')" style="flex:1;padding:7px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s">🔗 Vincular existente</button>
+    </div>
+
+    <!-- Painel Nova -->
+    <div id="_atp-nova" style="display:flex;flex-direction:column;gap:10px">
+      <input id="_atp-nome" placeholder="Nome da tarefa *" style="padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;outline:none" />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <select id="_atp-urg" style="padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.78rem">
+          <option value="baixo">🟢 Baixa</option>
+          <option value="medio" selected>🔵 Média</option>
+          <option value="alto">🟠 Alta</option>
+          <option value="urgente">🔴 Urgente</option>
+        </select>
+        <select id="_atp-cat" style="padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.78rem">
+          <option value="outros">📋 Outros</option>
+          <option value="vendas">💼 Vendas</option>
+          <option value="financeiro">💰 Financeiro</option>
+          <option value="operacional">⚙️ Operacional</option>
+          <option value="estrategico">🎯 Estratégico</option>
+          <option value="pessoal">🙋 Pessoal</option>
+        </select>
+      </div>
+      <input id="_atp-data" type="date" style="padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.78rem;outline:none" />
+      <button onclick="_atpCriarNova(${projId})" style="padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;margin-top:4px">✨ Criar e vincular</button>
+    </div>
+
+    <!-- Painel Vincular -->
+    <div id="_atp-vincular" style="display:none;flex-direction:column;gap:8px;flex:1;min-height:0">
+      <input id="_atp-busca" oninput="_atpFiltrar(${projId})" placeholder="Buscar tarefa..." style="padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.8rem;outline:none;flex-shrink:0" />
+      <div style="font-size:.62rem;color:var(--muted);flex-shrink:0">Clique para vincular ao projeto</div>
+      <div id="_atp-lista" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px;max-height:320px;padding-right:2px"></div>
+    </div>
+
+    <button onclick="document.getElementById('_add-task-proj-modal').remove()" style="margin-top:14px;padding:9px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;flex-shrink:0">Cancelar</button>
+  </div>`;
+
+  modal.addEventListener("click", e=>{ if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+  document.getElementById("_atp-nome")?.focus();
+  _atpFiltrar(projId);
+}
+
+function _atpTab(tab){
+  const isNova = tab==="nova";
+  document.getElementById("_atp-nova").style.display = isNova ? "flex" : "none";
+  document.getElementById("_atp-vincular").style.display = isNova ? "none" : "flex";
+  const btnNova = document.getElementById("_atp-tab-nova");
+  const btnVinc = document.getElementById("_atp-tab-vincular");
+  if(btnNova){ btnNova.style.background=isNova?"var(--accent)":"transparent"; btnNova.style.color=isNova?"#fff":"var(--muted)"; }
+  if(btnVinc){ btnVinc.style.background=isNova?"transparent":"var(--accent)"; btnVinc.style.color=isNova?"var(--muted)":"#fff"; }
+}
+
+function _atpCriarNova(projId){
+  const nome = (document.getElementById("_atp-nome")?.value||"").trim();
+  if(!nome){ document.getElementById("_atp-nome")?.focus(); return; }
+  const urg  = document.getElementById("_atp-urg")?.value||"medio";
+  const cat  = document.getElementById("_atp-cat")?.value||"outros";
+  const data = document.getElementById("_atp-data")?.value||"";
+  TASKS.push({ id:nextId++, name:nome, urg, cat, icon:"📋", date:data, project_id:projId });
+  document.getElementById("_add-task-proj-modal")?.remove();
+  renderAll();
+}
+
+function _atpFiltrar(projId){
+  const busca = (document.getElementById("_atp-busca")?.value||"").toLowerCase();
+  const lista = document.getElementById("_atp-lista");
+  if(!lista) return;
+
+  const tarefasDoProjeto = new Set(TASKS.filter(t=>t.project_id===projId).map(t=>t.id));
+  const urgLabel = {baixo:"🟢",medio:"🔵",alto:"🟠",urgente:"🔴"};
+
+  const disponiveis = TASKS.filter(t=>{
+    if(tarefasDoProjeto.has(t.id)) return false; // já nesse projeto
+    if(busca && !t.name.toLowerCase().includes(busca)) return false;
+    return true;
   });
+
+  if(!disponiveis.length){
+    lista.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted);font-size:.75rem">${busca?"Nenhuma tarefa encontrada.":"Todas as tarefas já estão neste projeto."}</div>`;
+    return;
+  }
+
+  lista.innerHTML = disponiveis.map(t=>{
+    const done = doneSet.has(t.id);
+    const projAtual = t.project_id ? PROJECTS.find(p=>p.id===t.project_id) : null;
+    const projBadge = projAtual
+      ? `<span style="font-size:.58rem;background:rgba(160,122,232,.15);color:var(--accent);border-radius:4px;padding:1px 5px;margin-left:4px">${projAtual.icon||"📁"} ${projAtual.name.slice(0,18)}</span>`
+      : `<span style="font-size:.58rem;color:var(--muted);margin-left:4px">avulsa</span>`;
+    return `<button onclick="_atpVincular(${projId},${t.id})" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;text-align:left;width:100%;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <span style="font-size:.82rem;opacity:${done?.4:1}">${urgLabel[t.urg]||"🔵"}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.78rem;font-weight:600;color:${done?"var(--muted)":"var(--text)"};${done?"text-decoration:line-through":""}; white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(t.name)}</div>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;margin-top:1px">${projBadge}${t.date?`<span style="font-size:.58rem;color:var(--muted);margin-left:4px">📅 ${t.date}</span>`:""}</div>
+      </div>
+      ${done?`<span style="font-size:.65rem;color:var(--green);flex-shrink:0">✓ Concluída</span>`:""}
+    </button>`;
+  }).join("");
+}
+
+function _atpVincular(projId, taskId){
+  const t = TASKS.find(x=>x.id===taskId);
+  if(!t) return;
+  t.project_id = projId;
+  document.getElementById("_add-task-proj-modal")?.remove();
   renderAll();
 }
 
