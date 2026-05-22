@@ -14421,11 +14421,25 @@ REGRA CRÍTICA:
 — Se não tiver dados suficientes, seja honesta sobre isso
 — Responda sempre em português brasileiro
 
+PROTOCOLO DE AÇÕES (use quando o usuário pedir para categorizar, corrigir ou revisar transações):
+Você pode propor alterações diretas no banco de dados. Ao final da resposta, inclua um bloco assim:
+<ryuki-actions>[
+  {"action":"edit_tx","id":123,"categoria":"🏡 Casa / Imóvel","tipo":"despesa_fixa","nome":"Aluguel"},
+  {"action":"create_rule","keyword":"Raimundo Alves","categoria":"🏡 Casa / Imóvel","tipo_tx":"despesa_fixa","tipo_match":"despesa"}
+]</ryuki-actions>
+
+Ações disponíveis:
+— edit_tx: edita uma transação (campos opcionais: categoria, tipo, nome). Use o ID do contexto.
+— create_rule: cria regra de aprendizado para futuros imports (keyword=texto que aparece no nome).
+
+Tipos válidos: receita | despesa_extra | despesa_fixa | investimento | cartao
+Só proponha ações quando o usuário pedir explicitamente. Explique cada mudança antes do bloco.
+
 FORMATO:
 — Use listas com — (travessão) ao invés de *
 — Negrito com **palavra** para destaques
 — Seja concisa mas profunda — cada resposta deve gerar reflexão
-— Máximo de 350 palavras por resposta (seja direta)`;
+— Máximo de 400 palavras por resposta (seja direta)`;
 
 let ryukiHistory = [];
 let ryukiOpen = false;
@@ -14555,9 +14569,9 @@ function buildRyukiContext(){
   const prevDesp=prevTx.filter(t=>t.tipo!=="receita"&&t.tipo!=="investimento").reduce((s,t)=>s+Math.abs(t.valor),0);
   const varPct = prevDesp>0 ? ((totalDesp-prevDesp)/prevDesp*100).toFixed(1) : null;
 
-  // Últimas 25 transações
-  const recent=[...tx].sort((a,b)=>(b.data||"").localeCompare(a.data||"")).slice(0,25)
-    .map(t=>`  ${t.data} | ${(t.nome||"").slice(0,28).padEnd(28)} | ${fmtV(t.valor)} | ${t.categoria||""}${t.futuro?" [PENDENTE]":""}`)
+  // Todas as transações do mês com IDs (para permitir edição via ações)
+  const recent=[...tx].sort((a,b)=>(b.data||"").localeCompare(a.data||""))
+    .map(t=>`  ID:${t.id} | ${t.data} | ${(t.nome||"").slice(0,26).padEnd(26)} | ${fmtV(t.valor)} | ${t.tipo} | ${t.categoria||""}${t.futuro?" [PENDENTE]":""}`)
     .join("\n");
 
   // Cartões
@@ -14586,7 +14600,7 @@ ${topCats||"  Sem dados"}
 CARTÕES CADASTRADOS:
 ${cartoes}
 
-ÚLTIMAS ${Math.min(tx.length,25)} TRANSAÇÕES:
+TRANSAÇÕES DO MÊS (${tx.length} total) — use os IDs para propor edições:
 ${recent||"  Sem transações no mês"}
 
 TOTAL DE TRANSAÇÕES: ${tx.length}
@@ -14595,7 +14609,9 @@ DATA/HORA: ${new Date().toLocaleString("pt-BR")}
 }
 
 function ryukiMarkdown(text){
-  return text
+  // Remove bloco de ações antes de renderizar
+  const clean = text.replace(/<ryuki-actions>[\s\S]*?<\/ryuki-actions>/g,"").trim();
+  return clean
     .replace(/\*\*(.*?)\*\*/g,"<b>$1</b>")
     .replace(/^— (.+)$/gm,"<li>$1</li>")
     .replace(/(<li>.*<\/li>\n?)+/gs, m=>`<ul>${m}</ul>`)
@@ -14603,6 +14619,95 @@ function ryukiMarkdown(text){
     .replace(/\n/g,"<br>")
     .replace(/^(.)/,"<p>$1")
     .replace(/(.)$/,"$1</p>");
+}
+
+// ── PARSE E APLICAÇÃO DE AÇÕES DA RYUKI ──────────
+function parseRyukiActions(text){
+  const m = text.match(/<ryuki-actions>([\s\S]*?)<\/ryuki-actions>/);
+  if(!m) return null;
+  try{ return JSON.parse(m[1].trim()); }catch(e){ return null; }
+}
+
+function showRyukiActionsModal(actions){
+  document.getElementById("_ryuki-actions-modal")?.remove();
+  const tipoLabel={receita:"💰 Receita",despesa_extra:"💸 Despesa variável",despesa_fixa:"📌 Despesa fixa",investimento:"📈 Investimento",cartao:"💳 Cartão"};
+  const rows = actions.map((a,i)=>{
+    if(a.action==="edit_tx"){
+      const tx = FIN_TRANSACTIONS.find(t=>t.id===a.id);
+      const txName = tx ? tx.nome : `ID ${a.id}`;
+      const changes = [
+        a.categoria ? `categoria → <b>${a.categoria}</b>` : "",
+        a.tipo      ? `tipo → <b>${tipoLabel[a.tipo]||a.tipo}</b>` : "",
+        a.nome      ? `nome → <b>${a.nome}</b>` : ""
+      ].filter(Boolean).join(" · ");
+      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
+        <input type="checkbox" data-idx="${i}" checked style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:2px">✏️ ${(txName).slice(0,40)}</div>
+          <div style="font-size:.68rem;color:var(--muted)">${changes}</div>
+        </div>
+      </label>`;
+    } else if(a.action==="create_rule"){
+      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
+        <input type="checkbox" data-idx="${i}" checked style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.75rem;font-weight:700;color:var(--accent);margin-bottom:2px">🧠 Regra: "<code>${a.keyword}</code>" → ${a.categoria}</div>
+          <div style="font-size:.68rem;color:var(--muted)">${tipoLabel[a.tipo_tx]||""} ${a.tipo_match?`· apenas ${a.tipo_match}`:""}</div>
+        </div>
+      </label>`;
+    }
+    return "";
+  }).join("");
+
+  const m2 = document.createElement("div");
+  m2.id="_ryuki-actions-modal";
+  m2.style.cssText="position:fixed;inset:0;z-index:10001;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);padding:20px";
+  m2.innerHTML=`
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:min(460px,95vw);max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.5)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span style="font-size:1.3rem">✦</span>
+      <h3 style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;margin:0">Ryuki propõe ${actions.length} alteração${actions.length!==1?"ões":""}</h3>
+    </div>
+    <p style="font-size:.72rem;color:var(--muted);margin:0 0 14px">Desmarque as que não quiser aplicar.</p>
+    <div style="overflow-y:auto;flex:1;margin-bottom:16px">${rows}</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('_ryuki-actions-modal').remove()" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer">Cancelar</button>
+      <button onclick="applyRyukiActions(${JSON.stringify(actions).replace(/"/g,"&quot;")})" style="flex:2;padding:10px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">✅ Aplicar selecionadas</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m2);
+  m2.addEventListener("click",e=>{ if(e.target===m2) m2.remove(); });
+}
+
+function applyRyukiActions(actions){
+  const modal = document.getElementById("_ryuki-actions-modal");
+  const checked = new Set([...modal.querySelectorAll("input[type=checkbox]:checked")].map(el=>parseInt(el.dataset.idx)));
+  modal.remove();
+  let editCount=0, ruleCount=0;
+  actions.forEach((a,i)=>{
+    if(!checked.has(i)) return;
+    if(a.action==="edit_tx"){
+      const tx=FIN_TRANSACTIONS.find(t=>t.id===a.id);
+      if(!tx) return;
+      if(a.categoria) tx.categoria=a.categoria;
+      if(a.tipo)      tx.tipo=a.tipo;
+      if(a.nome)      tx.nome=a.nome;
+      tx.editado=true;
+      editCount++;
+    } else if(a.action==="create_rule"){
+      if(!a.keyword||!a.categoria) return;
+      const existe=FIN_CAT_RULES.find(r=>r.keyword.toLowerCase()===a.keyword.toLowerCase());
+      if(existe){ existe.categoria=a.categoria; if(a.tipo_tx) existe.tipo_tx=a.tipo_tx; }
+      else FIN_CAT_RULES.unshift({id:"rule_"+Date.now()+"_"+i,keyword:a.keyword,categoria:a.categoria,tipo_tx:a.tipo_tx||null,tipo_match:a.tipo_match||null,label:a.keyword,vezes:0,criadoEm:new Date().toISOString()});
+      ruleCount++;
+    }
+  });
+  renderFinanceiro();
+  try{saveData();}catch(e){}
+  const parts=[];
+  if(editCount) parts.push(`${editCount} transação${editCount!==1?"ões":""} atualizada${editCount!==1?"s":""}`);
+  if(ruleCount) parts.push(`${ruleCount} regra${ruleCount!==1?"s":""} criada${ruleCount!==1?"s":""}`);
+  appendRyukiMsg("ryuki",`<span style="color:var(--green)">✅ ${parts.join(" · ")}</span>`);
 }
 
 function appendRyukiMsg(role, html, streaming=false){
@@ -14634,8 +14739,8 @@ async function ryukiProxyStream(messages, onChunk){
     method:"POST",
     headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
     body:JSON.stringify({
-      model:"claude-sonnet-4-5",
-      max_tokens:1024,
+      model:"claude-opus-4-5",
+      max_tokens:4096,
       stream:true,
       system:RYUKI_SYSTEM,
       messages
@@ -14735,6 +14840,9 @@ async function sendRyukiMessage(){
     });
     typingEl?.remove();
     if(!bubble) appendRyukiMsg("ryuki", ryukiMarkdown(full));
+    // Verifica se há ações propostas
+    const ryukiActs = parseRyukiActions(full);
+    if(ryukiActs && ryukiActs.length) setTimeout(()=>showRyukiActionsModal(ryukiActs), 400);
 
     // Atualiza histórico multi-turn (sempre texto simples para turnos seguintes)
     const histUserText = ryukiHistory.length===0 ? contextNote : (text||"[arquivo enviado]");
