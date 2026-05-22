@@ -13653,43 +13653,63 @@ function _atpFiltrar(projId){
   const lista = document.getElementById("_atp-lista");
   if(!lista) return;
 
-  const tarefasDoProjeto = new Set(TASKS.filter(t=>t.project_id===projId).map(t=>t.id));
+  // Normaliza projId para número (vem como string do HTML onclick)
+  const pid = typeof projId === "string" ? parseInt(projId, 10) : projId;
+
+  const tarefasDoProjeto = new Set(
+    TASKS.filter(t => String(t.project_id) === String(pid)).map(t=>t.id)
+  );
   const urgLabel = {baixo:"🟢",medio:"🔵",alto:"🟠",urgente:"🔴"};
 
   const disponiveis = TASKS.filter(t=>{
-    if(tarefasDoProjeto.has(t.id)) return false; // já nesse projeto
+    if(tarefasDoProjeto.has(t.id)) return false;
     if(busca && !t.name.toLowerCase().includes(busca)) return false;
     return true;
   });
 
+  lista.innerHTML = "";
+
   if(!disponiveis.length){
-    lista.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted);font-size:.75rem">${busca?"Nenhuma tarefa encontrada.":"Todas as tarefas já estão neste projeto."}</div>`;
+    const msg = document.createElement("div");
+    msg.style.cssText = "text-align:center;padding:20px;color:var(--muted);font-size:.75rem";
+    msg.textContent = busca ? "Nenhuma tarefa encontrada." : "Todas as tarefas já estão neste projeto.";
+    lista.appendChild(msg);
     return;
   }
 
-  lista.innerHTML = disponiveis.map(t=>{
+  disponiveis.forEach(t=>{
     const done = doneSet.has(t.id);
-    const projAtual = t.project_id ? PROJECTS.find(p=>p.id===t.project_id) : null;
-    const projBadge = projAtual
+    const projAtual = t.project_id != null ? PROJECTS.find(p=>p.id===t.project_id) : null;
+
+    const btn = document.createElement("button");
+    btn.style.cssText = "display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;text-align:left;width:100%;transition:border-color .15s";
+    btn.onmouseover = ()=> btn.style.borderColor = "var(--accent)";
+    btn.onmouseout  = ()=> btn.style.borderColor = "var(--border)";
+
+    const badge = projAtual
       ? `<span style="font-size:.58rem;background:rgba(160,122,232,.15);color:var(--accent);border-radius:4px;padding:1px 5px;margin-left:4px">${projAtual.icon||"📁"} ${projAtual.name.slice(0,18)}</span>`
       : `<span style="font-size:.58rem;color:var(--muted);margin-left:4px">avulsa</span>`;
-    return `<button onclick="_atpVincular(${projId},${t.id})" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;text-align:left;width:100%;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-      <span style="font-size:.82rem;opacity:${done?.4:1}">${urgLabel[t.urg]||"🔵"}</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:.78rem;font-weight:600;color:${done?"var(--muted)":"var(--text)"};${done?"text-decoration:line-through":""}; white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(t.name)}</div>
-        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;margin-top:1px">${projBadge}${t.date?`<span style="font-size:.58rem;color:var(--muted);margin-left:4px">📅 ${t.date}</span>`:""}</div>
-      </div>
-      ${done?`<span style="font-size:.65rem;color:var(--green);flex-shrink:0">✓ Concluída</span>`:""}
-    </button>`;
-  }).join("");
-}
+    const dateBadge = t.date ? `<span style="font-size:.58rem;color:var(--muted);margin-left:4px">📅 ${t.date}</span>` : "";
 
-function _atpVincular(projId, taskId){
-  const t = TASKS.find(x=>x.id===taskId);
-  if(!t) return;
-  t.project_id = projId;
-  document.getElementById("_add-task-proj-modal")?.remove();
-  renderAll();
+    btn.innerHTML = `
+      <span style="font-size:.85rem;opacity:${done?".4":"1"}">${urgLabel[t.urg]||"🔵"}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.78rem;font-weight:600;color:${done?"var(--muted)":"var(--text)"};${done?"text-decoration:line-through":""};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(t.name)}</div>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;margin-top:1px">${badge}${dateBadge}</div>
+      </div>
+      ${done?`<span style="font-size:.65rem;color:var(--green);flex-shrink:0">✓</span>`:""}`;
+
+    // Listener direto no elemento — sem string onclick
+    btn.addEventListener("click", ()=>{
+      const task = TASKS.find(x=>x.id===t.id);
+      if(!task) return;
+      task.project_id = pid;
+      document.getElementById("_add-task-proj-modal")?.remove();
+      renderAll();
+    });
+
+    lista.appendChild(btn);
+  });
 }
 
 function updateProjectSelects(){
