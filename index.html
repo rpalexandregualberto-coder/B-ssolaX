@@ -8303,15 +8303,24 @@ const FIN_CAT_COLORS = {
   "✈️ Viagens":"#38bdf8",
 };
 
-// KPI Metas semanais (baseado na sua análise real)
-const FIN_KPIS = [
-  {label:"🍔 iFood",    meta:200,  cat:"🍔 iFood",   period:"semana"},
-  {label:"🥖 Padaria",  meta:120,  cat:"🥖 Padaria",  period:"semana"},
-  {label:"🍽️ Restaurante",meta:350, cat:"🍽️ Restaurante",period:"semana"},
-  {label:"🛒 Mercado",  meta:650,  cat:"🛒 Mercado",  period:"semana"},
-  {label:"🚗 Uber",     meta:120,  cat:"🚗 Uber",     period:"semana"},
-  {label:"🎯 Lazer",    meta:150,  cat:"🎯 Lazer",    period:"semana"},
+// KPI Metas semanais — array dinâmico, persistido no localStorage
+const FIN_KPIS_DEFAULT = [
+  {id:"kpi_ifood",     label:"🍔 iFood",       meta:200, cat:"🍔 iFood",        period:"semana"},
+  {id:"kpi_padaria",   label:"🥖 Padaria",     meta:120, cat:"🥖 Padaria",      period:"semana"},
+  {id:"kpi_rest",      label:"🍽️ Restaurante", meta:350, cat:"🍽️ Restaurante",  period:"semana"},
+  {id:"kpi_mercado",   label:"🛒 Mercado",     meta:650, cat:"🛒 Mercado",      period:"semana"},
+  {id:"kpi_uber",      label:"🚗 Uber",        meta:120, cat:"🚗 Uber",         period:"semana"},
+  {id:"kpi_lazer",     label:"🎯 Lazer",       meta:150, cat:"🎯 Lazer",        period:"semana"},
 ];
+let FIN_KPIS = [...FIN_KPIS_DEFAULT];
+
+function deleteKpi(id){
+  const i = FIN_KPIS.findIndex(k=>k.id===id);
+  if(i===-1) return;
+  FIN_KPIS.splice(i,1);
+  renderFinanceiro();
+  try{saveData();}catch(e){}
+}
 
 function fmtBRL(val){
   return "R$ "+Math.abs(val).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -8823,7 +8832,8 @@ function renderFinanceiro(){
       const pct=Math.min(Math.round(spent/metaMes*100),100);
       const ok=spent<=metaMes;
       const color=ok?"var(--green)":"var(--red)";
-      return `<div style="background:var(--card);border:1px solid ${ok?"var(--green-border)":"var(--red-border)"};border-radius:10px;padding:9px 11px;text-align:center">
+      return `<div style="background:var(--card);border:1px solid ${ok?"var(--green-border)":"var(--red-border)"};border-radius:10px;padding:9px 11px;text-align:center;position:relative">
+        <button onclick="deleteKpi('${k.id}')" title="Remover KPI" style="position:absolute;top:4px;right:5px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:.65rem;line-height:1;padding:2px 4px;opacity:.5" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">✕</button>
         <div style="font-size:.72rem;font-weight:700;margin-bottom:4px">${k.label}</div>
         <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:900;color:${color}">${fmtBRL(spent)}</div>
         <div style="font-size:.6rem;color:var(--muted);margin:3px 0">meta: ${fmtBRL(metaMes)}/mês</div>
@@ -11874,6 +11884,7 @@ function saveData(){
       FIN_META_GASTOS,
       FIN_IMPORT_HISTORY,
       FIN_CAT_RULES,
+      FIN_KPIS,
       HABITS,
       HABITS_DONE,
       nextHabId,
@@ -11968,6 +11979,7 @@ function loadData(){
     if(data.FIN_META_GASTOS!=null) FIN_META_GASTOS = data.FIN_META_GASTOS;
     if(data.FIN_IMPORT_HISTORY)  FIN_IMPORT_HISTORY.splice(0,FIN_IMPORT_HISTORY.length,...data.FIN_IMPORT_HISTORY);
     if(data.FIN_CAT_RULES)       FIN_CAT_RULES.splice(0,FIN_CAT_RULES.length,...data.FIN_CAT_RULES);
+    if(data.FIN_KPIS && data.FIN_KPIS.length) FIN_KPIS.splice(0,FIN_KPIS.length,...data.FIN_KPIS);
     if(data.HABITS)              HABITS.splice(0,HABITS.length,...data.HABITS);
     if(data.HABITS_DONE)         Object.assign(HABITS_DONE, data.HABITS_DONE);
     if(data.nextHabId!=null)     nextHabId = data.nextHabId;
@@ -14464,6 +14476,7 @@ Ações disponíveis:
 — create_rule: cria regra de aprendizado para futuros imports (keyword=texto que aparece no nome).
 — add_fixa: adiciona uma conta fixa ao registro mensal (campos: nome, valor, dia, cat). cat pode ser: moradia, energia, agua, internet, telefone, alimentacao, transporte, saude, financiamento, seguro, outros.
 — delete_tx: remove uma transação do histórico (campo: id).
+— add_kpi: cria um novo KPI de controle de gastos (campos: label, cat, meta, period). label=nome exibido com emoji, cat=categoria exata das transações, meta=valor em R$ por semana, period="semana"). Exemplo: {"action":"add_kpi","label":"🌿 THC","cat":"🌿 THC","meta":300,"period":"semana"}
 
 Tipos válidos: receita | despesa_extra | despesa_fixa | investimento | cartao
 Só proponha ações quando o usuário pedir explicitamente. Explique cada mudança antes do bloco.
@@ -14751,6 +14764,14 @@ function showRyukiActionsModal(actions){
           <div style="font-size:.68rem;color:var(--muted)">Vence dia ${a.dia||"?"} · categoria: ${a.cat||"outros"}</div>
         </div>
       </label>`;
+    } else if(a.action==="add_kpi"){
+      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
+        <input type="checkbox" data-idx="${i}" checked style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.75rem;font-weight:700;color:var(--accent);margin-bottom:2px">📊 Novo KPI: ${escHtml(a.label||"?")} — meta R$ ${Number(a.meta||0).toFixed(0)}/semana</div>
+          <div style="font-size:.68rem;color:var(--muted)">Categoria: ${escHtml(a.cat||"?")} · período: ${a.period||"semana"}</div>
+        </div>
+      </label>`;
     } else if(a.action==="delete_tx"){
       const tx = FIN_TRANSACTIONS.find(t=>t.id===a.id);
       const txName = tx ? tx.nome : `ID ${a.id}`;
@@ -14789,7 +14810,7 @@ function applyRyukiActions(actions){
   const modal = document.getElementById("_ryuki-actions-modal");
   const checked = new Set([...modal.querySelectorAll("input[type=checkbox]:checked")].map(el=>parseInt(el.dataset.idx)));
   modal.remove();
-  let editCount=0, ruleCount=0, fixaCount=0, deleteCount=0;
+  let editCount=0, ruleCount=0, fixaCount=0, deleteCount=0, kpiCount=0;
   actions.forEach((a,i)=>{
     if(!checked.has(i)) return;
     if(a.action==="edit_tx"){
@@ -14826,6 +14847,19 @@ function applyRyukiActions(actions){
     } else if(a.action==="delete_tx"){
       const idx = FIN_TRANSACTIONS.findIndex(t=>t.id===a.id);
       if(idx!==-1){ FIN_TRANSACTIONS.splice(idx,1); deleteCount++; }
+    } else if(a.action==="add_kpi"){
+      if(!a.label||!a.cat||!a.meta) return;
+      const jaExiste = FIN_KPIS.some(k=>k.cat.toLowerCase()===a.cat.toLowerCase());
+      if(!jaExiste){
+        FIN_KPIS.push({
+          id: "kpi_"+Date.now()+"_"+i,
+          label: a.label,
+          cat: a.cat,
+          meta: Number(a.meta)||100,
+          period: a.period||"semana"
+        });
+        kpiCount++;
+      }
     }
   });
   renderFinanceiro();
@@ -14835,6 +14869,7 @@ function applyRyukiActions(actions){
   if(ruleCount)  parts.push(`${ruleCount} regra${ruleCount!==1?"s":""} criada${ruleCount!==1?"s":""}`);
   if(fixaCount)  parts.push(`${fixaCount} fixa${fixaCount!==1?"s":""} registrada${fixaCount!==1?"s":""}`);
   if(deleteCount) parts.push(`${deleteCount} transação${deleteCount!==1?"ões":""} removida${deleteCount!==1?"s":""}`);
+  if(kpiCount)   parts.push(`${kpiCount} KPI${kpiCount!==1?"s":""} criado${kpiCount!==1?"s":""}`);
   appendRyukiMsg("ryuki",`<span style="color:var(--green)">✅ ${parts.join(" · ")}</span>`);
 }
 
