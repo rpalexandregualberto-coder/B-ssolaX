@@ -14618,28 +14618,42 @@ REGRA CRÍTICA:
 — Se não tiver dados suficientes, seja honesta sobre isso
 — Responda sempre em português brasileiro
 
-PROTOCOLO DE AÇÕES (use quando o usuário pedir para categorizar, corrigir ou revisar transações):
-Você pode propor alterações diretas no banco de dados. Ao final da resposta, inclua um bloco assim:
+PROTOCOLO DE AÇÕES — AUTONOMIA TOTAL:
+Você tem autonomia completa para criar, editar e corrigir transações no banco financeiro sem pedir permissão.
+Sempre que identificar transações faltando, valores errados ou divergências: aplique as correções IMEDIATAMENTE via bloco de ações.
+Não espere o usuário pedir — se você viu o problema, corrija. Explique o que fez após aplicar.
+
+Ao final de qualquer resposta com correções, inclua o bloco:
 <ryuki-actions>[
-  {"action":"edit_tx","id":123,"categoria":"🏡 Casa / Imóvel","tipo":"despesa_fixa","nome":"Aluguel"},
-  {"action":"create_rule","keyword":"Raimundo Alves","categoria":"🏡 Casa / Imóvel","tipo_tx":"despesa_fixa","tipo_match":"despesa"}
+  {"action":"add_tx","nome":"C&A Roupas","valor":595.94,"tipo":"cartao","categoria":"🛍️ Compras","data":"2026-04-02","cartao_nome":"Nubank"},
+  {"action":"edit_tx","id":325,"valor":2331.00,"categoria":"✈️ Viagens"},
+  {"action":"create_rule","keyword":"Raimundo Alves","categoria":"🌿 THC","tipo_tx":"cartao","tipo_match":"despesa"}
 ]</ryuki-actions>
 
-Ações disponíveis:
-— edit_tx: edita uma transação (campos opcionais: categoria, tipo, nome). Use o ID do contexto.
-— create_rule: cria regra de aprendizado para futuros imports (keyword=texto que aparece no nome).
-— add_fixa: adiciona uma conta fixa ao registro mensal (campos: nome, valor, dia, cat). cat pode ser: moradia, energia, agua, internet, telefone, alimentacao, transporte, saude, financiamento, seguro, outros.
-— delete_tx: remove uma transação do histórico (campo: id).
-— add_kpi: cria um novo KPI de controle de gastos (campos: label, cat, meta, period). label=nome exibido com emoji, cat=categoria exata das transações, meta=valor em R$ por semana, period="semana"). Exemplo: {"action":"add_kpi","label":"🌿 THC","cat":"🌿 THC","meta":300,"period":"semana"}
+AÇÕES DISPONÍVEIS:
+— add_tx: CRIA uma nova transação. Campos obrigatórios: nome (string), valor (número), tipo, data ("YYYY-MM-DD"). Opcionais: categoria, cartao_nome (nome do cartão para tipo cartao). Exemplo: {"action":"add_tx","nome":"Zig Morocha Club","valor":400.90,"tipo":"cartao","categoria":"🎯 Lazer","data":"2026-04-04","cartao_nome":"Nubank"}
+— edit_tx: EDITA transação existente (campos: categoria, tipo, nome, valor). Use o ID do contexto.
+— create_rule: CRIA regra de aprendizado para futuros imports (keyword=texto que aparece no nome).
+— add_fixa: ADICIONA conta fixa ao registro mensal (campos: nome, valor, dia, cat). cat: moradia, energia, agua, internet, telefone, alimentacao, transporte, saude, financiamento, seguro, outros.
+— delete_tx: REMOVE transação (campo: id). Este é o único que pede confirmação visual.
+— add_kpi: CRIA KPI de controle (campos: label, meta, cat, period). Exemplo: {"action":"add_kpi","label":"🌿 THC","cat":"🌿 THC","meta":300,"period":"semana"}
 
-Tipos válidos: receita | despesa_extra | despesa_fixa | investimento | cartao
-Só proponha ações quando o usuário pedir explicitamente. Explique cada mudança antes do bloco.
+Tipos de transação válidos: receita | despesa_extra | despesa_fixa | investimento | cartao
+
+PROTOCOLO DE CONCILIAÇÃO PDF × SISTEMA:
+Quando analisar uma fatura (PDF ou CSV) comparando com os dados do sistema:
+1. Liste TODAS as transações do documento
+2. Cruze com o sistema (tolerância: nome aproximado + valor exato)
+3. Transações no documento mas AUSENTES no sistema → add_tx automático (zero tolerância)
+4. Valores divergentes → edit_tx para corrigir ao valor real do documento
+5. Emita relatório de conciliação ao final: o que foi adicionado, corrigido e o impacto nos totais
+Regra de ouro: nunca deixe uma transação do documento de faturamento sem entrada no sistema.
 
 FORMATO:
 — Use listas com — (travessão) ao invés de *
 — Negrito com **palavra** para destaques
 — Seja concisa mas profunda — cada resposta deve gerar reflexão
-— Máximo de 400 palavras por resposta (seja direta)`;
+— Para análises de fatura: pode ultrapassar 400 palavras se necessário para não omitir nenhuma transação`;
 
 let ryukiHistory = [];
 let ryukiMessages = []; // [{role, html}] para restaurar visual
@@ -15072,16 +15086,47 @@ function _ryukiModalRows_unused(actions){
 
 // ── AUTONOMIA TOTAL: Ryuki aplica ações sem modal ──────────
 function applyRyukiActions(actions){
-  let editCount=0, ruleCount=0, fixaCount=0, kpiCount=0;
+  let editCount=0, ruleCount=0, fixaCount=0, kpiCount=0, addTxCount=0;
   const toDelete=[];
 
   actions.forEach((a,i)=>{
-    if(a.action==="edit_tx"){
+    if(a.action==="add_tx"){
+      // Ryuki cria nova transação no histórico financeiro
+      if(!a.nome||!a.valor) return;
+      const newId = nextFinId++;
+      const tx = {
+        id: newId,
+        nome: a.nome,
+        valor: Number(a.valor)||0,
+        tipo: a.tipo||"cartao",
+        categoria: a.categoria||"🎲 Gasto Aleatório",
+        data: a.data||new Date().toISOString().split("T")[0],
+        origem: "ryuki"
+      };
+      if(tx.tipo==="cartao"){
+        // Tenta encontrar cartão por nome, fallback pro primeiro
+        if(a.cartao_nome){
+          const c=FIN_CARTOES.find(x=>(x.nome||"").toLowerCase().includes((a.cartao_nome||"").toLowerCase()));
+          if(c) tx.cartao_id=c.id;
+        }
+        if(!tx.cartao_id && FIN_CARTOES.length>0) tx.cartao_id=FIN_CARTOES[0].id;
+      } else {
+        if(a.conta_nome){
+          const c=FIN_CONTAS.find(x=>(x.nome||"").toLowerCase().includes((a.conta_nome||"").toLowerCase()));
+          if(c) tx.conta_id=c.id;
+        }
+        if(!tx.conta_id && FIN_CONTAS.length>0) tx.conta_id=FIN_CONTAS[0].id;
+      }
+      FIN_TRANSACTIONS.push(tx);
+      addTxCount++;
+
+    } else if(a.action==="edit_tx"){
       const tx=FIN_TRANSACTIONS.find(t=>t.id===a.id);
       if(!tx) return;
       if(a.categoria) tx.categoria=a.categoria;
       if(a.tipo)      tx.tipo=a.tipo;
       if(a.nome)      tx.nome=a.nome;
+      if(a.valor!=null) tx.valor=Number(a.valor);  // permite corrigir valor
       tx.editado=true;
       editCount++;
     } else if(a.action==="create_rule"){
@@ -15120,15 +15165,16 @@ function applyRyukiActions(actions){
     }
   });
 
-  const total = editCount+ruleCount+fixaCount+kpiCount;
+  const total = editCount+ruleCount+fixaCount+kpiCount+addTxCount;
   if(total > 0){
     renderFinanceiro();
     try{saveData();}catch(e){}
     const parts=[];
-    if(editCount) parts.push(`${editCount} transação${editCount!==1?"ões":""} atualizada${editCount!==1?"s":""}`);
-    if(ruleCount) parts.push(`${ruleCount} regra${ruleCount!==1?"s":""} criada${ruleCount!==1?"s":""}`);
-    if(fixaCount) parts.push(`${fixaCount} conta${fixaCount!==1?"s":""} fixa${fixaCount!==1?"s":""} adicionada${fixaCount!==1?"s":""} ao painel`);
-    if(kpiCount)  parts.push(`${kpiCount} KPI${kpiCount!==1?"s":""} criado${kpiCount!==1?"s":""}`);
+    if(addTxCount) parts.push(`${addTxCount} transação${addTxCount!==1?"ões":""} criada${addTxCount!==1?"s":""}`);
+    if(editCount)  parts.push(`${editCount} transação${editCount!==1?"ões":""} atualizada${editCount!==1?"s":""}`);
+    if(ruleCount)  parts.push(`${ruleCount} regra${ruleCount!==1?"s":""} criada${ruleCount!==1?"s":""}`);
+    if(fixaCount)  parts.push(`${fixaCount} conta${fixaCount!==1?"s":""} fixa${fixaCount!==1?"s":""} adicionada${fixaCount!==1?"s":""} ao painel`);
+    if(kpiCount)   parts.push(`${kpiCount} KPI${kpiCount!==1?"s":""} criado${kpiCount!==1?"s":""}`);
     appendRyukiMsg("ryuki",`<span style="color:var(--green)">✅ Aplicado automaticamente: ${parts.join(" · ")}</span>`);
   }
 
