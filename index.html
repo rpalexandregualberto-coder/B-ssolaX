@@ -2500,28 +2500,6 @@ textarea.form-input{border-radius:16px;resize:vertical}
 .fin-fluxo-bar{border-radius:4px 4px 0 0;width:100%;min-height:2px;transition:height .5s ease}
 .fin-fluxo-label{font-size:.58rem;color:var(--muted);font-weight:600}
 
-/* ── COMISSÕES (consórcio) ── */
-.fin-comiss-card{
-  background:var(--card);
-  backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);
-  border:1px solid var(--green-border);border-radius:22px;
-  padding:18px 24px;margin-bottom:14px;
-  box-shadow:var(--card-shadow);
-}
-.fin-comiss-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.fin-comiss-title{font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--green)}
-.fin-comiss-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.fin-comiss-item{padding:14px;border-radius:14px;background:var(--surface);border:1px solid var(--border);text-align:center}
-.fin-comiss-val{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:900}
-.fin-comiss-label{font-size:.62rem;color:var(--muted);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.07em}
-.fin-comiss-add-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
-.fin-comiss-list{margin-top:10px;display:flex;flex-direction:column;gap:7px;max-height:200px;overflow-y:auto}
-.fin-comiss-tx{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:11px;background:var(--surface);border:1px solid var(--border)}
-.fin-comiss-tx-nome{flex:1;font-size:.78rem;font-weight:600;color:var(--text)}
-.fin-comiss-tx-val{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:var(--green)}
-.fin-comiss-tx-status{font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:6px}
-.fin-comiss-tx-status.recebida{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
-.fin-comiss-tx-status.pendente{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border)}
 
 /* Upload de fatura/extrato */
 .fin-upload-card{
@@ -3936,11 +3914,6 @@ textarea.form-input{border-radius:16px;resize:vertical}
             <div style="color:var(--muted);font-size:.72rem;padding:8px">Sem dados</div>
           </div>
         </div>
-        <!-- Comissões -->
-        <div class="fdash-card">
-          <div class="fdash-title">💼 Comissões do Mês</div>
-          <div id="fd-comiss-content"></div>
-        </div>
       </div>
 
       <!-- Fixas por categoria (barras horizontais) -->
@@ -4099,42 +4072,6 @@ textarea.form-input{border-radius:16px;resize:vertical}
         </div>
       </div>
 
-      <!-- COMISSÕES — Consórcio -->
-      <div class="fin-comiss-card">
-        <div class="fin-comiss-head">
-          <div class="fin-comiss-title">Comissões — Consórcio</div>
-          <button class="btn btn-primary" style="padding:4px 12px;font-size:.65rem" onclick="toggleComissForm()">+ Lançar</button>
-        </div>
-        <div class="fin-comiss-grid">
-          <div class="fin-comiss-item">
-            <div class="fin-comiss-val" style="color:var(--green)" id="fc-comiss-recebida">R$ 0</div>
-            <div class="fin-comiss-label">Recebidas</div>
-          </div>
-          <div class="fin-comiss-item">
-            <div class="fin-comiss-val" style="color:var(--orange)" id="fc-comiss-pendente">R$ 0</div>
-            <div class="fin-comiss-label">Pendentes</div>
-          </div>
-          <div class="fin-comiss-item">
-            <div class="fin-comiss-val" style="color:var(--blue)" id="fc-comiss-total">R$ 0</div>
-            <div class="fin-comiss-label">Total Mês</div>
-          </div>
-        </div>
-        <!-- Form escondido -->
-        <div id="fin-comiss-form" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-          <div class="fin-comiss-add-row">
-            <input class="fin-input" id="fc-comiss-nome" placeholder="Ex: Venda cota imóvel 60k..." style="flex:2;min-width:140px">
-            <input class="fin-input" id="fc-comiss-val-input" type="number" placeholder="R$" style="width:90px">
-            <select class="fin-input" id="fc-comiss-status" style="width:120px">
-              <option value="recebida">Recebida</option>
-              <option value="pendente">Pendente</option>
-            </select>
-            <button class="btn btn-primary" onclick="addComissao()" style="font-size:.7rem">Salvar</button>
-          </div>
-        </div>
-        <div class="fin-comiss-list" id="fin-comiss-list">
-          <div style="text-align:center;padding:14px;color:var(--muted);font-size:.72rem">Nenhuma comissão lançada este mês</div>
-        </div>
-      </div>
 
     </div>
 
@@ -8528,30 +8465,6 @@ function renderFinDashboard(){
     }).join("");
   }
 
-  // ── Comissões ──
-  const comissEl = document.getElementById("fd-comiss-content");
-  if(comissEl){
-    const comMes = FIN_COMISSOES.filter(c=>c.mes===mk);
-    const rec = comMes.filter(c=>c.status==="recebida").reduce((s,c)=>s+c.valor,0);
-    const pend = comMes.filter(c=>c.status==="pendente").reduce((s,c)=>s+c.valor,0);
-    comissEl.innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <div style="background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px;padding:10px;text-align:center">
-          <div style="font-family:'Outfit',sans-serif;font-size:.98rem;font-weight:900;color:var(--green)">${fmtBRL(rec)}</div>
-          <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-top:3px">Recebidas</div>
-        </div>
-        <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:10px;text-align:center">
-          <div style="font-family:'Outfit',sans-serif;font-size:.98rem;font-weight:900;color:var(--orange)">${fmtBRL(pend)}</div>
-          <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;font-weight:700;margin-top:3px">Pendentes</div>
-        </div>
-      </div>
-      ${comMes.length ? comMes.slice(-4).reverse().map(c=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:.72rem">
-          <span style="color:var(--dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(c.nome)}</span>
-          <span style="font-weight:700;color:${c.status==="recebida"?"var(--green)":"var(--orange)"};margin-left:8px">${fmtBRL(c.valor)}</span>
-        </div>`).join("") : '<div style="font-size:.72rem;color:var(--muted);text-align:center;padding:8px">Nenhuma comissão</div>'}`;
-  }
-
   // ── Fixas por categoria ──
   const fixasCatEl = document.getElementById("fd-fixas-cat");
   if(fixasCatEl){
@@ -9156,9 +9069,6 @@ function renderFinanceiro(){
   // ── Alertas de Vencimento ──
   renderAlertasVencimento();
 
-  // ── Comissões ──
-  renderComissoes();
-
   // ── Meta Financeira + Top Categoria ──
   renderMetaFinanceira();
   renderTopCategoria();
@@ -9574,7 +9484,7 @@ function renderAlertasVencimento(){
   }).join("");
 }
 
-// ── COMISSÕES ────────────────────────────────────
+// ── COMISSÕES (mantido para compatibilidade com dados salvos, UI removida) ──
 let FIN_COMISSOES = [];
 
 // ── CONTEÚDO ─────────────────────────────────────
@@ -9591,67 +9501,7 @@ let nextHabId = 1;
 // HABITS_DONE: { "habId_YYYY-MM-DD": true }
 let HABITS_DONE = {};
 
-function toggleComissForm(){
-  const f = document.getElementById("fin-comiss-form");
-  if(f) f.style.display = f.style.display==="none" ? "block" : "none";
-}
-
-function addComissao(){
-  const nome  = document.getElementById("fc-comiss-nome")?.value.trim();
-  const val   = parseFloat(document.getElementById("fc-comiss-val-input")?.value)||0;
-  const status= document.getElementById("fc-comiss-status")?.value||"pendente";
-  if(!nome||!val) return;
-
-  FIN_COMISSOES.push({
-    id: Date.now(), nome, valor:val, status,
-    mes: monthKey(finYear, finMonth),
-    data: new Date().toISOString().split("T")[0]
-  });
-
-  document.getElementById("fc-comiss-nome").value="";
-  document.getElementById("fc-comiss-val-input").value="";
-  saveData();
-  renderFinanceiro();
-}
-
-function deleteComissao(id){
-  FIN_COMISSOES = FIN_COMISSOES.filter(c=>c.id!==id);
-  saveData(); renderFinanceiro();
-}
-
-function toggleComissaoStatus(id){
-  const c = FIN_COMISSOES.find(c=>c.id===id);
-  if(c) c.status = c.status==="recebida" ? "pendente" : "recebida";
-  saveData(); renderFinanceiro();
-}
-
-function renderComissoes(){
-  const mk = monthKey(finYear, finMonth);
-  const mes = FIN_COMISSOES.filter(c=>c.mes===mk);
-
-  const recebidas = mes.filter(c=>c.status==="recebida").reduce((s,c)=>s+c.valor,0);
-  const pendentes = mes.filter(c=>c.status==="pendente").reduce((s,c)=>s+c.valor,0);
-  const total = recebidas + pendentes;
-
-  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-  setEl("fc-comiss-recebida", fmtBRL(recebidas));
-  setEl("fc-comiss-pendente", fmtBRL(pendentes));
-  setEl("fc-comiss-total",    fmtBRL(total));
-
-  const listEl = document.getElementById("fin-comiss-list");
-  if(!listEl) return;
-  if(!mes.length){
-    listEl.innerHTML=`<div style="text-align:center;padding:14px;color:var(--muted);font-size:.72rem">Nenhuma comissão lançada este mês</div>`;
-    return;
-  }
-  listEl.innerHTML = mes.sort((a,b)=>b.id-a.id).map(c=>`
-    <div class="fin-comiss-tx">
-      <div class="fin-comiss-tx-nome">${c.nome}</div>
-      <div class="fin-comiss-tx-val">${fmtBRL(c.valor)}</div>
-      <div class="fin-comiss-tx-status ${c.status}" onclick="toggleComissaoStatus(${c.id})" style="cursor:pointer">${c.status==="recebida"?"Recebida":"Pendente"}</div>
-      <button onclick="deleteComissao(${c.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.7rem;padding:0 4px">✕</button>
-    </div>`).join("");
-}
+// Comissões: funções removidas (UI suprimida — use entradas tipo "receita" para registrar pro-labore)
 
 // ── Parser direto para CSV Nubank (date,title,amount) ─────────
 function _parseNubankCSV(text, tipo, dataDefault){
