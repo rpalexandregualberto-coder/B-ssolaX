@@ -1,6 +1,12 @@
 # Backups de dados (localStorage exports)
 backups/
 
+# Backups locais do código (não vão pro Git — ficam só no computador)
+archive/v3-historico/index-backup-*.html
+archive/v3-historico/central-v3_pre-*.html
+archive/v3-historico/central-v3_rename-*.html
+archive/v3-historico/index-.html
+
 # Arquivos de sistema
 Thumbs.db
 .DS_Store
