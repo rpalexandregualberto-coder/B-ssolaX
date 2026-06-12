@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BússolaX — A central inteligente do seu dia</title>
+<title>SimWork — A central inteligente do seu dia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -4734,7 +4734,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div style="font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.08em">Sobre</div>
       </div>
       <div style="font-size:.78rem;color:var(--muted);line-height:1.6">
-        <strong style="color:var(--text)">BússolaX</strong> — A central inteligente do seu dia. Produtividade pessoal com IA. Tudo roda no seu navegador. Sem servidor, sem rastreamento.
+        <strong style="color:var(--text)">SimWork</strong> — A central inteligente do seu dia. Produtividade pessoal com IA. Seus dados ficam no seu navegador e, com conta, sincronizados na nuvem com segurança.
       </div>
     </div>
   </div>
@@ -5228,7 +5228,7 @@ function applyUserProfileToUI(){
     const ini = name.split(/\s+/).slice(0,2).map(s=>(s[0]||"")).join("").toUpperCase() || "U";
     av.textContent = ini;
   }
-  document.title = USER_PROFILE.name ? `BússolaX — ${USER_PROFILE.name}` : "BússolaX";
+  document.title = USER_PROFILE.name ? `SimWork — ${USER_PROFILE.name}` : "SimWork";
 }
 
 function showOnboardingModal(){
@@ -5239,7 +5239,7 @@ function showOnboardingModal(){
   overlay.innerHTML = `
     <div style="background:var(--bg);border:1px solid var(--accent);border-radius:16px;max-width:480px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.5)">
       <div style="font-size:2.5rem;text-align:center;margin-bottom:8px">👋</div>
-      <h2 style="font-family:'Outfit',sans-serif;font-size:1.4rem;text-align:center;margin:0 0 8px;color:var(--accent);font-weight:800">Bem-vindo ao BússolaX! 🧭</h2>
+      <h2 style="font-family:'Outfit',sans-serif;font-size:1.4rem;text-align:center;margin:0 0 8px;color:var(--accent);font-weight:800">Bem-vindo ao SimWork! 🚀</h2>
       <p style="text-align:center;color:var(--muted);font-size:.85rem;margin:0 0 22px">Vamos personalizar tudo pra você — leva 30 segundos.</p>
       <div style="display:flex;flex-direction:column;gap:12px">
         <div>
@@ -11751,8 +11751,13 @@ function saveData(){
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     showSaveIndicator();
+    try{ if(typeof scheduleCloudSave==="function") scheduleCloudSave(); }catch(_){}
   } catch(e){
     console.warn("Erro ao salvar:", e);
+    if(!window._saveFailWarned){
+      window._saveFailWarned = true;
+      alert("⚠️ ATENÇÃO: não foi possível salvar seus dados (armazenamento do navegador cheio ou bloqueado).\n\nExporte um backup agora em Configurações → Exportar Backup e libere espaço antes de continuar.");
+    }
   }
 }
 
@@ -14123,6 +14128,7 @@ function saveNotasLivres(){
   const ta = document.getElementById("notas-livres-textarea");
   if(!ta) return;
   try{ localStorage.setItem("central_acao_notas_livres", ta.value); }catch(e){}
+  try{ if(typeof scheduleCloudSave==="function") scheduleCloudSave(); }catch(_){}
   // Feedback visual de "salvo"
   const status = document.getElementById("notas-livres-status");
   if(status){
@@ -15447,6 +15453,177 @@ function clearRyukiHistory(){
     </div>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════════════════
+     SIMWORK CLOUD — Supabase (login + sincronização)
+     ══════════════════════════════════════════════════════ -->
+<style>
+#sw-auth-overlay{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(22,17,42,0.55);backdrop-filter:blur(8px);padding:20px}
+.sw-auth-card{width:min(380px,94vw);background:var(--bg);border:1px solid var(--border-light);border-radius:22px;padding:28px 26px;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+.sw-auth-card h2{font-family:'Outfit',sans-serif;font-weight:800;font-size:1.5rem;color:var(--accent);text-align:center;margin:0 0 4px}
+.sw-auth-sub{font-size:.8rem;color:var(--muted);text-align:center;margin:0 0 18px;line-height:1.5}
+.sw-auth-card input{width:100%;padding:11px 13px;margin-bottom:10px;border-radius:12px;border:1px solid var(--border-light);background:var(--surface);color:var(--text);font-size:.9rem;outline:none}
+.sw-auth-btn{width:100%;padding:11px;border:none;border-radius:12px;font-weight:700;font-size:.9rem;cursor:pointer;margin-bottom:8px;font-family:inherit}
+.sw-auth-btn.primary{background:var(--accent);color:#fff}
+.sw-auth-btn.ghost{background:transparent;color:var(--muted);border:1px dashed var(--border-light);font-weight:500;font-size:.78rem}
+#sw-auth-msg{font-size:.78rem;margin-bottom:10px;min-height:16px;text-align:center;line-height:1.45}
+#sw-cloud-chip{position:fixed;left:14px;bottom:14px;z-index:9997;font-size:.72rem;padding:7px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--border-light);color:var(--muted);cursor:pointer;backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+</style>
+
+<div id="sw-auth-overlay" style="display:none">
+  <div class="sw-auth-card">
+    <h2>SimWork ☁️</h2>
+    <p class="sw-auth-sub">Crie sua conta (ou entre) pra ter seus dados salvos na nuvem e acessar de qualquer dispositivo.</p>
+    <input id="sw-auth-email" type="email" placeholder="Seu e-mail" autocomplete="email">
+    <input id="sw-auth-pass" type="password" placeholder="Senha (mínimo 6 caracteres)" autocomplete="current-password">
+    <div id="sw-auth-msg"></div>
+    <button class="sw-auth-btn primary" onclick="swAuthLogin()">Entrar</button>
+    <button class="sw-auth-btn primary" style="opacity:.85" onclick="swAuthSignup()">Criar conta</button>
+    <button class="sw-auth-btn ghost" onclick="swAuthSkip()">Continuar sem conta (só neste dispositivo)</button>
+  </div>
+</div>
+<div id="sw-cloud-chip" style="display:none" onclick="swChipClick()"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SW_SUPABASE_URL = "https://rssrqsbxpusoglvkxqbp.supabase.co";
+const SW_SUPABASE_KEY = "sb_publishable_wgSwTyma32xvsWJ5LKu0WQ_hQAQVW0b";
+const SW_SITE = location.origin.startsWith("http") ? location.origin : "https://b-ssola-x.vercel.app";
+const SW_CLOUD_KEYS = ["central_acao_v3","central_acao_notas_livres","central_acao_pomo","central_acao_recurrence_last","central_acao_theme","central_acao_user","central_acao_username","bsx_pinned_goal"];
+let swUser = null, _swTimer = null;
+
+const swClient = window.supabase ? window.supabase.createClient(SW_SUPABASE_URL, SW_SUPABASE_KEY) : null;
+
+function swCollectState(){
+  const s = {};
+  SW_CLOUD_KEYS.forEach(k=>{ const v = localStorage.getItem(k); if(v!==null) s[k] = v; });
+  return s;
+}
+function swSavedAt(str){
+  try{ return JSON.parse(str||"{}").savedAt || null; }catch(_){ return null; }
+}
+function scheduleCloudSave(){
+  if(!swClient || !swUser) return;
+  clearTimeout(_swTimer);
+  _swTimer = setTimeout(swCloudSaveNow, 2500);
+}
+async function swCloudSaveNow(){
+  if(!swClient || !swUser) return;
+  try{
+    const { error } = await swClient.from("user_data").upsert({ user_id: swUser.id, data: swCollectState(), updated_at: new Date().toISOString() });
+    if(error) throw error;
+    swSetChip("☁️ Sincronizado · " + (swUser.email||""));
+  }catch(e){
+    console.warn("SimWork cloud save:", e);
+    swSetChip("⚠️ Erro ao sincronizar — suas alterações estão salvas neste dispositivo");
+  }
+}
+async function swCloudPull(){
+  const { data: rows, error } = await swClient.from("user_data").select("data").eq("user_id", swUser.id);
+  if(error) throw error;
+  if(!rows || !rows.length) return "empty";
+  const state = rows[0].data || {};
+  const cloudAt = swSavedAt(state.central_acao_v3);
+  const localAt = swSavedAt(localStorage.getItem("central_acao_v3"));
+  if(cloudAt && (!localAt || new Date(cloudAt) > new Date(localAt))){
+    SW_CLOUD_KEYS.forEach(k=>{ if(state[k]!==undefined){ try{ localStorage.setItem(k, state[k]); }catch(_){} } });
+    location.reload();
+    return "pulled";
+  }
+  return "local-newer";
+}
+async function swAfterLogin(){
+  try{
+    const r = await swCloudPull();
+    if(r==="pulled") return;
+    await swCloudSaveNow();
+  }catch(e){
+    console.warn("SimWork sync:", e);
+    swSetChip("⚠️ Erro de sincronização — dados locais preservados");
+  }
+}
+function swAuthMsg(txt, ok){
+  const el = document.getElementById("sw-auth-msg");
+  if(el){ el.textContent = txt; el.style.color = ok ? "var(--green)" : "var(--red)"; }
+}
+function swAuthErrPt(msg){
+  const m = (msg||"").toLowerCase();
+  if(m.includes("invalid login")) return "E-mail ou senha incorretos.";
+  if(m.includes("already registered")) return "Esse e-mail já tem conta — use o botão Entrar.";
+  if(m.includes("at least 6")) return "A senha precisa de pelo menos 6 caracteres.";
+  if(m.includes("valid email") || m.includes("invalid format")) return "Digite um e-mail válido.";
+  if(m.includes("not confirmed")) return "Confirme seu e-mail pelo link que enviamos antes de entrar.";
+  if(m.includes("rate limit") || m.includes("security purposes") || m.includes("seconds")) return "Muitas tentativas — aguarde um minuto e tente de novo.";
+  return "Erro: " + (msg || "desconhecido");
+}
+async function swAuthLogin(){
+  if(!swClient) return;
+  const email = (document.getElementById("sw-auth-email")?.value||"").trim();
+  const pass  = document.getElementById("sw-auth-pass")?.value||"";
+  if(!email || !pass){ swAuthMsg("Preencha e-mail e senha."); return; }
+  swAuthMsg("Entrando...", true);
+  const { data, error } = await swClient.auth.signInWithPassword({ email, password: pass });
+  if(error){ swAuthMsg(swAuthErrPt(error.message)); return; }
+  swUser = data.user;
+  try{ localStorage.removeItem("simwork_skip_login"); }catch(_){}
+  swHideOverlay();
+  swSetChip("☁️ Sincronizando...");
+  await swAfterLogin();
+}
+async function swAuthSignup(){
+  if(!swClient) return;
+  const email = (document.getElementById("sw-auth-email")?.value||"").trim();
+  const pass  = document.getElementById("sw-auth-pass")?.value||"";
+  if(!email || !pass){ swAuthMsg("Preencha e-mail e senha."); return; }
+  swAuthMsg("Criando conta...", true);
+  const { data, error } = await swClient.auth.signUp({ email, password: pass, options: { emailRedirectTo: SW_SITE } });
+  if(error){ swAuthMsg(swAuthErrPt(error.message)); return; }
+  if(data.session){
+    swUser = data.user;
+    try{ localStorage.removeItem("simwork_skip_login"); }catch(_){}
+    swHideOverlay();
+    swSetChip("☁️ Sincronizando...");
+    await swAfterLogin();
+  } else {
+    swAuthMsg("✉️ Conta criada! Abra o link de confirmação que enviamos pro seu e-mail e depois volte aqui e clique em Entrar.", true);
+  }
+}
+function swAuthSkip(){
+  try{ localStorage.setItem("simwork_skip_login","1"); }catch(_){}
+  swHideOverlay();
+  swSetChip("📴 Modo local — clique pra usar a nuvem");
+}
+async function swLogout(){
+  if(!confirm("Sair da conta? Seus dados continuam salvos na nuvem e neste dispositivo.")) return;
+  try{ await swClient.auth.signOut(); }catch(_){}
+  swUser = null;
+  location.reload();
+}
+function swChipClick(){
+  if(swUser){ swLogout(); }
+  else { try{ localStorage.removeItem("simwork_skip_login"); }catch(_){} swShowOverlay(); }
+}
+function swShowOverlay(){ const o=document.getElementById("sw-auth-overlay"); if(o) o.style.display="flex"; }
+function swHideOverlay(){ const o=document.getElementById("sw-auth-overlay"); if(o) o.style.display="none"; }
+function swSetChip(txt){ const c=document.getElementById("sw-cloud-chip"); if(c){ c.style.display="block"; c.textContent=txt; } }
+
+(async function swInit(){
+  if(!swClient){ console.warn("SimWork: supabase-js não carregou (sem internet?) — seguindo em modo local."); return; }
+  try{
+    const { data:{ session } } = await swClient.auth.getSession();
+    if(session){
+      swUser = session.user;
+      swSetChip("☁️ Sincronizando...");
+      await swAfterLogin();
+    } else if(!localStorage.getItem("simwork_skip_login")){
+      swShowOverlay();
+      swSetChip("📴 Modo local");
+    } else {
+      swSetChip("📴 Modo local — clique pra usar a nuvem");
+    }
+  }catch(e){ console.warn("SimWork init:", e); }
+})();
+</script>
 
 </body>
 </html>

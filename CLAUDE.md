@@ -95,8 +95,20 @@ Glassmorphism + Mesh Gradient (redesign 2026-05):
 3. **PWA + mobile-first** (instalar como app)
 4. **Visual refinado tipo "Investment Dashboard"** — ✅ CONCLUÍDO (Glassmorphism + Mesh Gradients + Bento Grid + dual mode light/dark)
 
+## SimWork Cloud (Supabase) — adicionado 2026-06-12
+
+O app foi renomeado de **BússolaX** para **SimWork** (parte da suíte SimFlow/Catálogo/CRM/SimWork) e ganhou login + sincronização na nuvem:
+
+- **Módulo:** bloco `<style>` + HTML + `<script>` no final do `index.html` (antes de `</body>`), tudo prefixado com `sw`/`SW_`
+- **Supabase:** projeto `rssrqsbxpusoglvkxqbp` (org SimWork), tabela `public.user_data` (user_id uuid PK, data jsonb, updated_at) com RLS — cada usuário só lê/escreve a própria linha
+- **Modelo de dados:** blob único — `data` guarda um espelho das chaves do localStorage (`SW_CLOUD_KEYS`); a API key da Anthropic **não** é sincronizada (fica só no dispositivo)
+- **Sync:** `saveData()` chama `scheduleCloudSave()` (debounce 2,5s) → upsert. No boot/login, `swCloudPull()` compara `savedAt` e puxa da nuvem se for mais novo (last-write-wins) + `location.reload()`
+- **Auth:** e-mail+senha (`swAuthLogin`/`swAuthSignup`), modo local opcional (`simwork_skip_login`), chip de status fixo no canto inferior esquerdo
+- **Dev local neste PC (sem Node):** `tools/dev-server.ps1` serve em http://localhost:8765 (config no `.claude/launch.json`, nome `simwork`)
+
 ## Pontos de atenção pro usuário
 
-- Não tem auth — qualquer um com a URL acessa um app limpo
-- Dados são por dispositivo/navegador (localStorage)
+- Dados são por dispositivo/navegador (localStorage) + nuvem quando logado
 - API key ficar no cliente é OK pra BYOK pessoal, **NÃO pra comercialização** (precisaria backend)
+- `PROXY_SECRET` hardcoded no frontend é fraco — próximo passo: validar o JWT do Supabase no proxy
+- Confirmação de e-mail do Supabase: configurar a Site URL pra `https://b-ssola-x.vercel.app` no painel (Auth → URL Configuration)

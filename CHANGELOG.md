@@ -51,3 +51,14 @@ Protótipos iniciais em HTML cru e JSX
 ### Corrigido (acumuladas hoje)
 - Notas Livres: font-size 16px (evita zoom iOS), atributos touch melhorados, indicador "💾 Salvo" visual
 - Removidas todas as 13 referências hardcoded a "Alexandre"
+
+## v3.32 - 2026-06-12
+
+### SimWork Cloud (Supabase)
+- Renomeado de BussolaX para **SimWork** (titulo, rodape, onboarding, document.title)
+- **Login com e-mail+senha** (Supabase Auth) + opcao "Continuar sem conta"
+- **Sincronizacao na nuvem**: dados espelhados na tabela user_data (RLS por usuario), debounce 2,5s apos cada saveData
+- **Migracao automatica**: primeiro login sobe os dados do localStorage; em outros dispositivos, baixa da nuvem (last-write-wins por savedAt)
+- **Chip de status** no canto inferior esquerdo (sincronizado / modo local / erro)
+- **Alerta de falha de salvamento**: aviso ao usuario quando localStorage falha (antes era silencioso)
+- Mini servidor de dev em PowerShell (tools/dev-server.ps1) pra maquinas sem Node
