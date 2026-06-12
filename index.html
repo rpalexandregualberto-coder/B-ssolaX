@@ -10273,21 +10273,8 @@ function deleteReviewTx(id){
 
 // Seed default despesas fixas from your real structure
 function seedContasFixas(){
-  const haNovoFormato = Object.keys(FIN_FIXAS_BY_MONTH).length>0;
-  const haAntigoFormato = FIN_CONTAS_FIXAS.length>0;
-  if(haNovoFormato || haAntigoFormato) return;
-  const defaults=[
-    {nome:"Fatura Nubank",valor:0,dia:5},
-    {nome:"Aluguel / Davi Emmanuel",valor:0,dia:5},
-    {nome:"Salário Camila Das Neves",valor:0,dia:5},
-    {nome:"Internet TERANET",valor:149.90,dia:18},
-    {nome:"Fatura Cartão Daycoval",valor:0,dia:15},
-    {nome:"Parcela Consórcio EVOY",valor:485.26,dia:18},
-    {nome:"Fatura Riachuelo (MIDWAY)",valor:0,dia:18},
-    {nome:"Escola de Aimê",valor:0,dia:10},
-  ];
-  const fixas = getFixas();
-  defaults.forEach(d=>fixas.push({id:nextFixaId++,...d,paga:false}));
+  // Usuários novos começam sem contas fixas — cada um cadastra as suas.
+  // (Antes havia contas pessoais do dono hardcoded aqui, vazando pra todo usuário novo.)
 }
 
 // Match extrato transactions to fixed bills and auto-fill values
@@ -15532,8 +15519,24 @@ async function swCloudPull(){
   }
   return "local-newer";
 }
+const SW_OWNER_KEY = "simwork_data_owner";
 async function swAfterLogin(){
   try{
+    const owner = localStorage.getItem(SW_OWNER_KEY);
+    if(owner && owner !== swUser.id){
+      // Os dados locais pertencem a OUTRA conta (troca de usuário no mesmo aparelho).
+      // Nunca subir pro novo usuário: limpa o local e puxa só o que é dele da nuvem.
+      SW_CLOUD_KEYS.forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} });
+      try{ localStorage.setItem(SW_OWNER_KEY, swUser.id); }catch(_){}
+      const { data: rows } = await swClient.from("user_data").select("data").eq("user_id", swUser.id);
+      if(rows && rows.length){
+        const st = rows[0].data || {};
+        SW_CLOUD_KEYS.forEach(k=>{ if(st[k]!==undefined){ try{ localStorage.setItem(k, st[k]); }catch(_){} } });
+      }
+      location.reload();
+      return;
+    }
+    try{ localStorage.setItem(SW_OWNER_KEY, swUser.id); }catch(_){}
     const r = await swCloudPull();
     if(r==="pulled") return;
     await swCloudSaveNow();
