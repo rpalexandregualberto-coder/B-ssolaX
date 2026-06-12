@@ -1,5 +1,24 @@
 export const config = { runtime: 'edge' };
 
+const SUPABASE_URL = "https://rssrqsbxpusoglvkxqbp.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wgSwTyma32xvsWJ5LKu0WQ_hQAQVW0b";
+
+// Valida o token de sessão do Supabase — só usuários logados no SimWork usam a IA
+async function validateUser(req) {
+  const auth = req.headers.get("authorization") || "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (!token) return null;
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: SUPABASE_PUBLISHABLE_KEY, authorization: `Bearer ${token}` }
+    });
+    if (!resp.ok) return null;
+    return await resp.json();
+  } catch (_) {
+    return null;
+  }
+}
+
 export default async function handler(req) {
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: { message: "Method Not Allowed" } }), {
@@ -7,10 +26,10 @@ export default async function handler(req) {
     });
   }
 
-  const proxySecret = process.env.PROXY_SECRET;
-  if (!proxySecret || req.headers.get("x-proxy-secret") !== proxySecret) {
-    return new Response(JSON.stringify({ error: { message: "Acesso não autorizado." } }), {
-      status: 403, headers: { "Content-Type": "application/json" }
+  const user = await validateUser(req);
+  if (!user) {
+    return new Response(JSON.stringify({ error: { message: "Entre na sua conta SimWork para usar a IA." } }), {
+      status: 401, headers: { "Content-Type": "application/json" }
     });
   }
 

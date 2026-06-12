@@ -5093,7 +5093,7 @@ function showNotaModal(id){
       </div>
       
       <label style="display:block;font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px">Título</label>
-      <input id="nm-title" type="text" value="${(n.title||'').replace(/"/g,'&quot;')}" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-size:1rem;font-family:inherit;outline:none;font-weight:700;margin-bottom:14px">
+      <input id="nm-title" type="text" value="${escHtml(n.title||'')}" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-size:1rem;font-family:inherit;outline:none;font-weight:700;margin-bottom:14px">
       
       <label style="display:block;font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:6px">Cor</label>
       <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
@@ -5104,24 +5104,24 @@ function showNotaModal(id){
       <textarea id="nm-content" placeholder="Anote aqui suas ideias, pautas, pensamentos..." style="width:100%;min-height:160px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-size:.92rem;font-family:inherit;outline:none;resize:vertical;line-height:1.5;margin-bottom:14px">${n.content||''}</textarea>
       
       <label style="display:block;font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px">Tags (separadas por vírgula)</label>
-      <input id="nm-tags" type="text" value="${(n.tags||[]).join(', ')}" placeholder="Ex: ideia, allure, urgente" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-size:.85rem;font-family:inherit;outline:none;margin-bottom:14px">
+      <input id="nm-tags" type="text" value="${escHtml((n.tags||[]).join(', '))}" placeholder="Ex: ideia, allure, urgente" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-size:.85rem;font-family:inherit;outline:none;margin-bottom:14px">
       
       <label style="display:block;font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:6px">🔗 Vínculos</label>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:14px">
         ${linkedNotas.length===0 && linkedTasks.length===0 ? '<div style="font-size:.74rem;color:var(--muted);text-align:center;padding:6px">Sem vínculos ainda. Adicione abaixo.</div>' : ''}
         ${linkedNotas.map(ln=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:.78rem">
-          <span>${notaCor(ln.color).emoji}</span><span style="flex:1">📝 ${ln.title}</span>
+          <span>${notaCor(ln.color).emoji}</span><span style="flex:1">📝 ${escHtml(ln.title)}</span>
           <button onclick="unlinkFromNota(${id},'note',${ln.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem">✕</button>
         </div>`).join('')}
         ${linkedTasks.map(lt=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:.78rem">
-          <span>✅</span><span style="flex:1">${lt.icon||''} ${lt.name}</span>
+          <span>✅</span><span style="flex:1">${escHtml(lt.icon||'')} ${escHtml(lt.name)}</span>
           <button onclick="unlinkFromNota(${id},'task',${lt.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem">✕</button>
         </div>`).join('')}
         <div style="display:flex;gap:6px;margin-top:8px">
-          ${otherNotas.length ? `<select id="nm-link-note" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px;font-size:.75rem;color:var(--text)"><option value="">+ Vincular nota...</option>${otherNotas.map(o=>`<option value="${o.id}">${notaCor(o.color).emoji} ${o.title}</option>`).join('')}</select><button onclick="linkFromModal(${id},'note')" class="btn btn-primary" style="padding:6px 10px;font-size:.7rem">+</button>` : ''}
+          ${otherNotas.length ? `<select id="nm-link-note" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px;font-size:.75rem;color:var(--text)"><option value="">+ Vincular nota...</option>${otherNotas.map(o=>`<option value="${o.id}">${notaCor(o.color).emoji} ${escHtml(o.title)}</option>`).join('')}</select><button onclick="linkFromModal(${id},'note')" class="btn btn-primary" style="padding:6px 10px;font-size:.7rem">+</button>` : ''}
         </div>
         <div style="display:flex;gap:6px;margin-top:6px">
-          <select id="nm-link-task" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px;font-size:.75rem;color:var(--text)"><option value="">+ Vincular tarefa...</option>${TASKS.filter(t=>!doneSet.has(t.id)).map(t=>`<option value="${t.id}">${t.icon||''} ${t.name}</option>`).join('')}</select>
+          <select id="nm-link-task" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px;font-size:.75rem;color:var(--text)"><option value="">+ Vincular tarefa...</option>${TASKS.filter(t=>!doneSet.has(t.id)).map(t=>`<option value="${t.id}">${escHtml(t.icon||'')} ${escHtml(t.name)}</option>`).join('')}</select>
           <button onclick="linkFromModal(${id},'task')" class="btn btn-primary" style="padding:6px 10px;font-size:.7rem">+</button>
         </div>
       </div>
@@ -5428,7 +5428,7 @@ function openCatManager(){
   if(!modal||!body) return;
   const nativeHtml = NATIVE_CATS.map(c=>`
     <div class="cat-row">
-      <div class="cat-row-icon">${c.icon}</div>
+      <div class="cat-row-icon">${escHtml(c.icon)}</div>
       <span class="cat-row-label">${c.label}</span>
       ${c.systemView?`<span class="cat-row-system">→ ${c.systemView}</span>`:""}
       <span class="cat-row-lock" title="Categoria nativa — não pode ser excluída">🔒</span>
@@ -5436,7 +5436,7 @@ function openCatManager(){
   const customHtml = CUSTOM_CATS.length
     ? CUSTOM_CATS.map(c=>`
         <div class="cat-row">
-          <div class="cat-row-icon">${c.icon||"🏷"}</div>
+          <div class="cat-row-icon">${escHtml(c.icon||"🏷")}</div>
           <span class="cat-row-label">${c.label}</span>
           <button class="cat-del-btn" onclick="deleteCustomCat('${c.key}')" title="Excluir categoria">✕</button>
         </div>`).join("")
@@ -5511,11 +5511,11 @@ function mkRow(task){
   if(isOverdue) div.classList.add("overdue");
   div.innerHTML = `
     <div class="cb" onclick="event.stopPropagation();event.preventDefault();cycleStatus(${task.id})">${isDone?"✓":""}</div>
-    <div class="tname">${task.icon} ${task.name}</div>
+    <div class="tname">${escHtml(task.icon)} ${escHtml(task.name)}</div>
     <div class="tmeta">
       ${statusBadge}
       <span class="badge ${urgInfo.badge}">${urgInfo.icon} ${urgInfo.label}</span>
-      <span class="badge ${catInfo.badge}">${catInfo.icon} ${catInfo.label}</span>
+      <span class="badge ${catInfo.badge}">${escHtml(catInfo.icon)} ${escHtml(catInfo.label)}</span>
       ${dateBadge}
       ${recBadge}
       ${subsBadge}
@@ -5611,11 +5611,11 @@ function renderKanban(){
       card.innerHTML=`
         <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:7px">
           <span style="font-size:.9rem;flex-shrink:0;margin-top:1px">⠿</span>
-          <div class="bcard-title" style="flex:1">${t.icon} ${t.name}</div>
+          <div class="bcard-title" style="flex:1">${escHtml(t.icon)} ${escHtml(t.name)}</div>
         </div>
         <div class="bcard-foot">
           <span class="badge ${urgI.badge}" style="font-size:.56rem">${urgI.icon} ${urgI.label}</span>
-          <span class="badge ${catI.badge}" style="font-size:.56rem">${catI.icon} ${catI.label}</span>
+          <span class="badge ${catI.badge}" style="font-size:.56rem">${escHtml(catI.icon)} ${escHtml(catI.label)}</span>
           ${t.date?`<span class="badge b-date" style="font-size:.52rem">📅 ${fmtDate(t.date)}</span>`:""}
         </div>`;
       // Click to open panel
@@ -6559,7 +6559,7 @@ function addAITask(el,taskName){
   TASKS.push({id:nextId++,name:taskName,urg:"medio",cat:"outros",icon:"🎙"});
   renderAll();
 }
-function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function escHtml(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 
 // ══════════════════════════════════════
 //  VIEW SWITCH
@@ -6671,15 +6671,15 @@ function renderDashCards(){
   sonhoEl.innerHTML=`
     <div style="display:flex;align-items:flex-start;gap:12px">
       <div style="flex:1">
-        <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;color:var(--text);margin-bottom:3px">${goal.icon||"🎯"} ${goal.name}</div>
-        <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px">${goal.current} de ${goal.target} ${goal.unit||""}${goal.due?" · Prazo: "+new Date(goal.due+"T12:00:00").toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"}):""}
+        <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;color:var(--text);margin-bottom:3px">${escHtml(goal.icon||"🎯")} ${escHtml(goal.name)}</div>
+        <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px">${goal.current} de ${goal.target} ${escHtml(goal.unit||"")}${goal.due?" · Prazo: "+new Date(goal.due+"T12:00:00").toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"}):""}
         </div>
         <div style="height:7px;background:var(--border);border-radius:99px;overflow:hidden">
           <div style="width:${pct}%;height:100%;background:${corBarra};border-radius:99px;transition:width .6s ease"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted);margin-top:5px">
           <span style="color:${corBarra};font-weight:700">${pct}% concluído</span>
-          <span>falta: ${goal.target-goal.current} ${goal.unit||""}</span>
+          <span>falta: ${goal.target-goal.current} ${escHtml(goal.unit||"")}</span>
         </div>
       </div>
     </div>`;
@@ -6703,7 +6703,18 @@ function pinGoalToSonho(){
 //  API KEY (in-memory only)
 // ══════════════════════════════════════
 let userApiKey = "";
-const PROXY_SECRET = "bsx-7f3a9c2e1d4b8f0a6e5c3d2b1a9f8e7d";
+
+// ── Autenticação das chamadas de IA: token da sessão Supabase (SimWork Cloud) ──
+// O proxy na Vercel valida esse token; sem login, os recursos de IA do servidor não funcionam.
+async function swAIHeaders(){
+  try{
+    if(typeof swClient !== "undefined" && swClient){
+      const { data:{ session } } = await swClient.auth.getSession();
+      if(session?.access_token) return { "Authorization": "Bearer " + session.access_token };
+    }
+  }catch(_){}
+  throw new Error("Entre na sua conta SimWork (nuvem) para usar os recursos de IA.");
+}
 
 // ── Helper central para chamadas de IA ───────────────────────
 // Lê como texto primeiro, evitando erro em resp.json() quando proxy retorna texto puro
@@ -6746,7 +6757,7 @@ function _parseAIResponse(raw){
 async function aiProxyCall(prompt, maxTokens=8192, model="claude-sonnet-4-5"){
   const resp = await fetch("/api/ai-proxy",{
     method:"POST",
-    headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
+    headers:{"Content-Type":"application/json", ...(await swAIHeaders())},
     body:JSON.stringify({model,max_tokens:maxTokens,messages:[{role:"user",content:prompt}]})
   });
   const respText = await resp.text();
@@ -6766,7 +6777,7 @@ async function aiProxyCall(prompt, maxTokens=8192, model="claude-sonnet-4-5"){
 async function aiProxyCallStream(prompt, maxTokens=3000, model="claude-sonnet-4-5"){
   const resp = await fetch("/api/ai-proxy",{
     method:"POST",
-    headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
+    headers:{"Content-Type":"application/json", ...(await swAIHeaders())},
     body:JSON.stringify({model,max_tokens:maxTokens,stream:true,messages:[{role:"user",content:prompt}]})
   });
   if(!resp.ok){
@@ -6797,11 +6808,32 @@ async function aiProxyCallStream(prompt, maxTokens=3000, model="claude-sonnet-4-
   return _parseAIResponse(fullText);
 }
 
-// ── Direto no browser com API key do usuário (financeiro — sem timeout) ──
+// ── IA financeira: proxy autenticado (preferido) com fallback BYOK ──
 async function aiDirectCall(prompt, maxTokens=4096){
+  // 1) Logado no SimWork → usa o proxy (a chave fica no servidor)
+  let swh = null;
+  try{ swh = await swAIHeaders(); }catch(_){}
+  if(swh){
+    const resp = await fetch("/api/ai-proxy",{
+      method:"POST",
+      headers:{"Content-Type":"application/json", ...swh},
+      body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:maxTokens,messages:[{role:"user",content:prompt}]})
+    });
+    const respText = await resp.text();
+    if(!resp.ok){
+      let errMsg = `Erro IA ${resp.status}`;
+      try{ errMsg = JSON.parse(respText)?.error?.message || errMsg; }catch(_){}
+      throw new Error(errMsg);
+    }
+    let data;
+    try{ data = JSON.parse(respText); }catch(_){ throw new Error("Resposta inválida: "+respText.slice(0,120)); }
+    const raw = (data.content||[]).map(b=>b.text||"").join("").trim();
+    return _parseAIResponse(raw);
+  }
+  // 2) Sem conta (modo local) → chave própria do usuário, direto no browser
   const key = localStorage.getItem("central_acao_apikey")||"";
   if(!key||!key.startsWith("sk-"))
-    throw new Error("Configure sua API key da Anthropic em ⚙️ Configurações antes de usar a IA financeira.");
+    throw new Error("Entre na sua conta SimWork ou configure sua API key da Anthropic em ⚙️ Configurações.");
   const resp = await fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
     headers:{
@@ -7095,7 +7127,7 @@ async function startAssemblyRecording() {
     // 1. Busca token temporário no nosso proxy (v3)
     const tokenResp = await fetch("/api/assembly-token", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-proxy-secret": PROXY_SECRET }
+      headers: { "Content-Type": "application/json", ...(await swAIHeaders()) }
     });
     if (!tokenResp.ok) return false;
     const { token } = await tokenResp.json();
@@ -7847,12 +7879,12 @@ function renderGoals(){
     const dueStr=g.due?new Date(g.due+"T12:00:00").toLocaleDateString("pt-BR"):"Sem prazo";
     return `<div class="goal-card ${colClass}">
       <div class="goal-card-head">
-        <span class="goal-icon">${g.icon}</span>
+        <span class="goal-icon">${escHtml(g.icon)}</span>
         <span class="goal-status-badge ${statusClass}">${statusLabel}</span>
       </div>
-      <div class="goal-name">${g.name}</div>
+      <div class="goal-name">${escHtml(g.name)}</div>
       <div class="goal-progress-row">
-        <span class="goal-progress-nums" style="color:${barColor}">${g.current} / ${g.target} ${g.unit}</span>
+        <span class="goal-progress-nums" style="color:${barColor}">${g.current} / ${g.target} ${escHtml(g.unit)}</span>
         <span class="goal-progress-pct">${pct}%</span>
       </div>
       <div class="goal-bar-track">
@@ -8763,7 +8795,7 @@ function renderFinanceiro(){
   if(catSel){
     const cats=[...new Set(tx.map(t=>t.categoria))].sort();
     catSel.innerHTML=`<option value="all">Todas categorias</option>`+
-      cats.map(cat=>`<option value="${cat}" ${catFilter===cat?"selected":""}>${cat}</option>`).join("");
+      cats.map(cat=>`<option value="${escHtml(cat)}" ${catFilter===cat?"selected":""}>${escHtml(cat)}</option>`).join("");
     catSel.value=catFilter;
   }
 
@@ -8788,7 +8820,7 @@ function renderFinanceiro(){
         return `<div class="fin-tx-item">
           <div class="fin-tx-cat-dot" style="background:${color}"></div>
           <div class="fin-tx-info">
-            <div class="fin-tx-name">${t.nome}${t.futuro?` <span style="font-size:.58rem;background:#f59e0b22;color:#f59e0b;border-radius:4px;padding:1px 5px;font-weight:700;vertical-align:middle">⏳ PENDENTE</span>`:""}${t.estorno?` <span style="font-size:.58rem;background:rgba(52,197,122,.15);color:var(--green);border-radius:4px;padding:1px 5px;font-weight:700;vertical-align:middle">↩ ESTORNO</span>`:""}</div>
+            <div class="fin-tx-name">${escHtml(t.nome)}${t.futuro?` <span style="font-size:.58rem;background:#f59e0b22;color:#f59e0b;border-radius:4px;padding:1px 5px;font-weight:700;vertical-align:middle">⏳ PENDENTE</span>`:""}${t.estorno?` <span style="font-size:.58rem;background:rgba(52,197,122,.15);color:var(--green);border-radius:4px;padding:1px 5px;font-weight:700;vertical-align:middle">↩ ESTORNO</span>`:""}</div>
             <div class="fin-tx-meta">
               <span>${t.categoria}</span>
               <span>📅 ${d}</span>
@@ -8909,7 +8941,7 @@ function renderFinanceiro(){
         const cor = saldo >= 0 ? 'var(--green)' : 'var(--red)';
         return `<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;background:var(--card);border:1px solid var(--border);border-left:3px solid ${c.cor||'var(--accent)'};margin-bottom:6px">
           <div style="flex:1;min-width:0">
-            <div style="font-weight:700;font-size:.84rem;color:var(--text)">${c.nome}</div>
+            <div style="font-weight:700;font-size:.84rem;color:var(--text)">${escHtml(c.nome)}</div>
             <div style="font-size:.62rem;color:var(--muted)">${c.banco||'-'} · ${c.tipo||'corrente'}</div>
           </div>
           <div style="text-align:right">
@@ -8984,7 +9016,7 @@ function renderFinanceiro(){
             </div>
             <!-- card name -->
             <div style="position:relative">
-              <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,.2)">${c.nome}</div>
+              <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,.2)">${escHtml(c.nome)}</div>
               <div style="font-size:.58rem;opacity:.72">Fecha dia ${c.dia_fechamento||'?'} · Vence dia ${c.dia_vencimento||'?'}</div>
             </div>
             <!-- bottom: fatura + limit bar -->
@@ -9180,7 +9212,7 @@ function renderFixasCards(fixas, txFixas=[]){
     const cardClass = f.paga ? "paga" : (diasRestantes < 0 ? "vencida" : "");
     return `<div class="fixa-card ${cardClass}">
       <div class="fixa-card-top">
-        <div class="fixa-cat-icon" style="background:${cat.bg}">${cat.icon}</div>
+        <div class="fixa-cat-icon" style="background:${cat.bg}">${escHtml(cat.icon)}</div>
         <div class="fixa-card-info">
           <div class="fixa-card-nome" title="${escHtml(f.nome)}">${escHtml(f.nome)}</div>
           <div class="fixa-card-sub">${cat.label}</div>
@@ -9474,7 +9506,7 @@ function renderAlertasVencimento(){
     return `<div class="fin-alerta-row">
       <div class="fin-alerta-badge ${badgeCls}">${badgeText}</div>
       <div>
-        <div class="fin-alerta-nome">${a.nome}</div>
+        <div class="fin-alerta-nome">${escHtml(a.nome)}</div>
         <div class="fin-alerta-dia">Dia ${a.dia}</div>
       </div>
       <div style="margin-left:auto">
@@ -10186,7 +10218,7 @@ function showImportReview(importedIds, resumo){
             ${t.motivoReview?`<div style="font-size:.68rem;color:var(--orange);margin-bottom:6px">↳ ${esc(t.motivoReview)}</div>`:""}
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
               <select id="review-cat-${t.id}" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:.74rem;color:var(--text);outline:none;flex:1">
-                ${allCats.map(c=>`<option value="${c}" ${c===t.categoria?"selected":""}>${c}</option>`).join("")}
+                ${allCats.map(c=>`<option value="${escHtml(c)}" ${c===t.categoria?"selected":""}>${escHtml(c)}</option>`).join("")}
               </select>
               <button onclick="confirmReviewTx(${t.id})" style="background:var(--green);color:#000;border:none;border-radius:6px;padding:4px 12px;font-size:.7rem;font-weight:700;cursor:pointer;white-space:nowrap">✓ Confirmar</button>
               <button onclick="deleteReviewTx(${t.id})" style="background:var(--card);border:1px solid var(--border);color:var(--red);border-radius:6px;padding:4px 10px;font-size:.7rem;cursor:pointer">🗑</button>
@@ -10348,7 +10380,7 @@ function renderViagens(){
     const pendBadge = t.futuro ? `<span style="font-size:.58rem;background:#f59e0b22;color:#f59e0b;border-radius:4px;padding:1px 5px;font-weight:700">⏳</span> ` : "";
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--border);gap:8px">
       <div style="flex:1;min-width:0">
-        <div style="font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pendBadge}${t.nome||"—"}</div>
+        <div style="font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pendBadge}${escHtml(t.nome||"—")}</div>
         <div style="font-size:.65rem;color:var(--muted)">${t.data||""} · ${t.categoria||""}</div>
       </div>
       <div style="font-size:.82rem;font-weight:800;color:#38bdf8;white-space:nowrap">${fmtBRL(t.valor)}</div>
@@ -10511,7 +10543,7 @@ function openEditTx(id){
     {v:"investimento",l:"📈 Investimento"},
     {v:"cartao",l:"💳 Cartão"}
   ];
-  const catOptsHtml=allCats.map(c=>`<option value="${c}" ${tx.categoria===c?"selected":""}>${c}</option>`).join("");
+  const catOptsHtml=allCats.map(c=>`<option value="${escHtml(c)}" ${tx.categoria===c?"selected":""}>${escHtml(c)}</option>`).join("");
   const tipoOptsHtml=tipoOpts.map(o=>`<option value="${o.v}" ${tx.tipo===o.v?"selected":""}>${o.l}</option>`).join("");
   // Keyword sugerida: primeiros 3 tokens do nome
   const kwSugest=(tx.nome_original||tx.nome||"").split(/[\s\-,]+/).slice(0,3).join(" ");
@@ -10526,13 +10558,13 @@ function openEditTx(id){
       <button onclick="document.getElementById('_edit-tx-modal').remove()" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;line-height:1">✕</button>
     </div>
     <div style="font-size:.72rem;color:var(--muted);margin-bottom:16px;background:rgba(255,255,255,.04);padding:8px 12px;border-radius:10px;line-height:1.5">
-      <strong style="color:var(--text)">${tx.nome}</strong><br>
+      <strong style="color:var(--text)">${escHtml(tx.nome)}</strong><br>
       📅 ${tx.data} &nbsp;·&nbsp; ${(tx.valor>0?"+":"")}R$ ${tx.valor.toFixed(2).replace(".",",")}
     </div>
 
     <label style="display:block;margin-bottom:14px">
       <span style="font-size:.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">NOME DE EXIBIÇÃO</span>
-      <input id="_etx-nome" value="${(tx.nome||"").replace(/"/g,"&quot;")}" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:.82rem;color:var(--text);font-family:inherit">
+      <input id="_etx-nome" value="${escHtml(tx.nome||"")}" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:.82rem;color:var(--text);font-family:inherit">
     </label>
 
     <label style="display:block;margin-bottom:14px">
@@ -10559,7 +10591,7 @@ function openEditTx(id){
         <p style="font-size:.68rem;color:var(--muted);margin:0 0 10px">A IA vai aplicar esta regra automaticamente nas próximas importações.</p>
         <label style="display:block;margin-bottom:10px">
           <span style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">PALAVRA-CHAVE (nome contém...)</span>
-          <input id="_etx-kw" value="${kwSugest.replace(/"/g,"&quot;")}" placeholder="ex: Raimundo Alves" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:.8rem;color:var(--text);font-family:inherit">
+          <input id="_etx-kw" value="${escHtml(kwSugest)}" placeholder="ex: Raimundo Alves" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:.8rem;color:var(--text);font-family:inherit">
         </label>
         <label style="display:block">
           <span style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">APLICAR PARA</span>
@@ -10822,7 +10854,7 @@ function closeSearchOnOverlay(e){
 }
 
 function highlight(text,query){if(!query)return text;var idx=text.toLowerCase().indexOf(query.toLowerCase());if(idx<0)return text;return text.slice(0,idx)+"<mark>"+text.slice(idx,idx+query.length)+"</mark>"+text.slice(idx+query.length);}
-function escapeHtml(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function escapeHtml(s){ return escHtml(s); }
 
 function runSearch(query){
   const q = query.trim().toLowerCase();
@@ -10843,7 +10875,7 @@ function runSearch(query){
         searchResults.push({type:"task",id:t.id});
         const isDone = doneSet.has(t.id);
         html += `<div class="search-result-item" data-idx="${idx}" onclick="selectSearchResult(${idx})">
-          <span class="search-result-icon">${t.icon}</span>
+          <span class="search-result-icon">${escHtml(t.icon)}</span>
           <span class="search-result-title">${escapeHtml(t.name)}</span>
           <span class="search-result-meta">${isDone?"✓ Concluída":""}</span>
           <span class="search-result-type srt-task">Tarefa</span>
@@ -10878,7 +10910,7 @@ function runSearch(query){
       searchResults.push({type:"task",id:t.id});
       const isDone = doneSet.has(t.id);
       html += `<div class="search-result-item" data-idx="${idx}" onclick="selectSearchResult(${idx})">
-        <span class="search-result-icon">${t.icon}</span>
+        <span class="search-result-icon">${escHtml(t.icon)}</span>
         <span class="search-result-title">${highlight(escapeHtml(t.name),q)}</span>
         <span class="search-result-meta">${isDone?"✓":""}</span>
         <span class="search-result-type srt-task">Tarefa</span>
@@ -10894,7 +10926,7 @@ function runSearch(query){
       const idx = searchResults.length;
       searchResults.push({type:"project",id:p.id});
       html += `<div class="search-result-item" data-idx="${idx}" onclick="selectSearchResult(${idx})">
-        <span class="search-result-icon">${p.icon}</span>
+        <span class="search-result-icon">${escHtml(p.icon)}</span>
         <span class="search-result-title">${highlight(escapeHtml(p.name),q)}</span>
         <span class="search-result-meta">${projectProgress(p.id)}%</span>
         <span class="search-result-type srt-proj">Projeto</span>
@@ -10928,7 +10960,7 @@ function runSearch(query){
       html += `<div class="search-result-item" data-idx="${idx}" onclick="selectSearchResult(${idx})">
         <span class="search-result-icon">📞</span>
         <span class="search-result-title">${highlight(escapeHtml(l.nome),q)}</span>
-        <span class="search-result-meta">${l.assunto||""}</span>
+        <span class="search-result-meta">${escHtml(l.assunto||"")}</span>
         <span class="search-result-type" style="background:var(--green-dim);color:var(--green)">Ligação</span>
       </div>`;
     });
@@ -11188,7 +11220,7 @@ function renderCardVisual(card, mesKey){
     <div class="cc-card-number">•••• •••• •••• ${card.ultimos4||"••••"}</div>
     <div class="cc-card-footer">
       <div>
-        <div class="cc-card-bank-name">${card.nome||b.nome}</div>
+        <div class="cc-card-bank-name">${escHtml(card.nome||b.nome)}</div>
         <div style="font-size:.58rem;opacity:.7;margin-top:2px">Fecha dia ${card.fechamento||"?"} · Vence dia ${card.vencimento||"?"}</div>
       </div>
       <div style="text-align:right">
@@ -11247,12 +11279,12 @@ function renderCardDetail(cardId){
     <div class="cc-detail-top">
       <div style="width:140px;height:84px;border-radius:12px;background:linear-gradient(135deg,${b.cor},${b.cor2});flex-shrink:0;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:10px 12px">
         <div class="cc-card-bg1" style="width:100px;height:100px;right:-30px;top:-30px"></div>
-        <div style="font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:900;color:${b.corTexto}">${card.nome||b.nome}</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:900;color:${b.corTexto}">${escHtml(card.nome||b.nome)}</div>
         <div style="font-size:.55rem;color:${b.corTexto};opacity:.75">•••• ${card.ultimos4||"••••"}</div>
       </div>
       <div class="cc-detail-info">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <h3 style="margin:0">${card.nome||b.nome}</h3>
+          <h3 style="margin:0">${escHtml(card.nome||b.nome)}</h3>
           ${statusBadge}
           <button onclick="deleteCard('${cardId}')" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:7px;padding:3px 8px;cursor:pointer;color:var(--muted);font-size:.7rem">🗑</button>
         </div>
@@ -11387,7 +11419,7 @@ function renderInstallsHTML(cardId, compact=false){
     const pct=Math.round((t.parcela_atual||1)/(t.parcela_total||1)*100);
     const restantes=(t.parcela_total||1)-(t.parcela_atual||1);
     return `<div class="cc-install-item">
-      <div class="cc-install-name">${t.nome||"–"}</div>
+      <div class="cc-install-name">${escHtml(t.nome||"–")}</div>
       <div class="cc-install-prog"><div class="cc-install-fill" style="width:${pct}%"></div></div>
       <div class="cc-install-info">${t.parcela_atual||1}/${t.parcela_total||1} · ${fmtBRL((t.valor||0)*restantes)} futuros</div>
     </div>`;
@@ -11401,7 +11433,7 @@ function renderCardTxList(txs){
     const parc=t.parcela_total>1?`<span style="font-size:.58rem;color:var(--accent);font-weight:700">${t.parcela_atual}/${t.parcela_total}</span>`:"";
     return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
       <div style="flex:1;min-width:0">
-        <div style="font-size:.78rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.nome||"–"}</div>
+        <div style="font-size:.78rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(t.nome||"–")}</div>
         <div style="font-size:.62rem;color:var(--muted)">${t.data||""} · ${t.categoria||""}</div>
       </div>
       <div style="display:flex;gap:5px;align-items:center">${conf}${parc}</div>
@@ -11955,7 +11987,7 @@ function renderSubtasks(taskId){
   list.innerHTML = subs.map(s=>`
     <div class="subtask-item${s.done?" done-sub":""}" id="sub-${s.id}">
       <div class="subtask-cb" onclick="toggleSubtask(${taskId},${s.id})">${s.done?"✓":""}</div>
-      <span class="subtask-name">${s.text}</span>
+      <span class="subtask-name">${escHtml(s.text)}</span>
       <button class="subtask-del" onclick="deleteSubtask(${taskId},${s.id})" title="Remover">✕</button>
     </div>`).join("");
 }
@@ -12063,7 +12095,7 @@ function renderLigacoes(){
         const urgInfo = URG_MAP[t.urg]||URG_MAP["medio"];
         return `<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--border);margin-bottom:4px;cursor:pointer;transition:opacity .15s" onclick="cycleStatus(${t.id})" title="Clique para marcar como concluída">
           <span style="font-size:.85rem">📞</span>
-          <span style="flex:1;font-size:.82rem;color:var(--text);${isDone?"text-decoration:line-through;opacity:.5":""}">${t.name}</span>
+          <span style="flex:1;font-size:.82rem;color:var(--text);${isDone?"text-decoration:line-through;opacity:.5":""}">${escHtml(t.name)}</span>
           <span style="font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:5px;background:${urgInfo.bg};color:${urgInfo.color}">${urgInfo.label}</span>
           ${t.date?`<span style="font-size:.65rem;color:var(--dim)">${t.date}</span>`:""}
         </div>`;
@@ -12103,7 +12135,7 @@ function renderLigacoes(){
       if(fList) fList.innerHTML=atrasados.slice(0,4).map(l=>{
         const dias=Math.floor((new Date()-new Date(l.criado))/86400000);
         return `<div class="followup-item">
-          📞 <strong>${l.nome}</strong>${l.assunto?" — "+l.assunto:""}
+          📞 <strong>${escHtml(l.nome)}</strong>${l.assunto?" — "+escHtml(l.assunto):""}
           <span class="followup-days">há ${dias} dia${dias>1?"s":""}</span>
         </div>`;
       }).join("");
@@ -12132,10 +12164,10 @@ function renderLigacoes(){
     return `<div class="lig-card${isAtrasado?" overdue-lig":""}${l.done?" done-lig":""}">
       <div class="lig-avatar">${initials}</div>
       <div class="lig-info">
-        <div class="lig-name">${l.nome}${l.done?' <span style="color:var(--green);font-size:.7rem">✓ Ligado</span>':""}</div>
+        <div class="lig-name">${escHtml(l.nome)}${l.done?' <span style="color:var(--green);font-size:.7rem">✓ Ligado</span>':""}</div>
         <div class="lig-meta">
           ${l.tel?`<span>📱 ${l.tel}</span>`:""}
-          ${l.assunto?`<span>💬 ${l.assunto}</span>`:""}
+          ${l.assunto?`<span>💬 ${escHtml(l.assunto)}</span>`:""}
           <span class="badge" style="background:${prio.color}22;color:${prio.color};border:1px solid ${prio.color}44">${prio.label}</span>
           ${isAtrasado?`<span class="lig-follow-badge">⏰ há ${dias} dias</span>`:""}
         </div>
@@ -12590,9 +12622,9 @@ function renderHabitos(){
       return `<div class="hab-day ${cls}" title="${day.ds}">${day.label}</div>`;
     }).join("");
     return `<div class="hab-card${done?" done-today":""}">
-      <div class="hab-icon">${h.icon||"✅"}</div>
+      <div class="hab-icon">${escHtml(h.icon||"✅")}</div>
       <div class="hab-info">
-        <div class="hab-name" style="${done?"text-decoration:line-through;opacity:.7":""}">${h.nome}</div>
+        <div class="hab-name" style="${done?"text-decoration:line-through;opacity:.7":""}">${escHtml(h.nome)}</div>
         <div class="hab-streak">${streak>0?"🔥 "+streak+" dia"+(streak>1?"s":"")+" seguido"+(streak>1?"s":""):"—"} · +10 XP por check</div>
         <div class="hab-week">${week7}</div>
       </div>
@@ -12665,7 +12697,7 @@ function renderAgenda(){
             <div class="agenda-time">${i.hora||"—"}</div>
             <div class="agenda-item-type">${AGENDA_TYPE_ICONS[i.tipo]||"📌"}</div>
             <div class="agenda-item-info">
-              <div class="agenda-item-title">${i.titulo}</div>
+              <div class="agenda-item-title">${escHtml(i.titulo)}</div>
               <div class="agenda-item-meta">
                 ${i.nota?`<span>${i.nota}</span>`:""}
                 <span class="badge b-ns" style="font-size:.58rem">${i.tipo}</span>
@@ -12735,8 +12767,8 @@ function renderTemplates(){
   const all=[...DEFAULT_TEMPLATES,...CUSTOM_TEMPLATES];
   grid.innerHTML=all.map(tpl=>`
     <div class="tpl-card" onclick="applyTemplate('${tpl.id}')">
-      <div class="tpl-icon">${tpl.icon}</div>
-      <div class="tpl-name">${tpl.name}</div>
+      <div class="tpl-icon">${escHtml(tpl.icon)}</div>
+      <div class="tpl-name">${escHtml(tpl.name)}</div>
       <div class="tpl-desc">${tpl.desc}</div>
       <div class="tpl-count">✅ ${tpl.tasks.length} tarefas</div>
       <div class="tpl-tasks-preview">
@@ -12992,7 +13024,7 @@ function renderGamification(){
         const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":"";
         return `<div style="margin-bottom:10px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:.74rem;font-weight:600;color:var(--text)">${medal} ${archInfo.icon} ${cat}</span>
+            <span style="font-size:.74rem;font-weight:600;color:var(--text)">${medal} ${archInfo.icon} ${escHtml(cat)}</span>
             <span style="font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:800;color:${archInfo.color}">${xp} XP</span>
           </div>
           <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden">
@@ -13015,9 +13047,9 @@ function renderGamification(){
     } else {
       proximasEl.innerHTML = proximas.map(c=>`
         <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--blue-border)">
-          <div style="font-size:1.6rem;opacity:.5">${c.icon}</div>
+          <div style="font-size:1.6rem;opacity:.5">${escHtml(c.icon)}</div>
           <div style="flex:1">
-            <div style="font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:2px">${c.name}</div>
+            <div style="font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:2px">${escHtml(c.name)}</div>
             <div style="font-size:.64rem;color:var(--muted)">${c.desc}</div>
           </div>
           <div style="font-size:.65rem;font-weight:800;color:var(--blue);background:var(--blue-dim);border:1px solid var(--blue-border);border-radius:6px;padding:2px 8px;white-space:nowrap">+${c.xp} XP</div>
@@ -13327,8 +13359,8 @@ function renderProjects(){
               <button onclick="event.stopPropagation();deleteProject('${p.id}')" title="Excluir projeto" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:3px 7px;cursor:pointer;color:var(--muted);font-size:.7rem">🗑</button>
             </div>
             <div class="proj-card-title-row">
-              <span class="proj-icon">${p.icon}</span>
-              <span class="proj-name">${p.name}</span>
+              <span class="proj-icon">${escHtml(p.icon)}</span>
+              <span class="proj-name">${escHtml(p.name)}</span>
             </div>
             ${p.objective?`<div class="proj-objective">${p.objective}</div>`:""}
             <div class="proj-badges">
@@ -13363,7 +13395,7 @@ function renderProjects(){
               <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px">🎙 Reuniões (${projMeetings.length})</div>
               ${projMeetings.map(m=>`
               <div style="font-size:.75rem;padding:7px 10px;background:var(--card);border-radius:8px;margin-bottom:5px;border:1px solid var(--border)">
-                <div style="font-weight:600;color:var(--text)">${m.title}</div>
+                <div style="font-weight:600;color:var(--text)">${escHtml(m.title)}</div>
                 <div style="color:var(--muted);font-size:.66rem;margin-top:2px;display:flex;gap:8px">
                   <span>📅 ${m.date?new Date(m.date+'T12:00:00').toLocaleDateString('pt-BR'):'-'}</span>
                   ${m.aiData?`<span style="color:var(--green)">✓ IA analisada</span>`:`<span style="color:var(--muted)">Pendente análise</span>`}
@@ -13547,7 +13579,7 @@ function _atpFiltrar(projId){
     btn.onmouseout  = ()=> btn.style.borderColor = "var(--border)";
 
     const badge = projAtual
-      ? `<span style="font-size:.58rem;background:rgba(160,122,232,.15);color:var(--accent);border-radius:4px;padding:1px 5px;margin-left:4px">${projAtual.icon||"📁"} ${projAtual.name.slice(0,18)}</span>`
+      ? `<span style="font-size:.58rem;background:rgba(160,122,232,.15);color:var(--accent);border-radius:4px;padding:1px 5px;margin-left:4px">${escHtml(projAtual.icon||"📁")} ${projAtual.name.slice(0,18)}</span>`
       : `<span style="font-size:.58rem;color:var(--muted);margin-left:4px">avulsa</span>`;
     const dateBadge = t.date ? `<span style="font-size:.58rem;color:var(--muted);margin-left:4px">📅 ${t.date}</span>` : "";
 
@@ -13574,7 +13606,7 @@ function _atpFiltrar(projId){
 
 function updateProjectSelects(){
   const opts = `<option value="">📌 Sem projeto (avulsa)</option>` +
-    PROJECTS.map(p=>`<option value="${p.id}">${p.icon} ${p.name}</option>`).join("");
+    PROJECTS.map(p=>`<option value="${p.id}">${escHtml(p.icon)} ${escHtml(p.name)}</option>`).join("");
   ["qi-proj","all-proj","tp-proj"].forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
@@ -13970,14 +14002,14 @@ function renderFoco(){
     return `<div class="foco-task-item${isDone?" foco-done":""}${isActive?" foco-active":""}" id="foci-${t.id}">
       <div class="foco-cb" onclick="focoToggle(${t.id})">${isDone?"✓":""}</div>
       <div style="flex:1;min-width:0">
-        <div class="foco-task-name">${t.icon} ${t.name}</div>
+        <div class="foco-task-name">${escHtml(t.icon)} ${escHtml(t.name)}</div>
         <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap">
           <span class="badge" style="font-size:.57rem;background:${ui.color}22;color:${ui.color};border:1px solid ${ui.color}44">${ui.label}</span>
-          <span class="badge ${catInfo.badge}" style="font-size:.57rem">${catInfo.icon} ${catInfo.label}</span>
+          <span class="badge ${catInfo.badge}" style="font-size:.57rem">${escHtml(catInfo.icon)} ${escHtml(catInfo.label)}</span>
           ${dateBadge}
         </div>
       </div>
-      ${!isDone?`<button class="foco-play-btn${isActive?" active":""}" onclick="focoSelect(${t.id},'${t.name.replace(/'/g,"\'")}')">
+      ${!isDone?`<button class="foco-play-btn${isActive?" active":""}" onclick="focoSelect(${t.id})">
         ${isActive?"▶ Focando":"▶ Focar"}
       </button>`:""}
     </div>`;
@@ -14025,7 +14057,7 @@ function renderNotasMirror(){
         return `<div onclick="showNotaModal(${n.id})" style="background:${cor.bg};color:#222;border:1px solid var(--border);border-left:4px solid ${cor.border};border-radius:11px;padding:13px 14px;cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,.25)'" onmouseout="this.style.transform='none';this.style.boxShadow='none'">
           <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px">
             <span style="font-size:1.1rem">${cor.emoji}</span>
-            <span style="flex:1;font-weight:800;font-size:.94rem;color:var(--surface);line-height:1.3">${n.title||'(sem título)'}</span>
+            <span style="flex:1;font-weight:800;font-size:.94rem;color:var(--surface);line-height:1.3">${escHtml(n.title||'(sem título)')}</span>
           </div>
           ${snippet ? `<div style="font-size:.78rem;color:#444;line-height:1.5;margin-bottom:8px;white-space:pre-wrap;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">${snippet}</div>` : `<div style="font-size:.74rem;color:#666;font-style:italic;margin-bottom:8px">Sem conteúdo</div>`}
           <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;justify-content:space-between">
@@ -14066,9 +14098,9 @@ function renderNotasMirror(){
           const procBadge = isProc ? `<span style="font-size:.55rem;font-weight:800;padding:1px 6px;border-radius:4px;background:rgba(91,159,255,.15);color:#5b9fff;border:1px solid #5b9fff44">▶ Andamento</span>` : "";
           return `<div onclick="openPanel(${t.id})" style="background:var(--card);border:1px solid var(--border);border-left:3px solid ${ui.color};border-radius:9px;padding:9px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='var(--card)'">
             <div style="display:flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;color:var(--text)">
-              <span>${t.icon||"📋"}</span><span style="flex:1">${t.name}</span>
+              <span>${escHtml(t.icon||"📋")}</span><span style="flex:1">${escHtml(t.name)}</span>
             </div>
-            <div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap">${procBadge}<span style="font-size:.55rem;font-weight:700;padding:1px 6px;border-radius:4px;background:var(--surface);color:var(--muted);border:1px solid var(--border)">${cat.icon} ${cat.label}</span>${dateBadge}</div>
+            <div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap">${procBadge}<span style="font-size:.55rem;font-weight:700;padding:1px 6px;border-radius:4px;background:var(--surface);color:var(--muted);border:1px solid var(--border)">${escHtml(cat.icon)} ${escHtml(cat.label)}</span>${dateBadge}</div>
           </div>`;
         }).join("")}
       </div>
@@ -14091,11 +14123,11 @@ function renderNotasMirror(){
         const cat = (typeof CAT_LABEL_MAP!=='undefined' && CAT_LABEL_MAP[t.cat]) || {label:t.cat,icon:"📋"};
         return `<div onclick="openPanel(${t.id})" style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:9px;padding:9px 11px;cursor:pointer;opacity:.7" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">
           <div style="display:flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;color:var(--text);text-decoration:line-through">
-            <span>${t.icon||"📋"}</span><span style="flex:1">${t.name}</span><span style="color:var(--green);font-weight:800">✓</span>
+            <span>${escHtml(t.icon||"📋")}</span><span style="flex:1">${escHtml(t.name)}</span><span style="color:var(--green);font-weight:800">✓</span>
           </div>
           <div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap">
             <span style="font-size:.55rem;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(0,0,0,.15);color:${ui.color};border:1px solid ${ui.color}33">${ui.label}</span>
-            <span style="font-size:.55rem;font-weight:700;padding:1px 6px;border-radius:4px;background:var(--surface);color:var(--muted);border:1px solid var(--border)">${cat.icon} ${cat.label}</span>
+            <span style="font-size:.55rem;font-weight:700;padding:1px 6px;border-radius:4px;background:var(--surface);color:var(--muted);border:1px solid var(--border)">${escHtml(cat.icon)} ${escHtml(cat.label)}</span>
           </div>
         </div>`;
       }).join("");
@@ -14184,6 +14216,7 @@ function focoToggle(id){
 }
 
 function focoSelect(id, name){
+  if(!name){ const _t = TASKS.find(x=>x.id===id); name = _t ? _t.name : ""; }
   // Toggle: se ja esta focado nessa, desfoca
   if(focoActiveId === id){ focoDeselect(); return; }
   focoActiveId = id;
@@ -14866,7 +14899,7 @@ function _ryukiModalRows_unused(actions){
       const changes = [
         a.categoria ? `categoria → <b>${a.categoria}</b>` : "",
         a.tipo      ? `tipo → <b>${tipoLabel[a.tipo]||a.tipo}</b>` : "",
-        a.nome      ? `nome → <b>${a.nome}</b>` : ""
+        a.nome      ? `nome → <b>${escHtml(a.nome)}</b>` : ""
       ].filter(Boolean).join(" · ");
       return ``;
     } else if(a.action==="create_rule"){
@@ -15080,7 +15113,7 @@ function showRyukiTyping(){
 async function ryukiProxyStream(messages, onChunk){
   const resp = await fetch("/api/ai-proxy",{
     method:"POST",
-    headers:{"Content-Type":"application/json","x-proxy-secret":PROXY_SECRET},
+    headers:{"Content-Type":"application/json", ...(await swAIHeaders())},
     body:JSON.stringify({
       model:"claude-opus-4-5",
       max_tokens:4096,

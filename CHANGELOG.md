@@ -62,3 +62,12 @@ Protótipos iniciais em HTML cru e JSX
 - **Chip de status** no canto inferior esquerdo (sincronizado / modo local / erro)
 - **Alerta de falha de salvamento**: aviso ao usuario quando localStorage falha (antes era silencioso)
 - Mini servidor de dev em PowerShell (tools/dev-server.ps1) pra maquinas sem Node
+
+## v3.33 - 2026-06-12
+
+### Seguranca
+- **Proxy de IA autenticado**: backends validam o token da sessao Supabase; PROXY_SECRET (que ficava exposto no codigo-fonte) removido
+- **IA financeira via proxy**: aiDirectCall usa o proxy quando logado; chave propria (BYOK) vira fallback do modo local
+- **XSS corrigido**: escape (escHtml com aspas) em ~50 pontos de renderizacao - tarefas, projetos, metas, habitos, transacoes, cartoes, contas, categorias custom, notas, agenda, busca, foco e saida da Ryuki; testado com payload real (nenhuma execucao)
+- **Privacidade entre contas**: dados locais marcados por dono; login de outra conta no mesmo navegador nao herda dados
+- **focoSelect**: onclick passa so o id (nome era injetado em string JS com escape quebrado)

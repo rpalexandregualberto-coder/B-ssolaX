@@ -106,9 +106,16 @@ O app foi renomeado de **BússolaX** para **SimWork** (parte da suíte SimFlow/C
 - **Auth:** e-mail+senha (`swAuthLogin`/`swAuthSignup`), modo local opcional (`simwork_skip_login`), chip de status fixo no canto inferior esquerdo
 - **Dev local neste PC (sem Node):** `tools/dev-server.ps1` serve em http://localhost:8765 (config no `.claude/launch.json`, nome `simwork`)
 
+## Segurança (atualizado 2026-06-12)
+
+- **Proxy de IA autenticado**: `api/ai-proxy.js` e `api/assembly-token.js` validam o token JWT da sessão Supabase (header `Authorization: Bearer`). O `PROXY_SECRET` foi removido. No frontend, `swAIHeaders()` obtém o token; `aiDirectCall` usa o proxy quando logado e cai pro BYOK (chave própria no localStorage) só em modo local.
+- **XSS**: campos de usuário (nomes de tarefas/projetos/metas/hábitos/transações/cartões/categorias, ícones, unidades, títulos de notas/agenda, saída da Ryuki) passam por `escHtml()` nos templates. `escHtml` escapa `& < > " '`. **Toda nova interpolação `${...}` de dado de usuário em HTML deve usar `escHtml()`.**
+- **Troca de conta no mesmo aparelho**: `simwork_data_owner` marca o dono dos dados locais; login de outra conta limpa o localStorage e puxa da nuvem (não vaza dados entre contas).
+- **Seed limpo**: `seedContasFixas()` não cria mais contas pessoais do dono pra usuários novos.
+
 ## Pontos de atenção pro usuário
 
 - Dados são por dispositivo/navegador (localStorage) + nuvem quando logado
-- API key ficar no cliente é OK pra BYOK pessoal, **NÃO pra comercialização** (precisaria backend)
-- `PROXY_SECRET` hardcoded no frontend é fraco — próximo passo: validar o JWT do Supabase no proxy
-- Confirmação de e-mail do Supabase: configurar a Site URL pra `https://b-ssola-x.vercel.app` no painel (Auth → URL Configuration)
+- Site URL do Supabase já configurada pra `https://simwork-app.vercel.app`
+- E-mail embutido do Supabase tem rate limit baixo — configurar SMTP próprio antes de convidar muita gente
+- Categorias financeiras nos prompts da IA ainda citam "Consórcio EVOY"/"Aporte Nubank" — personalizar por usuário no futuro
