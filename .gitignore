@@ -6,6 +6,19 @@ archive/v3-historico/index-backup-*.html
 archive/v3-historico/central-v3_pre-*.html
 archive/v3-historico/central-v3_rename-*.html
 archive/v3-historico/index-.html
+archive/v3-historico/index-*.html
+archive/v3-historico/index_*.html
+archive/v3-historico/*.bak.*
+archive/v3-historico/pc-stale-copy-*/
+
+# Tooling pessoal de skills (npx skills) — não faz parte do app
+.agents/
+.claude/skills/
+skills-lock.json
+
+# Worktrees temporários e cache de build do Cloudflare
+.claude/worktrees/
+.wrangler/
 
 # Arquivos de sistema
 Thumbs.db
