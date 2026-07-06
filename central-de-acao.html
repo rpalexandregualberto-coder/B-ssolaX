@@ -3217,7 +3217,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
         </div>
       </div>
       <div class="dash-mais-card" style="min-width:160px">
-        <div class="dash-mais-label">🏅 Mais Concluído</div>
+        <div class="dash-mais-label">Mais Concluído</div>
         <div class="dash-mais-val" id="dash-mais-val">—</div>
         <div class="dash-mais-sub" id="dash-mais-sub">este mês</div>
       </div>
@@ -3261,15 +3261,15 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <option value="pouco">Pouco Urgente</option>
       </select>
       <select id="qi-cat" class="add-select" onchange="onCatSelectChange('qi-cat')">
-        <option value="allure">✨ Allure</option>
-        <option value="exacta">🏢 Exacta</option>
-        <option value="conteudo">📲 Conteúdo</option>
-        <option value="financeiro">💰 Financeiro</option>
-        <option value="posvenda">🤝 Pós-Venda</option>
-        <option value="ligacao">📞 Ligação Pendente</option>
-        <option value="equipe">👥 Equipe</option>
-        <option value="outros">📋 Outros</option>
-        <option value="__manage__" style="color:var(--accent)">⚙ Gerenciar categorias...</option>
+        <option value="allure">Allure</option>
+        <option value="exacta">Exacta</option>
+        <option value="conteudo">Conteúdo</option>
+        <option value="financeiro">Financeiro</option>
+        <option value="posvenda">Pós-Venda</option>
+        <option value="ligacao">Ligação Pendente</option>
+        <option value="equipe">Equipe</option>
+        <option value="outros">Outros</option>
+        <option value="__manage__" style="color:var(--accent)">Gerenciar categorias...</option>
       </select>
       <input id="qi-date" type="date" class="add-select" style="color-scheme:dark">
       <input id="qi-time" type="time" class="add-select" style="color-scheme:dark;width:90px" title="Horário (opcional)">
@@ -3332,15 +3332,15 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <option value="pouco">Pouco Urgente</option>
       </select>
       <select id="all-cat" style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:.72rem;color:var(--dim);outline:none;cursor:pointer;color-scheme:dark" onchange="onCatSelectChange('all-cat')">
-        <option value="allure">✨ Allure</option>
-        <option value="exacta">🏢 Exacta</option>
-        <option value="conteudo">📲 Conteúdo</option>
-        <option value="financeiro">💰 Financeiro</option>
-        <option value="posvenda">🤝 Pós-Venda</option>
-        <option value="ligacao">📞 Ligação Pendente</option>
-        <option value="equipe">👥 Equipe</option>
-        <option value="outros">📋 Outros</option>
-        <option value="__manage__" style="color:var(--accent)">⚙ Gerenciar categorias...</option>
+        <option value="allure">Allure</option>
+        <option value="exacta">Exacta</option>
+        <option value="conteudo">Conteúdo</option>
+        <option value="financeiro">Financeiro</option>
+        <option value="posvenda">Pós-Venda</option>
+        <option value="ligacao">Ligação Pendente</option>
+        <option value="equipe">Equipe</option>
+        <option value="outros">Outros</option>
+        <option value="__manage__" style="color:var(--accent)">Gerenciar categorias...</option>
       </select>
       <input id="all-date" type="date" style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:.72rem;color:var(--dim);outline:none;cursor:pointer;color-scheme:dark">
       <button class="btn btn-primary" onclick="allAdd()">+ Adicionar</button>
@@ -3403,12 +3403,12 @@ textarea.form-input{border-radius:16px;resize:vertical}
     </div>
 
     <div class="new-meeting-panel" id="new-meeting-panel">
-      <div class="panel-title">🎙 Nova Reunião</div>
+      <div class="panel-title">Nova Reunião</div>
       <div class="form-row"><label class="form-label">Título da Reunião</label><input class="form-input" id="nm-title" placeholder="Ex: Reunião com cliente João..."></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:13px">
         <div class="form-row" style="margin-bottom:0"><label class="form-label">Data</label><input class="form-input" id="nm-date" type="date"></div>
         <div class="form-row" style="margin-bottom:0"><label class="form-label">Horário</label><input class="form-input" id="nm-time" type="time"></div>
-        <div class="form-row" style="margin-bottom:0"><label class="form-label">📍 Local</label><input class="form-input" id="nm-location" placeholder="Escritório, Zoom..."></div>
+        <div class="form-row" style="margin-bottom:0"><label class="form-label">Local</label><input class="form-input" id="nm-location" placeholder="Escritório, Zoom..."></div>
       </div>
       <div class="form-grid">
         <div class="form-row"><label class="form-label">Participantes (PIC)</label><input class="form-input" id="nm-pic" placeholder="Ex: Você, colaborador, cliente..."></div>
@@ -3473,7 +3473,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <!-- Follow-up banner -->
     <div class="followup-banner" id="followup-banner">
       <div class="followup-banner-head">
-        <div class="followup-banner-title">⏰ Follow-ups Atrasados <span id="cnt-followup" style="background:var(--orange);color:#000;font-size:.62rem;padding:1px 7px;border-radius:99px">0</span></div>
+        <div class="followup-banner-title">Follow-ups Atrasados <span id="cnt-followup" style="background:var(--orange);color:#000;font-size:.62rem;padding:1px 7px;border-radius:99px">0</span></div>
         <button onclick="document.getElementById('followup-banner').classList.remove('show')" style="background:none;border:none;color:var(--muted);cursor:pointer">✕</button>
       </div>
       <div id="followup-list"></div>
@@ -3494,10 +3494,10 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <input id="lig-tel" type="text" placeholder="Telefone..." class="add-select" style="width:140px">
       <input id="lig-assunto" type="text" placeholder="Assunto..." class="add-select" style="width:160px">
       <select id="lig-prioridade" class="add-select">
-        <option value="urgente">🔴 Urgente</option>
-        <option value="hoje" selected>🟠 Hoje</option>
-        <option value="semana">🟡 Esta semana</option>
-        <option value="quando">⚪ Quando possível</option>
+        <option value="urgente">Urgente</option>
+        <option value="hoje" selected>Hoje</option>
+        <option value="semana">Esta semana</option>
+        <option value="quando">Quando possível</option>
       </select>
       <button class="btn btn-primary" onclick="addLigacao()">+ Adicionar</button>
     </div>
@@ -3529,7 +3529,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <!-- ORDENS DO DIA -->
     <div class="ordens-card" id="ordens-do-dia-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div class="ordens-title">⚡ Ordens do Dia</div>
+        <div class="ordens-title">Ordens do Dia</div>
         <div style="font-size:.68rem;color:var(--muted)" id="ordens-resumo">tarefas + reuniões de hoje</div>
       </div>
       <div id="ordens-list">
@@ -3547,10 +3547,10 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div class="form-grid">
         <div class="form-row"><label class="form-label">Tipo</label>
           <select class="form-input" id="ag-tipo">
-            <option value="tarefa">✅ Tarefa</option>
-            <option value="reuniao">🎙 Reunião</option>
-            <option value="ligacao">📞 Ligação</option>
-            <option value="compromisso">📌 Compromisso</option>
+            <option value="tarefa">Tarefa</option>
+            <option value="reuniao">Reunião</option>
+            <option value="ligacao">Ligação</option>
+            <option value="compromisso">Compromisso</option>
           </select>
         </div>
         <div class="form-row"><label class="form-label">Notas</label><input class="form-input" id="ag-nota" placeholder="Detalhes opcionais..."></div>
@@ -3597,20 +3597,20 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="form-row">
           <label class="form-label">Status</label>
           <select class="form-input" id="pf-status">
-            <option value="plan">📋 Planejamento</option>
-            <option value="anda" selected>🚀 Em Andamento</option>
-            <option value="paus">⏸ Pausado</option>
-            <option value="conc">✅ Concluído</option>
-            <option value="canc">❌ Cancelado</option>
+            <option value="plan">Planejamento</option>
+            <option value="anda" selected>Em Andamento</option>
+            <option value="paus">Pausado</option>
+            <option value="conc">Concluído</option>
+            <option value="canc">Cancelado</option>
           </select>
         </div>
         <div class="form-row">
           <label class="form-label">Classificação</label>
           <select class="form-input" id="pf-class">
             <option value="fin">Financeiro</option>
-            <option value="est" selected>🎯 Estratégico</option>
-            <option value="ope">⚙️ Operacional</option>
-            <option value="int">🧠 Intelectual</option>
+            <option value="est" selected>Estratégico</option>
+            <option value="ope">Operacional</option>
+            <option value="int">Intelectual</option>
           </select>
         </div>
       </div>
@@ -3622,13 +3622,13 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="form-row">
           <label class="form-label">Cor do Projeto</label>
           <select class="form-input" id="pf-color">
-            <option value="var(--accent)">🟡 Verde Lima</option>
-            <option value="#6b9fff">🔵 Azul</option>
-            <option value="#b580ff">🟣 Roxo</option>
-            <option value="#f06878">🔴 Vermelho</option>
-            <option value="#42e89a">🟢 Verde</option>
-            <option value="#f5a742">🟠 Laranja</option>
-            <option value="#ff78be">🩷 Rosa</option>
+            <option value="var(--accent)">Verde Lima</option>
+            <option value="#6b9fff">Azul</option>
+            <option value="#b580ff">Roxo</option>
+            <option value="#f06878">Vermelho</option>
+            <option value="#42e89a">Verde</option>
+            <option value="#f5a742">Laranja</option>
+            <option value="#ff78be">Rosa</option>
           </select>
         </div>
       </div>
@@ -3701,32 +3701,32 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="form-row"><label class="form-label">Título / Tema</label><input class="form-input" id="cnt-f-titulo" placeholder="Ex: Como funciona o consórcio?"></div>
         <div class="form-row"><label class="form-label">Plataforma</label>
           <select class="form-input" id="cnt-f-plat">
-            <option value="instagram">📸 Instagram</option>
-            <option value="tiktok">🎵 TikTok</option>
-            <option value="youtube">▶️ YouTube</option>
-            <option value="whatsapp">💬 WhatsApp Status</option>
-            <option value="linkedin">💼 LinkedIn</option>
-            <option value="outros">📱 Outros</option>
+            <option value="instagram">Instagram</option>
+            <option value="tiktok">TikTok</option>
+            <option value="youtube">YouTube</option>
+            <option value="whatsapp">WhatsApp Status</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="outros">Outros</option>
           </select>
         </div>
       </div>
       <div class="form-grid">
         <div class="form-row"><label class="form-label">Formato</label>
           <select class="form-input" id="cnt-f-format">
-            <option value="reels">🎬 Reels / Vídeo curto</option>
-            <option value="carrossel">🃏 Carrossel</option>
-            <option value="post">🖼️ Post / Foto</option>
-            <option value="story">📲 Story</option>
-            <option value="video_longo">🎥 Vídeo longo</option>
-            <option value="texto">✏️ Texto / Caption</option>
+            <option value="reels">Reels / Vídeo curto</option>
+            <option value="carrossel">Carrossel</option>
+            <option value="post">Post / Foto</option>
+            <option value="story">Story</option>
+            <option value="video_longo">Vídeo longo</option>
+            <option value="texto">Texto / Caption</option>
           </select>
         </div>
         <div class="form-row"><label class="form-label">Status inicial</label>
           <select class="form-input" id="cnt-f-status">
-            <option value="ideia">💡 Ideia</option>
-            <option value="producao">✏️ Em Produção</option>
-            <option value="revisao">👁️ Revisão</option>
-            <option value="agendado">📅 Agendado</option>
+            <option value="ideia">Ideia</option>
+            <option value="producao">Em Produção</option>
+            <option value="revisao">Revisão</option>
+            <option value="agendado">Agendado</option>
           </select>
         </div>
       </div>
@@ -3790,22 +3790,22 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <!-- HERO: Resumo Executivo + Navegação (compartilhado pelos dois modos) -->
     <div class="fin-hero-card" id="fin-hero" style="grid-template-columns:1fr 1fr 1fr 1fr auto">
       <div class="fin-hero-item">
-        <div class="fin-hero-label">🟢 Total Entradas</div>
+        <div class="fin-hero-label">Total Entradas</div>
         <div class="fin-hero-val positive" id="fin-total-receitas">R$ 0,00</div>
         <div class="fin-hero-sub" id="fin-receitas-count">fixas + extras</div>
       </div>
       <div class="fin-hero-item">
-        <div class="fin-hero-label">🔴 Total Despesas</div>
+        <div class="fin-hero-label">Total Despesas</div>
         <div class="fin-hero-val negative" id="fin-total-despesas">R$ 0,00</div>
         <div class="fin-hero-sub" id="fin-despesas-sub">fixas + extras + cartão</div>
       </div>
       <div class="fin-hero-item">
-        <div class="fin-hero-label">⏳ Fatura em Aberto</div>
+        <div class="fin-hero-label">Fatura em Aberto</div>
         <div class="fin-hero-val" style="color:var(--orange)" id="fin-total-cartao">R$ 0,00</div>
         <div class="fin-hero-sub">pendente — pagar no próximo mês</div>
       </div>
       <div class="fin-hero-item">
-        <div class="fin-hero-label">📊 Saldo Líquido</div>
+        <div class="fin-hero-label">Saldo Líquido</div>
         <div class="fin-hero-val neutral" id="fin-saldo">R$ 0,00</div>
         <div class="fin-hero-sub" id="fin-saldo-status">entradas − despesas</div>
       </div>
@@ -3851,7 +3851,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div class="fdash-row" style="grid-template-columns:minmax(280px,320px) 1fr">
         <!-- Gauge de Saúde -->
         <div class="fdash-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
-          <div class="fdash-title">💚 Saúde Financeira</div>
+          <div class="fdash-title">Saúde Financeira</div>
           <div style="position:relative;margin:6px 0">
             <svg class="fdash-gauge-svg" width="130" height="130" viewBox="0 0 140 140" id="fd-gauge-svg">
               <circle cx="70" cy="70" r="56" fill="none" stroke="var(--border)" stroke-width="12"/>
@@ -3882,7 +3882,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
         </div>
         <!-- Donut ampliado -->
         <div class="fdash-card">
-          <div class="fdash-title">🍩 Despesas por Categoria</div>
+          <div class="fdash-title">Despesas por Categoria</div>
           <div style="display:flex;align-items:center;gap:24px">
             <div style="position:relative;flex-shrink:0">
               <svg id="fd-donut-svg" width="130" height="130" viewBox="0 0 100 100" style="transform:rotate(-90deg)"></svg>
@@ -3900,12 +3900,12 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div class="fdash-row" style="grid-template-columns:1fr 1fr 1fr">
         <!-- Comparativo mensal -->
         <div class="fdash-card">
-          <div class="fdash-title">📅 Este Mês vs Anterior</div>
+          <div class="fdash-title">Este Mês vs Anterior</div>
           <div id="fd-comp-content"></div>
         </div>
         <!-- Fluxo semanal ampliado -->
         <div class="fdash-card">
-          <div class="fdash-title">📊 Fluxo Semanal</div>
+          <div class="fdash-title">Fluxo Semanal</div>
           <div style="display:flex;gap:12px;font-size:.62rem;margin-bottom:4px">
             <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--green);display:inline-block"></span>Entradas</span>
             <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--red);display:inline-block"></span>Despesas</span>
@@ -3919,14 +3919,14 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- Fixas por categoria (barras horizontais) -->
       <div class="fdash-row" style="grid-template-columns:1fr 1fr">
         <div class="fdash-card">
-          <div class="fdash-title">🏠 Fixas por Categoria</div>
+          <div class="fdash-title">Fixas por Categoria</div>
           <div id="fd-fixas-cat"></div>
         </div>
         <!-- Meta + Top categorias -->
         <div class="fdash-card">
-          <div class="fdash-title">🎯 Meta de Gastos</div>
+          <div class="fdash-title">Meta de Gastos</div>
           <div id="fd-meta-content"></div>
-          <div class="fdash-title" style="margin-top:16px">📊 Top Despesas</div>
+          <div class="fdash-title" style="margin-top:16px">Top Despesas</div>
           <div id="fd-top-cat"></div>
         </div>
       </div>
@@ -3934,7 +3934,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- Projeção de caixa ampliada -->
       <div class="fdash-card" style="margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between">
-          <div class="fdash-title" style="margin-bottom:0">📈 Projeção de Saldo — 30 Dias</div>
+          <div class="fdash-title" style="margin-bottom:0">Projeção de Saldo — 30 Dias</div>
           <div style="text-align:right">
             <span style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--text)" id="fd-proj-saldo">—</span>
             <span style="font-size:.6rem;color:var(--muted);margin-left:5px">hoje</span>
@@ -4032,27 +4032,27 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <!-- Stats rápidos -->
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px">
       <div class="fin-stat">
-        <div class="fin-stat-label">🔥 Burn Rate Diário</div>
+        <div class="fin-stat-label">Burn Rate Diário</div>
         <div class="fin-stat-val" style="color:var(--red)" id="fin-burn">—</div>
         <div class="fin-stat-sub">despesas ÷ dias</div>
       </div>
       <div class="fin-stat">
-        <div class="fin-stat-label">📈 Investimentos</div>
+        <div class="fin-stat-label">Investimentos</div>
         <div class="fin-stat-val" style="color:var(--green)" id="fin-invest-total">R$ 0,00</div>
         <div class="fin-stat-sub">aplicações + aportes</div>
       </div>
       <div class="fin-stat">
-        <div class="fin-stat-label">🏠 Despesas Fixas</div>
+        <div class="fin-stat-label">Despesas Fixas</div>
         <div class="fin-stat-val" style="color:var(--orange)" id="fin-fixas-total">R$ 0,00</div>
         <div class="fin-stat-sub" id="fin-fixas-pct">% das despesas</div>
       </div>
       <div class="fin-stat">
-        <div class="fin-stat-label">💸 Despesas Extras</div>
+        <div class="fin-stat-label">Despesas Extras</div>
         <div class="fin-stat-val" style="color:var(--red)" id="fin-vars-total">R$ 0,00</div>
         <div class="fin-stat-sub">PIX + conta</div>
       </div>
       <div class="fin-stat">
-        <div class="fin-stat-label">✅ Fixas Pagas</div>
+        <div class="fin-stat-label">Fixas Pagas</div>
         <div class="fin-stat-val" style="color:var(--green)" id="fin-fixas-pagas">0/0</div>
         <div class="fin-stat-sub">contas do mês</div>
       </div>
@@ -4078,7 +4078,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <!-- Upload IA -->
     <div class="fin-upload-card">
       <div class="fin-upload-head">
-        <div class="fin-upload-title">✨ Importar via IA</div>
+        <div class="fin-upload-title">Importar via IA</div>
         <div style="font-size:.72rem;color:var(--muted)">A IA lê, categoriza e separa automaticamente por tipo</div>
       </div>
       <div class="fin-drop-grid">
@@ -4112,7 +4112,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- CONTAS -->
       <div class="fin-card">
         <div class="fin-card-head">
-          <span class="fin-card-title">🏦 Minhas Contas</span>
+          <span class="fin-card-title">Minhas Contas</span>
           <button onclick="addConta()" class="btn btn-primary" style="padding:5px 11px;font-size:.7rem">+ Nova Conta</button>
         </div>
         <div id="fin-contas-list" style="margin-top:10px"></div>
@@ -4121,7 +4121,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- CARTOES -->
       <div class="fin-card">
         <div class="fin-card-head">
-          <span class="fin-card-title">💳 Meus Cartões</span>
+          <span class="fin-card-title">Meus Cartões</span>
           <button onclick="openAddCard()" class="btn btn-primary" style="padding:5px 11px;font-size:.7rem">+ Novo Cartão</button>
         </div>
         <div id="fin-cartoes-list" style="margin-top:10px"></div>
@@ -4131,7 +4131,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <!-- ORCAMENTO -->
     <div class="fin-card" style="margin-bottom:14px">
       <div class="fin-card-head">
-        <span class="fin-card-title">🎯 Orçamento por Categoria</span>
+        <span class="fin-card-title">Orçamento por Categoria</span>
         <span style="font-size:.65rem;color:var(--muted)">Clique numa categoria pra definir/editar limite</span>
       </div>
       <div id="fin-orcamento-list" style="margin-top:10px"></div>
@@ -4166,7 +4166,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- Transações / Movimentação -->
       <div class="fin-card">
         <div class="fin-card-head">
-          <span class="fin-card-title">💸 Movimentação — Conta + PIX</span>
+          <span class="fin-card-title">Movimentação — Conta + PIX</span>
           <div style="display:flex;gap:7px">
             <select id="fin-filter-tipo" class="add-select" onchange="renderFinanceiro()" style="font-size:.68rem">
               <option value="all">Tudo</option>
@@ -4184,10 +4184,10 @@ textarea.form-input{border-radius:16px;resize:vertical}
             <input class="fin-input" id="fin-tx-nome" placeholder="Descrição..." style="flex:2;min-width:120px">
             <input class="fin-input" id="fin-tx-val" type="number" placeholder="R$" style="width:90px">
             <select class="fin-input" id="fin-tx-tipo" style="width:140px" onchange="updateCatOptions()">
-              <option value="receita">💰 Entrada</option>
-              <option value="despesa_extra" selected>💸 Despesa Extra</option>
-              <option value="investimento">📈 Investimento</option>
-              <option value="cartao">💳 Lançamento Futuro</option>
+              <option value="receita">Entrada</option>
+              <option value="despesa_extra" selected>Despesa Extra</option>
+              <option value="investimento">Investimento</option>
+              <option value="cartao">Lançamento Futuro</option>
             </select>
             <select class="fin-input" id="fin-tx-cat" style="width:150px"></select>
             <button class="btn btn-primary" onclick="addTransaction()" style="white-space:nowrap;font-size:.73rem">+ Lançar</button>
@@ -4234,7 +4234,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- Despesas Fixas -->
       <div class="fin-card">
         <div class="fin-card-head">
-          <span class="fin-card-title">🏠 Despesas Fixas do Mês</span>
+          <span class="fin-card-title">Despesas Fixas do Mês</span>
           <button class="btn btn-primary" style="padding:4px 10px;font-size:.68rem" onclick="toggleFixaForm()">+ Nova</button>
         </div>
         <div id="fin-fixa-form" style="display:none;padding:12px 18px;border-bottom:1px solid var(--border)">
@@ -4276,7 +4276,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- Lançamentos Futuros (Cartão) -->
       <div class="fin-card">
         <div class="fin-card-head">
-          <span class="fin-card-title">💳 Lançamentos Futuros — Cartão</span>
+          <span class="fin-card-title">Lançamentos Futuros — Cartão</span>
           <span class="fin-card-title" style="color:var(--orange)" id="fin-cartao-total-label">R$ 0,00</span>
         </div>
         <div class="fin-card-body">
@@ -4289,7 +4289,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- Card Viagens -->
       <div class="fin-card" id="fin-viagens-card" style="margin-bottom:14px">
         <div class="fin-card-head">
-          <span class="fin-card-title">✈️ Viagens</span>
+          <span class="fin-card-title">Viagens</span>
           <span style="font-size:.7rem;color:var(--muted)" id="fin-viagens-mes"></span>
         </div>
         <div id="fin-viagens-body" style="padding:4px 0"></div>
@@ -4298,7 +4298,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- Histórico de Importações -->
       <div class="fin-card" id="fin-import-history-card">
         <div class="fin-card-head">
-          <span class="fin-card-title">📋 Histórico de Importações</span>
+          <span class="fin-card-title">Histórico de Importações</span>
           <span style="font-size:.7rem;color:var(--muted)" id="fin-import-history-count"></span>
         </div>
         <div class="fin-card-body" style="padding:0">
@@ -4311,7 +4311,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- Regras de Aprendizado da IA -->
       <div class="fin-card" id="fin-rules-card">
         <div class="fin-card-head">
-          <span class="fin-card-title">🧠 Regras de Aprendizado</span>
+          <span class="fin-card-title">Regras de Aprendizado</span>
           <span style="font-size:.7rem;color:var(--muted)" id="fin-rules-count"></span>
         </div>
         <div style="padding:8px 16px 12px;font-size:.7rem;color:var(--muted);line-height:1.5;border-bottom:1px solid var(--border)">
@@ -4428,8 +4428,8 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div class="form-row"><label class="form-label">Classificação</label>
         <select class="form-input" id="gf-class">
           <option value="fin">Financeiro</option>
-          <option value="est">🎯 Estratégico</option>
-          <option value="ope">⚙️ Operacional</option>
+          <option value="est">Estratégico</option>
+          <option value="ope">Operacional</option>
           <option value="out">Outros</option>
         </select>
       </div>
@@ -4568,14 +4568,14 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center">
       <input id="notas-search" type="text" placeholder="🔍 Buscar nota ou tarefa..." oninput="filterNotas()" style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-size:.85rem;font-family:inherit;outline:none">
       <select id="notas-color-filter" onchange="filterNotas()" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:.78rem;color:var(--text);outline:none">
-        <option value="">🎨 Todas as cores</option>
-        <option value="amarelo">💡 Amarelo</option>
-        <option value="verde">🌿 Verde</option>
-        <option value="azul">💧 Azul</option>
-        <option value="rosa">💗 Rosa</option>
-        <option value="roxo">🔮 Roxo</option>
-        <option value="laranja">🔥 Laranja</option>
-        <option value="cinza">📝 Cinza</option>
+        <option value="">Todas as cores</option>
+        <option value="amarelo">Amarelo</option>
+        <option value="verde">Verde</option>
+        <option value="azul">Azul</option>
+        <option value="rosa">Rosa</option>
+        <option value="roxo">Roxo</option>
+        <option value="laranja">Laranja</option>
+        <option value="cinza">Cinza</option>
       </select>
       <button onclick="toggleNotasArchive()" id="notas-archive-toggle" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 14px;cursor:pointer;color:var(--muted);font-size:.78rem;font-family:'Outfit',sans-serif;font-weight:700">📦 Arquivadas</button>
     </div>
@@ -4749,7 +4749,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
           <div class="foco-greeting-sub" id="foco-greeting-sub">Carregando seu dia...</div>
         </div>
         <div class="foco-scenario">
-          <div class="foco-scenario-label">📊 Cenário atual</div>
+          <div class="foco-scenario-label">Cenário atual</div>
           <div class="foco-scenario-text" id="foco-scenario-text">Analisando suas tarefas...</div>
         </div>
       </div>
@@ -4767,7 +4767,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <!-- Task List (left) -->
       <div class="foco-tasks-card">
         <div class="foco-tasks-header">
-          <span class="foco-tasks-title">⚡ Foco de Hoje</span>
+          <span class="foco-tasks-title">Foco de Hoje</span>
           <span class="foco-tasks-count" id="foco-tasks-count">0 tarefas</span>
         </div>
         <div id="foco-task-list"></div>
@@ -4775,7 +4775,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
 
       <!-- Pomodoro (right) -->
       <div class="foco-pomo-card">
-        <div class="foco-pomo-title">🍅 Pomodoro</div>
+        <div class="foco-pomo-title">Pomodoro</div>
         <div class="foco-pomo-task-name" id="pomo-task-name">Selecione uma tarefa →</div>
 
         <div class="foco-pomo-ring">
@@ -4850,12 +4850,12 @@ textarea.form-input{border-radius:16px;resize:vertical}
     <div class="form-grid">
       <div class="form-row"><label class="form-label">Categoria</label>
         <select class="form-input" id="hab-inp-cat">
-          <option value="saude">💪 Saúde</option>
-          <option value="trabalho">💼 Trabalho</option>
-          <option value="estudo">📚 Estudo</option>
-          <option value="financas">💰 Finanças</option>
-          <option value="espiritualidade">✝️ Espiritualidade</option>
-          <option value="pessoal">🌟 Pessoal</option>
+          <option value="saude">Saúde</option>
+          <option value="trabalho">Trabalho</option>
+          <option value="estudo">Estudo</option>
+          <option value="financas">Finanças</option>
+          <option value="espiritualidade">Espiritualidade</option>
+          <option value="pessoal">Pessoal</option>
         </select>
       </div>
       <div class="form-row"><label class="form-label">Frequência</label>
@@ -4885,14 +4885,14 @@ textarea.form-input{border-radius:16px;resize:vertical}
 <div class="task-panel-overlay" id="task-overlay" onclick="closePanelOnOverlay(event)">
   <div class="task-panel" id="task-panel">
     <div class="tp-header">
-      <span class="tp-header-title">📋 Detalhes da Tarefa</span>
+      <span class="tp-header-title">Detalhes da Tarefa</span>
       <button class="tp-close" onclick="closePanel()">✕</button>
     </div>
     <div class="tp-body">
       <input class="tp-name" id="tp-name" type="text" placeholder="Nome da tarefa...">
 
       <!-- Status buttons -->
-      <div class="tp-section-label">⚡ Status</div>
+      <div class="tp-section-label">Status</div>
       <div class="tp-status-row">
         <button class="tp-status-btn" id="tpst-ns" onclick="setPanelStatus('ns')">○ Não Iniciada</button>
         <button class="tp-status-btn" id="tpst-proc" onclick="setPanelStatus('proc')">▶ Em Andamento</button>
@@ -4914,15 +4914,15 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="tp-prop">
           <span class="tp-prop-label">Categoria</span>
           <select id="tp-cat" onchange="onCatSelectChange('tp-cat')">
-            <option value="allure">✨ Allure</option>
-            <option value="exacta">🏢 Exacta</option>
-            <option value="conteudo">📲 Conteúdo</option>
-            <option value="financeiro">💰 Financeiro</option>
-            <option value="posvenda">🤝 Pós-Venda</option>
-            <option value="ligacao">📞 Ligação Pendente</option>
-            <option value="equipe">👥 Equipe</option>
-            <option value="outros">📋 Outros</option>
-            <option value="__manage__" style="color:var(--accent)">⚙ Gerenciar categorias...</option>
+            <option value="allure">Allure</option>
+            <option value="exacta">Exacta</option>
+            <option value="conteudo">Conteúdo</option>
+            <option value="financeiro">Financeiro</option>
+            <option value="posvenda">Pós-Venda</option>
+            <option value="ligacao">Ligação Pendente</option>
+            <option value="equipe">Equipe</option>
+            <option value="outros">Outros</option>
+            <option value="__manage__" style="color:var(--accent)">Gerenciar categorias...</option>
           </select>
         </div>
         <div class="tp-prop">
@@ -4932,16 +4932,16 @@ textarea.form-input{border-radius:16px;resize:vertical}
         <div class="tp-prop">
           <span class="tp-prop-label">Projeto</span>
           <select id="tp-proj">
-            <option value="">📌 Sem projeto (avulsa)</option>
+            <option value="">Sem projeto (avulsa)</option>
           </select>
         </div>
         <div class="tp-prop">
           <span class="tp-prop-label">Recorrência</span>
           <select id="tp-rec" class="tp-rec-select">
-            <option value="">🔁 Sem recorrência</option>
-            <option value="daily">📅 Diária</option>
-            <option value="weekly">📆 Semanal</option>
-            <option value="monthly">🗓 Mensal</option>
+            <option value="">Sem recorrência</option>
+            <option value="daily">Diária</option>
+            <option value="weekly">Semanal</option>
+            <option value="monthly">Mensal</option>
           </select>
         </div>
       </div>
@@ -4949,7 +4949,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div class="tp-divider"></div>
 
       <!-- Subtasks -->
-      <div class="tp-section-label">✅ Subtarefas</div>
+      <div class="tp-section-label">Subtarefas</div>
       <div class="subtask-wrap">
         <div class="subtask-progress-row">
           <div class="subtask-progress-track">
@@ -4969,7 +4969,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div class="tp-divider"></div>
 
       <!-- Comments -->
-      <div class="tp-section-label">💬 Comentários</div>
+      <div class="tp-section-label">Comentários</div>
       <div class="comments-wrap">
         <div class="comment-list" id="tp-comment-list"></div>
         <div class="comment-input-wrap">
@@ -4984,14 +4984,14 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div class="tp-divider"></div>
 
       <!-- Notes -->
-      <div class="tp-section-label">📝 Anotações</div>
+      <div class="tp-section-label">Anotações</div>
       <textarea class="tp-notes" id="tp-notes" placeholder="Adicione contexto, links, detalhes importantes...&#10;&#10;Suporte a texto livre."></textarea>
 
       <div class="tp-divider"></div>
 
       <!-- Files -->
       <div class="tp-files">
-        <div class="tp-section-label">📎 Arquivos Anexados</div>
+        <div class="tp-section-label">Arquivos Anexados</div>
         <div class="tp-drop-zone" id="tp-dropzone">
           <input type="file" multiple onchange="handleFiles(event)">
           <div class="tp-drop-icon">📂</div>
@@ -5985,16 +5985,16 @@ function buildMeetingCard(m, isArchived=false){
       <div class="meeting-chevron">▶</div>
     </div>
     <div class="meeting-body">
-      ${m.agenda?`<div style="margin-bottom:12px"><label class="form-label">📋 Pauta</label><div style="font-size:.82rem;line-height:1.65;color:var(--text);white-space:pre-wrap;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.agenda)}</div></div>`:''}
+      ${m.agenda?`<div style="margin-bottom:12px"><label class="form-label">Pauta</label><div style="font-size:.82rem;line-height:1.65;color:var(--text);white-space:pre-wrap;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.agenda)}</div></div>`:''}
       ${m.transcript?`<div style="margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-          <label class="form-label" style="margin-bottom:0">🎙 Transcrição</label>
+          <label class="form-label" style="margin-bottom:0">Transcrição</label>
           <button onclick="toggleTranscript(${m.id},this)" style="font-size:.65rem;font-weight:600;padding:2px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);transition:all .15s" title="Expandir/Recolher">▼ Recolher</button>
         </div>
         <div id="transcript-body-${m.id}" style="font-size:.78rem;line-height:1.65;color:var(--dim);white-space:pre-wrap;max-height:160px;overflow-y:auto;background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border)">${escHtml(m.transcript)}</div>
       </div>`:''}
       <div style="margin-bottom:14px">
-        <label class="form-label">📝 Notas Pós-Reunião</label>
+        <label class="form-label">Notas Pós-Reunião</label>
         <textarea class="meeting-notes-area" id="notes-${m.id}" placeholder="Resuma o que foi discutido, decisões tomadas, próximos passos...">${escHtml(m.notes||"")}</textarea>
         <button class="meeting-action-btn" style="margin-top:6px" onclick="saveMeetingNotes(${m.id})">💾 Salvar notas</button>
       </div>
@@ -6189,7 +6189,7 @@ function renderMeetingPipeline(){
   // Pending past (no notes)
   if(pendingPast.length){
     html += `<div class="pipeline-group">
-      <div class="pipeline-group-label" style="color:var(--orange)">⚠️ Sem registro <span style="font-size:.65rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">Reuniões passadas sem notas</span></div>
+      <div class="pipeline-group-label" style="color:var(--orange)">Sem registro <span style="font-size:.65rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">Reuniões passadas sem notas</span></div>
       ${pendingPast.map(buildPipelineCard).join("")}
     </div>`;
   }
@@ -6246,7 +6246,7 @@ async function analyzeMeeting(id){
   const btn=document.getElementById(`btn-ai-${id}`);
   if(btn){ btn.classList.add("loading"); btn.textContent="✨ Analisando..."; }
   const resultEl=document.getElementById(`ai-result-${id}`);
-  if(resultEl) resultEl.innerHTML=`<div class="ai-box"><div class="ai-box-head"><div class="ai-box-title">🤖 IA Analisando</div></div><div class="ai-box-body"><div class="ai-loading"><div class="ai-spinner"></div> Processando transcrição e gerando análise...</div></div></div>`;
+  if(resultEl) resultEl.innerHTML=`<div class="ai-box"><div class="ai-box-head"><div class="ai-box-title">IA Analisando</div></div><div class="ai-box-body"><div class="ai-loading"><div class="ai-spinner"></div> Processando transcrição e gerando análise...</div></div></div>`;
 
   // Open the card
   const card=document.getElementById(`mc-${id}`);
@@ -6340,7 +6340,7 @@ Responda APENAS com o JSON. Seja brutalmente honesto, estratégico e profundamen
     const errDetail=e?.message||"Erro desconhecido";
     if(resultEl) resultEl.innerHTML=`
       <div class="ai-box">
-        <div class="ai-box-head"><div class="ai-box-title">⚠️ Erro na análise</div></div>
+        <div class="ai-box-head"><div class="ai-box-title">Erro na análise</div></div>
         <div class="ai-box-body">
           <p style="font-size:.78rem;color:var(--red);margin-bottom:10px">${errDetail}</p>
           <button class="btn btn-ai" onclick="analyzeMeeting(${id})" style="margin-top:4px">🔄 Tentar novamente</button>
@@ -6390,17 +6390,17 @@ function renderAIResult(data,meetingId){
   const prob=data.probabilidades||{};
   const probHtml=`
     <div class="ai-prob-row">
-      <span class="ai-prob-label">✅ Execução do plano</span>
+      <span class="ai-prob-label">Execução do plano</span>
       <div class="ai-prob-track"><div class="ai-prob-fill" style="width:${prob.execucao_plano||0}%;background:var(--green)"></div></div>
       <span class="ai-prob-num" style="color:var(--green)">${prob.execucao_plano||0}%</span>
     </div>
     <div class="ai-prob-row">
-      <span class="ai-prob-label">🚀 Sucesso operacional</span>
+      <span class="ai-prob-label">Sucesso operacional</span>
       <div class="ai-prob-track"><div class="ai-prob-fill" style="width:${prob.sucesso_operacional||0}%;background:var(--blue)"></div></div>
       <span class="ai-prob-num" style="color:var(--blue)">${prob.sucesso_operacional||0}%</span>
     </div>
     <div class="ai-prob-row">
-      <span class="ai-prob-label">⚠️ Risco sem resultado</span>
+      <span class="ai-prob-label">Risco sem resultado</span>
       <div class="ai-prob-track"><div class="ai-prob-fill" style="width:${prob.risco_sem_resultado||0}%;background:var(--red)"></div></div>
       <span class="ai-prob-num" style="color:var(--red)">${prob.risco_sem_resultado||0}%</span>
     </div>`;
@@ -6432,9 +6432,9 @@ function renderAIResult(data,meetingId){
   const emoHtml=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.79rem">
       ${emo.clima_predominante?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--accent)">Clima Geral</div><div style="color:var(--text)">${esc(emo.clima_predominante)}</div></div>`:""}
-      ${emo.quem_elevou?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--green)">⬆ Elevou energia</div><div style="color:var(--text)">${esc(emo.quem_elevou)}</div></div>`:""}
-      ${emo.quem_gerou_tensao?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--red)">⚡ Gerou tensão</div><div style="color:var(--text)">${esc(emo.quem_gerou_tensao)}</div></div>`:""}
-      ${emo.quem_estabilizou?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--blue)">🌊 Estabilizou</div><div style="color:var(--text)">${esc(emo.quem_estabilizou)}</div></div>`:""}
+      ${emo.quem_elevou?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--green)">Elevou energia</div><div style="color:var(--text)">${esc(emo.quem_elevou)}</div></div>`:""}
+      ${emo.quem_gerou_tensao?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--red)">Gerou tensão</div><div style="color:var(--text)">${esc(emo.quem_gerou_tensao)}</div></div>`:""}
+      ${emo.quem_estabilizou?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--blue)">Estabilizou</div><div style="color:var(--text)">${esc(emo.quem_estabilizou)}</div></div>`:""}
     </div>
     ${emo.mudancas?`<div style="font-size:.79rem;color:var(--dim);margin-top:8px;line-height:1.6;padding:8px 12px;background:var(--surface);border-radius:9px;border:1px solid var(--border)">${esc(emo.mudancas)}</div>`:""}`;
 
@@ -6495,18 +6495,18 @@ function renderAIResult(data,meetingId){
 
   // ── ANÁLISE EXECUTIVA FINAL ──
   const execHtml=`
-    ${data.maior_problema?`<div class="ai-col-card" style="margin-bottom:8px;border-color:rgba(255,77,109,.3)"><div class="ai-col-title" style="color:var(--red)">🔴 Maior Problema</div><div style="font-size:.8rem;color:var(--text)">${esc(data.maior_problema)}</div></div>`:""}
-    ${data.maior_acerto?`<div class="ai-col-card" style="margin-bottom:8px;border-color:rgba(52,197,122,.3)"><div class="ai-col-title" style="color:var(--green)">✅ Maior Acerto</div><div style="font-size:.8rem;color:var(--text)">${esc(data.maior_acerto)}</div></div>`:""}
-    ${data.o_que_ninguem_percebeu?`<div class="ai-col-card" style="margin-bottom:8px;border-color:var(--accent-border);background:var(--accent-dim)"><div class="ai-col-title" style="color:var(--accent)">🔮 O que ninguém percebeu</div><div style="font-size:.8rem;color:var(--text)">${esc(data.o_que_ninguem_percebeu)}</div></div>`:""}
+    ${data.maior_problema?`<div class="ai-col-card" style="margin-bottom:8px;border-color:rgba(255,77,109,.3)"><div class="ai-col-title" style="color:var(--red)">Maior Problema</div><div style="font-size:.8rem;color:var(--text)">${esc(data.maior_problema)}</div></div>`:""}
+    ${data.maior_acerto?`<div class="ai-col-card" style="margin-bottom:8px;border-color:rgba(52,197,122,.3)"><div class="ai-col-title" style="color:var(--green)">Maior Acerto</div><div style="font-size:.8rem;color:var(--text)">${esc(data.maior_acerto)}</div></div>`:""}
+    ${data.o_que_ninguem_percebeu?`<div class="ai-col-card" style="margin-bottom:8px;border-color:var(--accent-border);background:var(--accent-dim)"><div class="ai-col-title" style="color:var(--accent)">O que ninguém percebeu</div><div style="font-size:.8rem;color:var(--text)">${esc(data.o_que_ninguem_percebeu)}</div></div>`:""}
     <div class="ai-two-col" style="margin-bottom:8px">
-      ${(data.o_que_manter||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--green)">✅ Manter</div>${data.o_que_manter.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
-      ${(data.o_que_eliminar||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--red)">❌ Eliminar</div>${data.o_que_eliminar.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(data.o_que_manter||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--green)">Manter</div>${data.o_que_manter.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(data.o_que_eliminar||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--red)">Eliminar</div>${data.o_que_eliminar.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
     </div>
     <div class="ai-two-col" style="margin-bottom:8px">
-      ${(data.estrategicos||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--blue)">♟ Mais Estratégicos</div>${data.estrategicos.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
-      ${(data.operacionais||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--dim)">⚙ Mais Operacionais</div>${data.operacionais.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(data.estrategicos||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--blue)">Mais Estratégicos</div>${data.estrategicos.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(data.operacionais||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--dim)">Mais Operacionais</div>${data.operacionais.map(x=>`<div class="ai-col-item">${esc(x)}</div>`).join("")}</div>`:""}
     </div>
-    ${(data.proximo_encontro||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--accent)">📅 Próxima Reunião — Temas pendentes</div>${data.proximo_encontro.map(x=>`<div class="ai-col-item">↩ ${esc(x)}</div>`).join("")}</div>`:""}`;
+    ${(data.proximo_encontro||[]).length?`<div class="ai-col-card"><div class="ai-col-title" style="color:var(--accent)">Próxima Reunião — Temas pendentes</div>${data.proximo_encontro.map(x=>`<div class="ai-col-item">↩ ${esc(x)}</div>`).join("")}</div>`:""}`;
 
   const sec=(title,content,color="var(--accent)")=>`
     <div class="ai-section">
@@ -6516,7 +6516,7 @@ function renderAIResult(data,meetingId){
 
   return `<div class="ai-box">
     <div class="ai-box-head">
-      <div class="ai-box-title">🧠 Inteligência Corporativa · Análise Completa</div>
+      <div class="ai-box-title">Inteligência Corporativa · Análise Completa</div>
     </div>
     <div class="ai-box-body">
 
@@ -7689,8 +7689,8 @@ Responda APENAS com o JSON.`;
     const opHtml = `
       ${r.analise_operacional?.eficiencia?`<div class="rel-item insight" style="margin-bottom:10px">${esc(r.analise_operacional.eficiencia)}</div>`:""}
       <div class="rel-two-col">
-        ${(r.analise_operacional?.gargalos||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--orange)">⛔ Gargalos</div>${r.analise_operacional.gargalos.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
-        ${(r.analise_operacional?.ciclos_improdutivos||[]).filter(Boolean).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">🔄 Ciclos improdutivos</div>${r.analise_operacional.ciclos_improdutivos.filter(Boolean).map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.analise_operacional?.gargalos||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--orange)">Gargalos</div>${r.analise_operacional.gargalos.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.analise_operacional?.ciclos_improdutivos||[]).filter(Boolean).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">Ciclos improdutivos</div>${r.analise_operacional.ciclos_improdutivos.filter(Boolean).map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
       </div>
       ${(r.analise_operacional?.sinais_burnout||[]).filter(Boolean).length?`<div style="margin-top:8px">${r.analise_operacional.sinais_burnout.filter(Boolean).map(s=>`<div class="rel-item alerta">🔥 ${esc(s)}</div>`).join("")}</div>`:""}`;
 
@@ -7704,8 +7704,8 @@ Responda APENAS com o JSON.`;
     const metasHtml = `
       ${r.analise_metas?.progresso_geral?`<div class="rel-item insight" style="margin-bottom:8px">${esc(r.analise_metas.progresso_geral)}</div>`:""}
       <div class="rel-two-col">
-        ${(r.analise_metas?.evoluindo||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">✅ Evoluindo</div>${r.analise_metas.evoluindo.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
-        ${(r.analise_metas?.em_risco||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">⚠️ Em risco</div>${r.analise_metas.em_risco.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.analise_metas?.evoluindo||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">Evoluindo</div>${r.analise_metas.evoluindo.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.analise_metas?.em_risco||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">Em risco</div>${r.analise_metas.em_risco.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
       </div>`;
 
     // Financeiro
@@ -7713,29 +7713,29 @@ Responda APENAS com o JSON.`;
       ${r.analise_financeira?.saude?`<div class="rel-item insight" style="margin-bottom:8px">${esc(r.analise_financeira.saude)}</div>`:""}
       ${r.analise_financeira?.comportamento?`<div class="rel-item" style="background:var(--surface);border-left:2px solid var(--dim);margin-bottom:8px">${esc(r.analise_financeira.comportamento)}</div>`:""}
       <div class="rel-two-col">
-        ${(r.analise_financeira?.alertas||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">🚨 Alertas</div>${r.analise_financeira.alertas.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
-        ${(r.analise_financeira?.oportunidades||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">💡 Oportunidades</div>${r.analise_financeira.oportunidades.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.analise_financeira?.alertas||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">Alertas</div>${r.analise_financeira.alertas.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.analise_financeira?.oportunidades||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">Oportunidades</div>${r.analise_financeira.oportunidades.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
       </div>`;
 
     // Análise final
     const finalHtml = `
-      ${r.o_que_ai_percebeu?`<div class="rel-col-card" style="margin-bottom:10px;border-color:var(--accent-border);background:var(--accent-dim)"><div class="rel-col-title" style="color:var(--accent)">🔮 O que a IA percebeu que você provavelmente não percebe</div><div style="font-size:.82rem;color:var(--text);line-height:1.65">${esc(r.o_que_ai_percebeu)}</div></div>`:""}
+      ${r.o_que_ai_percebeu?`<div class="rel-col-card" style="margin-bottom:10px;border-color:var(--accent-border);background:var(--accent-dim)"><div class="rel-col-title" style="color:var(--accent)">O que a IA percebeu que você provavelmente não percebe</div><div style="font-size:.82rem;color:var(--text);line-height:1.65">${esc(r.o_que_ai_percebeu)}</div></div>`:""}
       <div class="rel-two-col">
-        ${(r.maiores_acertos||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">✅ Maiores acertos</div>${r.maiores_acertos.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
-        ${(r.maiores_erros||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">❌ Maiores erros</div>${r.maiores_erros.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.maiores_acertos||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">Maiores acertos</div>${r.maiores_acertos.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.maiores_erros||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">Maiores erros</div>${r.maiores_erros.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
       </div>
       <div class="rel-two-col">
-        ${(r.o_que_manter||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--blue)">✅ Manter</div>${r.o_que_manter.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
-        ${(r.o_que_eliminar||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">❌ Eliminar</div>${r.o_que_eliminar.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.o_que_manter||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--blue)">Manter</div>${r.o_que_manter.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+        ${(r.o_que_eliminar||[]).length?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">Eliminar</div>${r.o_que_eliminar.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
       </div>
-      ${(r.o_que_automatizar||[]).length?`<div class="rel-col-card" style="margin-bottom:10px"><div class="rel-col-title" style="color:var(--orange)">⚙️ Automatizar</div>${r.o_que_automatizar.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
-      ${(r.potencial_desperdicado||[]).length?`<div class="rel-col-card" style="margin-bottom:10px"><div class="rel-col-title" style="color:var(--accent)">💎 Potencial desperdiçado</div>${r.potencial_desperdicado.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
-      ${(r.padroes_repetindo||[]).length?`<div class="rel-col-card" style="margin-bottom:10px"><div class="rel-col-title" style="color:var(--orange)">🔁 Padrões se repetindo</div>${r.padroes_repetindo.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(r.o_que_automatizar||[]).length?`<div class="rel-col-card" style="margin-bottom:10px"><div class="rel-col-title" style="color:var(--orange)">Automatizar</div>${r.o_que_automatizar.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(r.potencial_desperdicado||[]).length?`<div class="rel-col-card" style="margin-bottom:10px"><div class="rel-col-title" style="color:var(--accent)">Potencial desperdiçado</div>${r.potencial_desperdicado.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
+      ${(r.padroes_repetindo||[]).length?`<div class="rel-col-card" style="margin-bottom:10px"><div class="rel-col-title" style="color:var(--orange)">Padrões se repetindo</div>${r.padroes_repetindo.map(x=>`<div class="rel-col-item">${esc(x)}</div>`).join("")}</div>`:""}
       <div class="rel-two-col">
-        ${r.area_desalinhada?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">📉 Área mais desalinhada</div><div style="font-size:.79rem;color:var(--text);line-height:1.5">${esc(r.area_desalinhada)}</div></div>`:""}
-        ${r.area_evoluindo?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">📈 Área evoluindo mais</div><div style="font-size:.79rem;color:var(--text);line-height:1.5">${esc(r.area_evoluindo)}</div></div>`:""}
+        ${r.area_desalinhada?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--red)">Área mais desalinhada</div><div style="font-size:.79rem;color:var(--text);line-height:1.5">${esc(r.area_desalinhada)}</div></div>`:""}
+        ${r.area_evoluindo?`<div class="rel-col-card"><div class="rel-col-title" style="color:var(--green)">Área evoluindo mais</div><div style="font-size:.79rem;color:var(--text);line-height:1.5">${esc(r.area_evoluindo)}</div></div>`:""}
       </div>
-      ${(r.decisoes_urgentes||[]).length?`<div class="rel-col-card" style="border-color:rgba(255,77,109,.3);background:var(--red-dim)"><div class="rel-col-title" style="color:var(--red)">🚨 Decisões urgentes</div>${r.decisoes_urgentes.map(x=>`<div class="rel-col-item">→ ${esc(x)}</div>`).join("")}</div>`:""}`;
+      ${(r.decisoes_urgentes||[]).length?`<div class="rel-col-card" style="border-color:rgba(255,77,109,.3);background:var(--red-dim)"><div class="rel-col-title" style="color:var(--red)">Decisões urgentes</div>${r.decisoes_urgentes.map(x=>`<div class="rel-col-item">→ ${esc(x)}</div>`).join("")}</div>`:""}`;
 
     const sec = (title, html, color="var(--accent)") =>
       `<div class="relatorio-card">
@@ -7759,7 +7759,7 @@ Responda APENAS com o JSON.`;
             <div class="rel-geral-sub">Gerado em ${weekStr} · Claude Sonnet</div>
           </div>
         </div>
-        <div class="relatorio-section-title" style="color:var(--accent)">📊 Scores da Semana</div>
+        <div class="relatorio-section-title" style="color:var(--accent)">Scores da Semana</div>
         <div class="rel-score-grid">${scoresHtml}</div>
       </div>
 
@@ -9349,7 +9349,7 @@ function renderFixasCards(fixas, txFixas=[]){
         <div class="fixa-cat-icon" style="background:rgba(160,122,232,.15)">📌</div>
         <div class="fixa-card-info">
           <div class="fixa-card-nome" title="${escHtml(t.nome||"")}">${escHtml((t.nome||"").slice(0,30))}</div>
-          <div class="fixa-card-sub" style="color:var(--accent);font-size:.58rem">✨ Importada · ${t.categoria||""}</div>
+          <div class="fixa-card-sub" style="color:var(--accent);font-size:.58rem">Importada · ${t.categoria||""}</div>
         </div>
         <div>
           <div class="fixa-card-valor paga">${fmtBRL(t.valor||0)}</div>
@@ -10979,7 +10979,7 @@ function runSearch(query){
     const recentMeet = [...meetings].slice(-3).reverse();
     let html = "";
     if(recent.length){
-      html += `<div class="search-section-title">⏱ Tarefas recentes</div>`;
+      html += `<div class="search-section-title">Tarefas recentes</div>`;
       recent.forEach((t,i)=>{
         const idx = searchResults.length;
         searchResults.push({type:"task",id:t.id});
@@ -10993,7 +10993,7 @@ function runSearch(query){
       });
     }
     if(recentMeet.length){
-      html += `<div class="search-section-title">🎙 Reuniões recentes</div>`;
+      html += `<div class="search-section-title">Reuniões recentes</div>`;
       recentMeet.forEach((m,i)=>{
         const idx = searchResults.length;
         searchResults.push({type:"meeting",id:m.id});
@@ -11014,7 +11014,7 @@ function runSearch(query){
   // Tasks
   const matchTasks = TASKS.filter(t=>t.name.toLowerCase().includes(q)||(t.cat||"").includes(q));
   if(matchTasks.length){
-    html += `<div class="search-section-title">✅ Tarefas (${matchTasks.length})</div>`;
+    html += `<div class="search-section-title">Tarefas (${matchTasks.length})</div>`;
     matchTasks.slice(0,6).forEach(t=>{
       const idx = searchResults.length;
       searchResults.push({type:"task",id:t.id});
@@ -11031,7 +11031,7 @@ function runSearch(query){
   // Projects
   const matchProj = PROJECTS.filter(p=>p.name.toLowerCase().includes(q)||(p.objective||"").toLowerCase().includes(q));
   if(matchProj.length){
-    html += `<div class="search-section-title">📁 Projetos (${matchProj.length})</div>`;
+    html += `<div class="search-section-title">Projetos (${matchProj.length})</div>`;
     matchProj.slice(0,4).forEach(p=>{
       const idx = searchResults.length;
       searchResults.push({type:"project",id:p.id});
@@ -11047,7 +11047,7 @@ function runSearch(query){
   // Meetings
   const matchMeet = meetings.filter(m=>m.title.toLowerCase().includes(q)||(m.transcript||"").toLowerCase().includes(q)||(m.agenda||"").toLowerCase().includes(q));
   if(matchMeet.length){
-    html += `<div class="search-section-title">🎙 Reuniões (${matchMeet.length})</div>`;
+    html += `<div class="search-section-title">Reuniões (${matchMeet.length})</div>`;
     matchMeet.slice(0,4).forEach(m=>{
       const idx = searchResults.length;
       searchResults.push({type:"meeting",id:m.id});
@@ -11063,7 +11063,7 @@ function runSearch(query){
   // Ligações
   const matchLig = LIGACOES.filter(l=>l.nome.toLowerCase().includes(q)||(l.assunto||"").toLowerCase().includes(q));
   if(matchLig.length){
-    html += `<div class="search-section-title">📞 Ligações (${matchLig.length})</div>`;
+    html += `<div class="search-section-title">Ligações (${matchLig.length})</div>`;
     matchLig.slice(0,3).forEach(l=>{
       const idx = searchResults.length;
       searchResults.push({type:"ligacao",id:l.id});
@@ -11541,7 +11541,7 @@ function renderCardChartsHTML(card, mesKey, txs, limite){
   return `
   <!-- Donut categorias -->
   <div class="cc-chart-card">
-    <div class="cc-chart-title">🍩 Por Categoria</div>
+    <div class="cc-chart-title">Por Categoria</div>
     <div style="display:flex;gap:10px;align-items:center">
       <div style="position:relative;flex-shrink:0">
         <svg width="88" height="88" viewBox="0 0 88 88" style="transform:rotate(-90deg)">${donutSVG}</svg>
@@ -11554,7 +11554,7 @@ function renderCardChartsHTML(card, mesKey, txs, limite){
   </div>
   <!-- Limite gauge -->
   <div class="cc-chart-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
-    <div class="cc-chart-title" style="text-align:center">🎯 Limite Usado</div>
+    <div class="cc-chart-title" style="text-align:center">Limite Usado</div>
     <div style="position:relative">
       <svg width="110" height="110" viewBox="0 0 140 140" style="transform:rotate(-90deg);display:block">
         <circle cx="70" cy="70" r="36" fill="none" stroke="var(--border)" stroke-width="10"/>
@@ -11570,7 +11570,7 @@ function renderCardChartsHTML(card, mesKey, txs, limite){
   </div>
   <!-- Parcelas ativas -->
   <div class="cc-chart-card">
-    <div class="cc-chart-title">📦 Parcelamentos</div>
+    <div class="cc-chart-title">Parcelamentos</div>
     ${renderInstallsHTML(card.id,true)}
   </div>`;
 }
@@ -11644,10 +11644,10 @@ function renderCardAIPanel(ai){
       ${scoreCard("Próxima Fatura",sc.projecao_prox_fatura||0,"var(--accent)")}
     </div>
     ${ai.insight_comportamental?`<div class="cc-ai-insight">"${ai.insight_comportamental}"</div>`:""}
-    ${alertas?`<div class="cc-ai-section-title">⚠️ Alertas</div>${alertas}`:""}
-    ${assinaturas?`<div class="cc-ai-section-title">🔁 Assinaturas Detectadas</div><div style="margin-bottom:10px">${assinaturas}</div>`:""}
-    ${parcelas?`<div class="cc-ai-section-title">📦 Parcelamentos Ativos</div>${parcelas}`:""}
-    ${ai.diagnostico?`<div class="cc-ai-section-title">🎯 Diagnóstico</div><div class="cc-ai-insight" style="margin-top:4px">${ai.diagnostico}</div>`:""}
+    ${alertas?`<div class="cc-ai-section-title">Alertas</div>${alertas}`:""}
+    ${assinaturas?`<div class="cc-ai-section-title">Assinaturas Detectadas</div><div style="margin-bottom:10px">${assinaturas}</div>`:""}
+    ${parcelas?`<div class="cc-ai-section-title">Parcelamentos Ativos</div>${parcelas}`:""}
+    ${ai.diagnostico?`<div class="cc-ai-section-title">Diagnóstico</div><div class="cc-ai-insight" style="margin-top:4px">${ai.diagnostico}</div>`:""}
   </div>`;
 }
 
@@ -13640,18 +13640,18 @@ function addTaskToProject(projId){
       <input id="_atp-nome" placeholder="Nome da tarefa *" style="padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;outline:none" />
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <select id="_atp-urg" style="padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.78rem">
-          <option value="baixo">🟢 Baixa</option>
-          <option value="medio" selected>🔵 Média</option>
-          <option value="alto">🟠 Alta</option>
-          <option value="urgente">🔴 Urgente</option>
+          <option value="baixo">Baixa</option>
+          <option value="medio" selected>Média</option>
+          <option value="alto">Alta</option>
+          <option value="urgente">Urgente</option>
         </select>
         <select id="_atp-cat" style="padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.78rem">
-          <option value="outros">📋 Outros</option>
-          <option value="vendas">💼 Vendas</option>
-          <option value="financeiro">💰 Financeiro</option>
-          <option value="operacional">⚙️ Operacional</option>
-          <option value="estrategico">🎯 Estratégico</option>
-          <option value="pessoal">🙋 Pessoal</option>
+          <option value="outros">Outros</option>
+          <option value="vendas">Vendas</option>
+          <option value="financeiro">Financeiro</option>
+          <option value="operacional">Operacional</option>
+          <option value="estrategico">Estratégico</option>
+          <option value="pessoal">Pessoal</option>
         </select>
       </div>
       <input id="_atp-data" type="date" style="padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.78rem;outline:none" />
@@ -13778,7 +13778,7 @@ function _atpFiltrar(projId){
 }
 
 function updateProjectSelects(){
-  const opts = `<option value="">📌 Sem projeto (avulsa)</option>` +
+  const opts = `<option value="">Sem projeto (avulsa)</option>` +
     PROJECTS.map(p=>`<option value="${p.id}">${escHtml(p.icon)} ${escHtml(p.name)}</option>`).join("");
   ["qi-proj","all-proj","tp-proj"].forEach(id=>{
     const el=document.getElementById(id);
@@ -15636,7 +15636,7 @@ function clearRyukiHistory(){
 <div class="cat-modal-overlay" id="cat-manager-modal" onclick="closeCatManager()" style="display:none">
   <div class="cat-modal-box" onclick="event.stopPropagation()">
     <div class="cat-modal-head">
-      <div class="cat-modal-title">⚙️ Gerenciar Categorias</div>
+      <div class="cat-modal-title">Gerenciar Categorias</div>
       <button onclick="closeCatManager()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;line-height:1">✕</button>
     </div>
     <div class="cat-modal-body" id="cat-manager-body">
