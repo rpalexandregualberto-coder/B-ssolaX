@@ -4104,6 +4104,9 @@ textarea.form-input{border-radius:16px;resize:vertical}
       </div>
     </div>
 
+    <!-- ━━━━━━ QUANTO PRECISO TER EM CAIXA ━━━━━━ -->
+    <div id="fin-caixa-box" style="margin-bottom:14px"></div>
+
     <!-- ━━━━━━ CONTAS / CARTOES / ORCAMENTO ━━━━━━ -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
       <!-- CONTAS -->
@@ -4119,7 +4122,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
       <div class="fin-card">
         <div class="fin-card-head">
           <span class="fin-card-title">💳 Meus Cartões</span>
-          <button onclick="addCartao()" class="btn btn-primary" style="padding:5px 11px;font-size:.7rem">+ Novo Cartão</button>
+          <button onclick="openAddCard()" class="btn btn-primary" style="padding:5px 11px;font-size:.7rem">+ Novo Cartão</button>
         </div>
         <div id="fin-cartoes-list" style="margin-top:10px"></div>
       </div>
@@ -4240,17 +4243,7 @@ textarea.form-input{border-radius:16px;resize:vertical}
             <input class="fin-input" id="fixa-val" type="number" placeholder="Valor R$">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-            <select class="fin-input" id="fixa-cat">
-              <option value="habitacao">🏠 Habitação</option>
-              <option value="transporte">🚗 Transporte</option>
-              <option value="assinaturas">📱 Assinaturas</option>
-              <option value="saude">💊 Saúde</option>
-              <option value="educacao">📚 Educação</option>
-              <option value="alimentacao">🍽️ Alimentação</option>
-              <option value="financiamento">🏦 Financiamento</option>
-              <option value="seguro">🛡️ Seguro</option>
-              <option value="outros">📋 Outros</option>
-            </select>
+            <select class="fin-input" id="fixa-cat" onchange="onFixaTipoChange()"></select>
             <select class="fin-input" id="fixa-dia">
               <option value="1">Dia 1</option><option value="2">Dia 2</option>
               <option value="3">Dia 3</option><option value="4">Dia 4</option>
@@ -4267,6 +4260,11 @@ textarea.form-input{border-radius:16px;resize:vertical}
               <option value="25">Dia 25</option><option value="26">Dia 26</option>
               <option value="27">Dia 27</option><option value="28">Dia 28</option>
             </select>
+          </div>
+          <div id="fixa-novo-tipo" style="display:none;grid-template-columns:1fr 88px auto;gap:8px;margin-bottom:8px">
+            <input class="fin-input" id="fixa-novo-tipo-nome" placeholder="Nome do tipo (ex: Consórcio)">
+            <input class="fin-input" id="fixa-novo-tipo-icon" placeholder="Ícone" maxlength="3" style="text-align:center">
+            <button class="btn btn-primary" onclick="addFixaTipo()" style="font-size:.7rem;white-space:nowrap">Criar tipo</button>
           </div>
           <button class="btn btn-primary" onclick="addContaFixa()" style="font-size:.73rem">Salvar Conta Fixa</button>
         </div>
@@ -7998,6 +7996,8 @@ let nextContaId = 1;
 // {id, nome, banco, limite, dia_fechamento, dia_vencimento, conta_pagamento_id, cor, ativo}
 let FIN_CARTOES = [];
 let nextCartaoId = 1;
+let FIN_MIGRACAO_CARTAO_V2 = false;
+let FIN_CARTOES_LEGACY = [];
 
 // ── ORCAMENTO POR CATEGORIA ──────────────────────
 // { "🍔 iFood": 200, "🛒 Mercado": 800, ... }
@@ -8023,7 +8023,7 @@ function saldoConta(contaId){
   FIN_TRANSACTIONS.forEach(t=>{
     if(t.conta_id !== contaId) return;
     if(t.tipo === 'receita') saldo += t.valor;
-    else if(t.tipo === 'despesa_extra' || t.tipo === 'despesa_fixa') saldo -= t.valor;
+    else if(t.tipo === 'despesa_extra' || t.tipo === 'despesa_fixa' || t.tipo === 'pagamento_fixa') saldo -= t.valor;
     else if(t.tipo === 'investimento') saldo -= t.valor; // sai da conta
   });
   return saldo;
@@ -8069,10 +8069,10 @@ function getFaturaMesLabel(dataStr, cartao){
 
 // Fatura ABERTA de um cartao = compras desde o ultimo fechamento ate o proximo
 function faturaAberta(cartaoId){
-  const cartao = FIN_CARTOES.find(c=>c.id===cartaoId);
+  const cartao = getCartaoAny(cartaoId);
   if(!cartao) return 0;
   const today = new Date();
-  const diaFech = cartao.dia_fechamento || 5;
+  const diaFech = cartaoFechamento(cartao);
   // Determina periodo da fatura aberta atual
   let inicio, fim;
   if(today.getDate() > diaFech){
@@ -8092,7 +8092,7 @@ function faturaAberta(cartaoId){
 
 // % de limite usado de um cartao
 function pctLimiteCartao(cartaoId){
-  const cartao = FIN_CARTOES.find(c=>c.id===cartaoId);
+  const cartao = getCartaoAny(cartaoId);
   if(!cartao || !cartao.limite) return 0;
   return Math.round((faturaAberta(cartaoId) / cartao.limite) * 100);
 }
@@ -8153,41 +8153,35 @@ function deleteConta(id){
 
 // ── MANAGEMENT: Cartoes ──────────────────────────
 function addCartao(){
-  const nome = prompt("Nome do cartao (ex: Daycoval Visa, Nubank Roxinho):");
-  if(!nome || !nome.trim()) return;
-  const banco = prompt("Banco/Bandeira:", "");
-  const limStr = prompt("Limite (R$):", "1000");
-  const limite = parseFloat((limStr||'0').replace(',','.')) || 0;
-  const dia_fechamento = parseInt(prompt("Dia de fechamento (1-31):", "5")) || 5;
-  const dia_vencimento = parseInt(prompt("Dia de vencimento (1-31):", "12")) || 12;
-  const cor = CONTA_CORES[(FIN_CARTOES.length+3) % CONTA_CORES.length];
-  FIN_CARTOES.push({id: nextCartaoId++, nome: nome.trim(), banco: (banco||'').trim(), limite, dia_fechamento, dia_vencimento, cor, ativo: true});
-  renderFinanceiro();
-  try{ saveData(); }catch(e){}
+  // Unificado: usa o modal completo do sistema CARDS (cores de banco + sem prompt nativo)
+  openAddCard();
 }
 
 function editCartao(id){
-  const c = FIN_CARTOES.find(x=>x.id===id);
+  const c = getCartaoAny(id);
   if(!c) return;
   const nome = prompt("Nome:", c.nome); if(nome===null) return;
   if(nome.trim()) c.nome = nome.trim();
-  const limStr = prompt("Limite (R$):", c.limite); 
+  const limStr = prompt("Limite (R$):", c.limite);
   if(limStr!==null) c.limite = parseFloat((limStr||'0').replace(',','.')) || 0;
-  const fech = prompt("Dia de fechamento:", c.dia_fechamento);
-  if(fech!==null) c.dia_fechamento = parseInt(fech) || c.dia_fechamento;
-  const venc = prompt("Dia de vencimento:", c.dia_vencimento);
-  if(venc!==null) c.dia_vencimento = parseInt(venc) || c.dia_vencimento;
+  const fech = prompt("Dia de fechamento:", cartaoFechamento(c));
+  if(fech!==null){ const v=parseInt(fech)||cartaoFechamento(c); c.fechamento=v; c.dia_fechamento=v; }
+  const venc = prompt("Dia de vencimento:", cartaoVencimento(c));
+  if(venc!==null){ const v=parseInt(venc)||cartaoVencimento(c); c.vencimento=v; c.dia_vencimento=v; }
   renderFinanceiro();
+  try{ if(typeof renderCartoes==="function") renderCartoes(); }catch(e){}
   try{ saveData(); }catch(e){}
 }
 
 function deleteCartao(id){
-  const c = FIN_CARTOES.find(x=>x.id===id);
+  const c = getCartaoAny(id);
   if(!c) return;
   if(!confirm(`Excluir cartao "${c.nome}"?`)) return;
   FIN_TRANSACTIONS.forEach(t=>{ if(t.cartao_id===id) delete t.cartao_id; });
+  const ci = CARDS.findIndex(x=>x.id===id); if(ci>-1) CARDS.splice(ci,1);
   FIN_CARTOES = FIN_CARTOES.filter(x=>x.id!==id);
   renderFinanceiro();
+  try{ if(typeof renderCartoes==="function") renderCartoes(); }catch(e){}
   try{ saveData(); }catch(e){}
 }
 
@@ -8507,7 +8501,7 @@ function renderFinDashboard(){
     const maxVal2 = sorted[0]?.[1]?.total || 1;
     if(!sorted.length){ fixasCatEl.innerHTML='<div style="font-size:.72rem;color:var(--muted)">Nenhuma conta fixa</div>'; }
     else fixasCatEl.innerHTML = sorted.map(([cat,d])=>{
-      const info = FIXA_CAT_MAP[cat]||FIXA_CAT_MAP.outros;
+      const info = fixaTipoInfo(cat);
       const pct = Math.round(d.total/maxVal2*100);
       const pctPago = d.total>0?Math.round(d.pago/d.total*100):0;
       return `<div class="fdash-hbar-row">
@@ -8631,12 +8625,12 @@ function addTransaction(){
     data:new Date().toISOString().split("T")[0],origem:"manual"
   };
   if(tipo === "cartao"){
-    if(FIN_CARTOES.length === 1) tx.cartao_id = FIN_CARTOES[0].id;
-    else if(FIN_CARTOES.length > 1){
-      const opts = FIN_CARTOES.map((c,i)=>`${i+1}. ${c.nome}`).join("\n");
+    if(CARDS.length === 1) tx.cartao_id = CARDS[0].id;
+    else if(CARDS.length > 1){
+      const opts = CARDS.map((c,i)=>`${i+1}. ${c.nome}`).join("\n");
       const escolhaStr = prompt(`Em qual cartão?\n${opts}\n\nDigite o número:`, "1");
       const idx = parseInt(escolhaStr) - 1;
-      if(FIN_CARTOES[idx]) tx.cartao_id = FIN_CARTOES[idx].id;
+      if(CARDS[idx]) tx.cartao_id = CARDS[idx].id;
     }
   } else {
     if(FIN_CONTAS.length === 1) tx.conta_id = FIN_CONTAS[0].id;
@@ -8663,13 +8657,14 @@ function deleteTransaction(id){
 function toggleFixaForm(){
   const f=document.getElementById("fin-fixa-form");
   if(f) f.style.display=f.style.display==="none"?"block":"none";
+  populateFixaTipoSelect();
 }
 
 function addContaFixa(){
   const nome=(document.getElementById("fixa-nome")?.value||"").trim();
   const val=parseFloat(document.getElementById("fixa-val")?.value)||0;
   const dia=parseInt(document.getElementById("fixa-dia")?.value)||1;
-  const cat=document.getElementById("fixa-cat")?.value||"outros";
+  let cat=document.getElementById("fixa-cat")?.value||"outros"; if(cat==="__novo__") cat="outros";
   if(!nome){alert("Informe o nome da conta.");return;}
   getFixas().push({id:nextFixaId++,nome,valor:val,dia,paga:false,cat});
   document.getElementById("fixa-nome").value="";
@@ -8700,7 +8695,29 @@ function updateFixaValor(id, val){
 
 function toggleContaPaga(id){
   const x=getFixas().find(f=>f.id===id);
-  if(x) x.paga=!x.paga;
+  if(!x) return;
+  x.paga=!x.paga;
+  if(x.paga){
+    // baixa de saldo real: ao marcar como paga, gera uma saida na conta de pagamento
+    if(FIN_CONTAS.length && (x.valor||0)>0){
+      const conta = FIN_CONTAS.find(c=>c.ativa!==false) || FIN_CONTAS[0];
+      const tx = {
+        id:nextFinId++, nome:"Pagamento: "+(x.nome||"conta fixa"), valor:(x.valor||0),
+        tipo:"pagamento_fixa", categoria:(x.cat?fixaTipoInfo(x.cat).label:"Contas Fixas"),
+        data:new Date().toISOString().split("T")[0], origem:"pagamento_fixa",
+        conta_id:conta.id, _fixaPagaId:x.id
+      };
+      FIN_TRANSACTIONS.push(tx);
+      x._pagTxId = tx.id;
+    }
+  } else {
+    // desmarcou: remove a saida gerada (estorna o saldo)
+    if(x._pagTxId!=null){
+      const i = FIN_TRANSACTIONS.findIndex(t=>t.id===x._pagTxId);
+      if(i>-1) FIN_TRANSACTIONS.splice(i,1);
+      delete x._pagTxId;
+    }
+  }
   renderFinanceiro();
   try{ saveData(); }catch(e){ console.warn("Save error:",e); }
 }
@@ -8710,6 +8727,59 @@ function deleteContaFixa(id){
   FIN_FIXAS_BY_MONTH[key] = (FIN_FIXAS_BY_MONTH[key]||[]).filter(x=>x.id!==id);
   renderFinanceiro();
   try{ saveData(); }catch(e){ console.warn("Save error:",e); }
+}
+
+// ── QUANTO PRECISO TER EM CAIXA — contas a pagar do periodo menos saldo ──
+// Fatura FECHADA de um cartao = ciclo que ja fechou e esta pendente de pagamento
+function faturaFechada(cardId){
+  const card=getCartaoAny(cardId); if(!card) return 0;
+  const diaFech=cartaoFechamento(card);
+  const today=new Date();
+  let fAno=today.getFullYear(), fMes=today.getMonth();
+  if(today.getDate()<=diaFech){ fMes--; if(fMes<0){fMes=11;fAno--;} }
+  const fim=new Date(fAno, fMes, diaFech, 23,59,59);
+  const inicio=new Date(fAno, fMes-1, diaFech+1, 0,0,0);
+  return FIN_TRANSACTIONS
+    .filter(t=>t.cartao_id===cardId && t.tipo==='cartao')
+    .filter(t=>{ const d=new Date((t.data||'')+'T12:00:00'); return d>=inicio && d<=fim; })
+    .reduce((s,t)=>s+(t.valor||0), 0);
+}
+function renderCaixaNecessario(){
+  const box=document.getElementById("fin-caixa-box"); if(!box) return;
+  let aPagarFixas=0; getFixas().forEach(f=>{ if(!f.paga) aPagarFixas+=(f.valor||0); });
+  let aPagarFaturas=0, previsaoParcial=0;
+  CARDS.forEach(c=>{
+    const fechada=faturaFechada(c.id); if(fechada>0) aPagarFaturas+=fechada;
+    const aberta=faturaAberta(c.id);   if(aberta>0)  previsaoParcial+=aberta;
+  });
+  const totalAPagar=aPagarFixas+aPagarFaturas;
+  const saldoAtual=FIN_CONTAS.reduce((s,c)=>s+saldoConta(c.id),0);
+  const falta=Math.max(0, totalAPagar-saldoAtual);
+  const folga=saldoAtual-totalAPagar;
+  let cor, chip, msg;
+  if(totalAPagar<=0){ cor='var(--muted)'; chip=''; msg='Nenhuma conta pendente no período.'; }
+  else if(folga>=0){ cor='var(--green)'; chip='Coberto'; msg=`Você já tem em conta. Folga de ${fmtBRL(folga)}.`; }
+  else if(falta<=totalAPagar*0.25){ cor='var(--orange)'; chip='Falta pouco'; msg=`Você tem ${fmtBRL(saldoAtual)}. Faltam ${fmtBRL(falta)}.`; }
+  else { cor='var(--red)'; chip='Déficit'; msg=`Você tem ${fmtBRL(saldoAtual)}. Faltam ${fmtBRL(falta)}.`; }
+  const mini=(lbl,val,c)=>`<div style="background:var(--surface);border-radius:10px;padding:9px 11px">
+      <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">${lbl}</div>
+      <div style="font-weight:800;font-size:.95rem;margin-top:2px${c?`;color:${c}`:''}">${val}</div></div>`;
+  box.innerHTML = `<div class="fin-card" style="border-left:3px solid ${cor}">
+      <div class="fin-card-head">
+        <span class="fin-card-title">Quanto preciso ter em caixa</span>
+        ${chip?`<span style="font-size:.62rem;font-weight:700;padding:3px 9px;border-radius:999px;background:${cor};color:#fff">${chip}</span>`:''}
+      </div>
+      <div style="padding:14px 18px 16px">
+        <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:1.9rem;color:${cor};line-height:1">${fmtBRL(totalAPagar)}</div>
+        <div style="font-size:.76rem;color:var(--muted);margin-top:5px">${escHtml(msg)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px">
+          ${mini('Fixas pendentes', fmtBRL(aPagarFixas))}
+          ${mini('Faturas fechadas', fmtBRL(aPagarFaturas))}
+          ${mini('Já tenho em conta', fmtBRL(saldoAtual), 'var(--green)')}
+        </div>
+        ${previsaoParcial>0?`<div style="font-size:.68rem;color:var(--muted);margin-top:10px">+ ${fmtBRL(previsaoParcial)} em faturas ainda abertas — previsão do próximo ciclo, fora do valor acima.</div>`:''}
+      </div>
+    </div>`;
 }
 
 function renderFinanceiro(){
@@ -8757,6 +8827,7 @@ function renderFinanceiro(){
   setEl("fin-month-label",FIN_MONTHS[finMonth]+" "+finYear);
   setEl("fin-receitas-count",entradas.length+" lançamento"+(entradas.length!==1?"s":""));
   setEl("fin-burn",burnRate>0?fmtBRL(burnRate)+"/dia":"—");
+  try{ renderCaixaNecessario(); }catch(e){}
   setEl("fin-invest-total",fmtBRL(totalInvest));
   const totalFixasAll = totalFixasCad + totalFixasTx;
   setEl("fin-fixas-total",fmtBRL(totalFixasAll));
@@ -8960,7 +9031,7 @@ function renderFinanceiro(){
   // ━━━━━━ CARTOES ━━━━━━
   const cartoesList = document.getElementById("fin-cartoes-list");
   if(cartoesList){
-    if(!FIN_CARTOES.length){
+    if(!CARDS.length){
       cartoesList.innerHTML = `<div style="text-align:center;padding:28px 16px;color:var(--muted);font-size:.78rem">
         <div style="font-size:2.5rem;margin-bottom:10px">💳</div>
         <div style="font-weight:700;margin-bottom:4px">Nenhum cartão cadastrado</div>
@@ -8968,14 +9039,14 @@ function renderFinanceiro(){
       </div>`;
     } else {
       cartoesList.innerHTML = `<div style="display:flex;gap:14px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent">
-        ${FIN_CARTOES.map(c=>{
+        ${CARDS.map(c=>{
           const fatura = faturaAberta(c.id);
           const pct = pctLimiteCartao(c.id);
           const pctNum = Math.min(pct, 100);
           const pctCor = pct < 70 ? 'rgba(52,197,122,.9)' : pct < 90 ? 'rgba(245,166,35,.9)' : 'rgba(255,77,109,.9)';
           const pctCorVar = pct < 70 ? 'var(--green)' : pct < 90 ? 'var(--orange)' : 'var(--red)';
-          const banco = (c.banco||'').toLowerCase();
-          // Detect bank gradient from name
+          const banco = ((c.banco||'')+' '+(c.nome||'')).toLowerCase();
+          // Detect bank gradient from banco + nome do cartao
           const bk = banco.includes('nubank')||banco.includes('nu ')?{g:'#7B00CC,#C24BF0',emoji:'💜',flag:'NU'}:
             banco.includes('itaú')||banco.includes('itau')?{g:'#CC5500,#FF9A40',emoji:'🟠',flag:'ITAÚ'}:
             banco.includes('bradesco')?{g:'#AA0020,#FF2D55',emoji:'🔴',flag:'BRAD'}:
@@ -8989,7 +9060,7 @@ function renderFinanceiro(){
             banco.includes('picpay')?{g:'#147830,#21C25E',emoji:'🟢',flag:'PIC'}:
             banco.includes('sicoob')?{g:'#004A20,#00823B',emoji:'🟢',flag:'SCOB'}:
             banco.includes('mastercard')||banco.includes('visa')||banco.includes('elo')?{g:'#2E1A6E,#6B3FAA',emoji:'💳',flag:banco.includes('visa')?'VISA':banco.includes('elo')?'ELO':'MC'}:
-            {g:`${c.cor||'#5b4fb5'},${c.cor||'#7c5fe6'}`,emoji:'💳',flag:'CARD'};
+            {g:'#5b4fb5,#7c5fe6',emoji:'💳',flag:'CARD'};
 
           const textoColor = ['bb ','bb','#aa8800','#f0cc20','#d4aa00'].some(x=>banco.includes(x))||banco.includes('banco do brasil')?'#111':'#fff';
 
@@ -9017,7 +9088,7 @@ function renderFinanceiro(){
             <!-- card name -->
             <div style="position:relative">
               <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:900;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,.2)">${escHtml(c.nome)}</div>
-              <div style="font-size:.58rem;opacity:.72">Fecha dia ${c.dia_fechamento||'?'} · Vence dia ${c.dia_vencimento||'?'}</div>
+              <div style="font-size:.58rem;opacity:.72">Fecha dia ${cartaoFechamento(c)} · Vence dia ${cartaoVencimento(c)}</div>
             </div>
             <!-- bottom: fatura + limit bar -->
             <div style="position:relative">
@@ -9041,10 +9112,10 @@ function renderFinanceiro(){
             </div>
             <!-- edit/delete overlay buttons -->
             <div style="position:absolute;top:10px;right:10px;display:flex;gap:4px">
-              <button onclick="event.stopPropagation();editCartao(${c.id})" title="Editar"
+              <button onclick="event.stopPropagation();editCartao('${c.id}')" title="Editar"
                 style="background:rgba(0,0,0,.25);border:none;border-radius:6px;width:24px;height:24px;cursor:pointer;color:rgba(255,255,255,.8);font-size:.7rem;display:flex;align-items:center;justify-content:center;transition:background .15s"
                 onmouseover="this.style.background='rgba(0,0,0,.45)'" onmouseout="this.style.background='rgba(0,0,0,.25)'">✏️</button>
-              <button onclick="event.stopPropagation();deleteCartao(${c.id})" title="Excluir"
+              <button onclick="event.stopPropagation();deleteCartao('${c.id}')" title="Excluir"
                 style="background:rgba(0,0,0,.25);border:none;border-radius:6px;width:24px;height:24px;cursor:pointer;color:rgba(255,255,255,.8);font-size:.7rem;display:flex;align-items:center;justify-content:center;transition:background .15s"
                 onmouseover="this.style.background='rgba(200,0,0,.5)'" onmouseout="this.style.background='rgba(0,0,0,.25)'">🗑</button>
             </div>
@@ -9151,6 +9222,45 @@ const FIXA_CAT_MAP = {
   outros:        {icon:"📋", label:"Outros",          bg:"var(--surface)",        color:"var(--dim)"},
 };
 
+// ── TIPOS DE DESPESA FIXA CONFIGURAVEIS (usuario pode criar os seus) ──
+let FIN_FIXA_TIPOS = {};
+function seedFixaTipos(){
+  if(!FIN_FIXA_TIPOS || !Object.keys(FIN_FIXA_TIPOS).length){
+    FIN_FIXA_TIPOS = JSON.parse(JSON.stringify(FIXA_CAT_MAP));
+  } else {
+    Object.keys(FIXA_CAT_MAP).forEach(k=>{ if(!FIN_FIXA_TIPOS[k]) FIN_FIXA_TIPOS[k]=FIXA_CAT_MAP[k]; });
+  }
+}
+function getFixaTipos(){ return (FIN_FIXA_TIPOS && Object.keys(FIN_FIXA_TIPOS).length) ? FIN_FIXA_TIPOS : FIXA_CAT_MAP; }
+function fixaTipoInfo(cat){ const t=getFixaTipos(); return t[cat||"outros"] || t.outros || FIXA_CAT_MAP.outros; }
+function populateFixaTipoSelect(){
+  const s=document.getElementById("fixa-cat"); if(!s) return;
+  const cur=s.value||"habitacao";
+  const t=getFixaTipos();
+  s.innerHTML = Object.entries(t).map(([k,v])=>`<option value="${escHtml(k)}">${escHtml(v.icon||"")} ${escHtml(v.label||k)}</option>`).join("")
+    + '<option value="__novo__">+ Criar novo tipo...</option>';
+  if(t[cur]) s.value=cur;
+}
+function onFixaTipoChange(){
+  const s=document.getElementById("fixa-cat"), box=document.getElementById("fixa-novo-tipo");
+  if(!s||!box) return;
+  box.style.display = s.value==="__novo__" ? "grid" : "none";
+}
+function addFixaTipo(){
+  const nome=(document.getElementById("fixa-novo-tipo-nome")?.value||"").trim();
+  const icon=(document.getElementById("fixa-novo-tipo-icon")?.value||"").trim()||"•";
+  if(!nome){ alert("Informe o nome do tipo."); return; }
+  const key=(nome.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""))||("tipo_"+nextFixaId);
+  seedFixaTipos();
+  FIN_FIXA_TIPOS[key]={icon, label:nome, bg:"rgba(160,122,232,.15)", color:"var(--purple)"};
+  document.getElementById("fixa-novo-tipo-nome").value="";
+  document.getElementById("fixa-novo-tipo-icon").value="";
+  populateFixaTipoSelect();
+  const s=document.getElementById("fixa-cat"); if(s) s.value=key;
+  const box=document.getElementById("fixa-novo-tipo"); if(box) box.style.display="none";
+  try{ saveData(); }catch(e){}
+}
+
 function renderFixasCards(fixas, txFixas=[]){
   const el = document.getElementById("fin-fixas-list");
   if(!el) return;
@@ -9195,7 +9305,7 @@ function renderFixasCards(fixas, txFixas=[]){
   });
 
   const cards = sorted.map(f=>{
-    const cat = FIXA_CAT_MAP[f.cat||"outros"] || FIXA_CAT_MAP.outros;
+    const cat = fixaTipoInfo(f.cat);
     const diasRestantes = f.dia - todayDay;
     let vencBadge, vencClass;
     if(f.paga){
@@ -9479,7 +9589,7 @@ function renderAlertasVencimento(){
     .sort((a,b) => a.diff - b.diff);
 
   // Também verifica cartões cadastrados
-  const cartaoAlertas = FIN_CARTOES.map(c=>{
+  const cartaoAlertas = CARDS.map(c=>{
     const diff = c.dia_vencimento - diaHoje;
     const fat = faturaAberta(c.id);
     if(diff >= 0 && diff <= 7 && fat > 0){
@@ -9641,18 +9751,18 @@ async function processFinFile(event, tipo){
   // Pergunta a qual conta/cartao a importacao se refere
   let vinculoId = null;
   if(tipo === "fatura"){
-    if(!FIN_CARTOES.length){
+    if(!CARDS.length){
       if(!confirm("Voce nao tem cartoes cadastrados. Importar mesmo assim (sem vincular a um cartao)?")){
         event.target.value = ""; return;
       }
-    } else if(FIN_CARTOES.length === 1){
-      vinculoId = FIN_CARTOES[0].id;
+    } else if(CARDS.length === 1){
+      vinculoId = CARDS[0].id;
     } else {
-      const opts = FIN_CARTOES.map((c,i)=>`${i+1}. ${c.nome}`).join("\n");
+      const opts = CARDS.map((c,i)=>`${i+1}. ${c.nome}`).join("\n");
       const escolhaStr = prompt(`Esta fatura é de qual cartão?\n${opts}\n\nDigite o número:`, "1");
       if(escolhaStr === null){ event.target.value=""; return; }
       const idx = parseInt(escolhaStr) - 1;
-      if(FIN_CARTOES[idx]) vinculoId = FIN_CARTOES[idx].id;
+      if(CARDS[idx]) vinculoId = CARDS[idx].id;
       else { alert("Cartão inválido."); event.target.value=""; return; }
     }
   } else {
@@ -9680,7 +9790,7 @@ async function processFinFile(event, tipo){
   let isFuturo = false;
   let autoFuturo = false; // true = usará calcTransacaoFuturo() por tx
   if(tipo === "fatura"){
-    const cartaoVinc = FIN_CARTOES.find(c=>c.id===vinculoId);
+    const cartaoVinc = getCartaoAny(vinculoId);
     if(cartaoVinc){
       autoFuturo = true; // futuro calculado por data de cada transação
     } else {
@@ -9781,7 +9891,7 @@ JSON SOMENTE:
       const newId=nextFinId++;
       const _vId=(typeof vinculoId!=="undefined")?vinculoId:window._finImportVinculoId;
       const _vTipo=(typeof tipo!=="undefined")?tipo:window._finImportTipo;
-      const cartaoObj = _vTipo==="fatura" ? FIN_CARTOES.find(c=>c.id===_vId) : null;
+      const cartaoObj = _vTipo==="fatura" ? getCartaoAny(_vId) : null;
       const _autoFuturo=(typeof autoFuturo!=="undefined")?autoFuturo:!!window._finImportAutoFuturo;
       // futuro por transação (regime de competência): usa ciclo do cartão se disponível
       let txFuturo = false;
@@ -10057,7 +10167,7 @@ JSON SOMENTE:
       }
       // futuro por transação usando ciclo do cartão (regime de competência)
       if(_vTipo === "fatura"){
-        const cartaoObj2 = FIN_CARTOES.find(c=>c.id===_vId);
+        const cartaoObj2 = getCartaoAny(_vId);
         if(_autoFuturo2 && cartaoObj2){
           newTx.futuro = calcTransacaoFuturo(newTx.data, cartaoObj2);
           newTx.fatura_mes = getFaturaMesLabel(newTx.data, cartaoObj2);
@@ -11133,6 +11243,62 @@ const BANKS = {
   outro:     {nome:"Outro",           emoji:"💳", cor:"#5b4fb5", cor2:"#7c5fe6", corTexto:"#fff"},
 };
 
+// ── CARTOES: resolvedor universal + migracao FIN_CARTOES -> CARDS (sistema unico) ──
+function getCartaoAny(id){
+  let c = CARDS.find(x=>x.id===id);
+  if(c) return c;
+  if(FIN_CARTOES && FIN_CARTOES.find) c = FIN_CARTOES.find(x=>x.id===id);
+  return c||null;
+}
+function cartaoFechamento(c){ return (c && (c.fechamento || c.dia_fechamento)) || 5; }
+function cartaoVencimento(c){ return (c && (c.vencimento || c.dia_vencimento)) || 10; }
+function bankKeyFromText(txt){
+  const b=(txt||'').toLowerCase();
+  if(b.includes('nubank')||b.includes('nu ')||b.trim()==='nu') return 'nubank';
+  if(b.includes('itaú')||b.includes('itau')) return 'itau';
+  if(b.includes('bradesco')) return 'bradesco';
+  if(b.includes('santander')) return 'santander';
+  if(b.includes('banco do brasil')||b.includes('bb ')||b.trim()==='bb') return 'bb';
+  if(b.includes('caixa')) return 'caixa';
+  if(b.includes('inter')) return 'inter';
+  if(b.includes('c6')) return 'c6';
+  if(b.includes('xp')) return 'xp';
+  if(b.includes('neon')) return 'neon';
+  if(b.includes('picpay')) return 'picpay';
+  if(b.includes('sicoob')) return 'sicoob';
+  if(b.includes('bndes')) return 'bndes';
+  return 'outro';
+}
+function migrateFinCartoesToCards(){
+  if(FIN_MIGRACAO_CARTAO_V2) return;
+  if(!FIN_CARTOES || !FIN_CARTOES.length){ FIN_MIGRACAO_CARTAO_V2=true; return; }
+  try{
+    FIN_CARTOES_LEGACY = JSON.parse(JSON.stringify(FIN_CARTOES));
+    const idMap={};
+    FIN_CARTOES.forEach(c=>{
+      const key=bankKeyFromText((c.banco||'')+' '+(c.nome||''));
+      const bk=BANKS[key]||BANKS.outro;
+      const novo={
+        id:"card_"+(nextCardId++),
+        nome:c.nome||bk.nome, banco:key, ultimos4:c.ultimos4||"",
+        cor:bk.cor, cor2:bk.cor2, corTexto:bk.corTexto,
+        limite:c.limite||0,
+        fechamento:c.dia_fechamento||5, vencimento:c.dia_vencimento||12,
+        dia_fechamento:c.dia_fechamento||5, dia_vencimento:c.dia_vencimento||12,
+        conta_pagamento_id:c.conta_pagamento_id||null,
+        ativo:c.ativo!==false, faturas:{}, criadoEm:new Date().toISOString(), _migradoDe:c.id
+      };
+      idMap[c.id]=novo.id;
+      CARDS.push(novo);
+    });
+    FIN_TRANSACTIONS.forEach(t=>{ if(t.cartao_id!=null && idMap[t.cartao_id]!=null) t.cartao_id=idMap[t.cartao_id]; });
+    FIN_CARTOES.length=0;
+    FIN_MIGRACAO_CARTAO_V2=true;
+    try{ saveData(); }catch(e){}
+    console.log("Migracao FIN_CARTOES->CARDS:", Object.keys(idMap).length, "cartoes migrados");
+  }catch(e){ console.warn("Falha migracao cartao:", e); FIN_MIGRACAO_CARTAO_V2=false; }
+}
+
 // Fix decimal bug: AI returns 24.03955 when should be 24039.55
 function parseAIValor(v){
   if(typeof v==="string"){
@@ -11150,6 +11316,7 @@ function parseAIValor(v){
 }
 
 // ── Render main view ──────────────────────────────────────
+function setEl(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
 function renderCartoes(){
   const scroll = document.getElementById("cc-cards-scroll");
   const wrap   = document.getElementById("cc-detail-wrap");
@@ -11743,6 +11910,7 @@ function saveData(){
       FIN_TRANSACTIONS,
       FIN_CONTAS_FIXAS,
       FIN_FIXAS_BY_MONTH,
+      FIN_FIXA_TIPOS,
       NOTAS, nextNotaId,
       FIN_CONTAS, nextContaId,
       FIN_CARTOES, nextCartaoId,
@@ -11760,6 +11928,8 @@ function saveData(){
       CUSTOM_CATS,
       CARDS,
       nextCardId,
+      FIN_MIGRACAO_CARTAO_V2,
+      FIN_CARTOES_LEGACY,
       finYear,
       finMonth,
       nextFinId,
@@ -11835,6 +12005,7 @@ function loadData(){
         FIN_FIXAS_BY_MONTH[k] = data.FIN_FIXAS_BY_MONTH[k];
       });
     }
+    if(data.FIN_FIXA_TIPOS && typeof data.FIN_FIXA_TIPOS==="object") FIN_FIXA_TIPOS = data.FIN_FIXA_TIPOS;
     // MIGRACAO: se tem fixas legacy mas nada novo, copia pro mes atual
     if(FIN_CONTAS_FIXAS.length > 0 && Object.keys(FIN_FIXAS_BY_MONTH).length === 0){
       const cKey = monthKey();
@@ -11863,6 +12034,8 @@ function loadData(){
     }
     if(data.CARDS)         CARDS.splice(0,CARDS.length,...data.CARDS);
     if(data.nextCardId!=null) nextCardId = data.nextCardId;
+    if(data.FIN_MIGRACAO_CARTAO_V2) FIN_MIGRACAO_CARTAO_V2 = true;
+    if(data.FIN_CARTOES_LEGACY) FIN_CARTOES_LEGACY = data.FIN_CARTOES_LEGACY;
     // Restaurar meta fixada
     try{ const pg=localStorage.getItem("bsx_pinned_goal"); if(pg) pinnedGoalId=parseInt(pg)||null; }catch(e){}
 
@@ -14447,6 +14620,9 @@ function loadTheme(){
 }
 
 loadData();
+migrateFinCartoesToCards();
+seedFixaTipos();
+populateFixaTipoSelect();
 loadTheme();
 loadApiKey();
 loadUserProfile();
@@ -14818,8 +14994,8 @@ function buildRyukiContext(){
     .join("\n");
 
   // Cartões
-  const cartoes = FIN_CARTOES.map(c=>
-    `  ${c.nome}: fecha dia ${c.dia_fechamento||"?"}, vence dia ${c.dia_vencimento||"?"}, limite ${fmtV(c.limite||0)}`
+  const cartoes = CARDS.map(c=>
+    `  ${c.nome}: fecha dia ${cartaoFechamento(c)}, vence dia ${cartaoVencimento(c)}, limite ${fmtV(c.limite||0)}`
   ).join("\n") || "  Nenhum cadastrado";
 
   // Burn rate diário
@@ -14982,10 +15158,10 @@ function applyRyukiActions(actions){
       if(tx.tipo==="cartao"){
         // Tenta encontrar cartão por nome, fallback pro primeiro
         if(a.cartao_nome){
-          const c=FIN_CARTOES.find(x=>(x.nome||"").toLowerCase().includes((a.cartao_nome||"").toLowerCase()));
+          const c=CARDS.find(x=>(x.nome||"").toLowerCase().includes((a.cartao_nome||"").toLowerCase()));
           if(c) tx.cartao_id=c.id;
         }
-        if(!tx.cartao_id && FIN_CARTOES.length>0) tx.cartao_id=FIN_CARTOES[0].id;
+        if(!tx.cartao_id && CARDS.length>0) tx.cartao_id=CARDS[0].id;
       } else {
         if(a.conta_nome){
           const c=FIN_CONTAS.find(x=>(x.nome||"").toLowerCase().includes((a.conta_nome||"").toLowerCase()));
@@ -15478,28 +15654,145 @@ function clearRyukiHistory(){
      SIMWORK CLOUD — Supabase (login + sincronização)
      ══════════════════════════════════════════════════════ -->
 <style>
-#sw-auth-overlay{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(22,17,42,0.55);backdrop-filter:blur(8px);padding:20px}
-.sw-auth-card{width:min(380px,94vw);background:var(--bg);border:1px solid var(--border-light);border-radius:22px;padding:28px 26px;box-shadow:0 24px 80px rgba(0,0,0,.35)}
-.sw-auth-card h2{font-family:'Outfit',sans-serif;font-weight:800;font-size:1.5rem;color:var(--accent);text-align:center;margin:0 0 4px}
-.sw-auth-sub{font-size:.8rem;color:var(--muted);text-align:center;margin:0 0 18px;line-height:1.5}
-.sw-auth-card input{width:100%;padding:11px 13px;margin-bottom:10px;border-radius:12px;border:1px solid var(--border-light);background:var(--surface);color:var(--text);font-size:.9rem;outline:none}
-.sw-auth-btn{width:100%;padding:11px;border:none;border-radius:12px;font-weight:700;font-size:.9rem;cursor:pointer;margin-bottom:8px;font-family:inherit}
-.sw-auth-btn.primary{background:var(--accent);color:#fff}
-.sw-auth-btn.ghost{background:transparent;color:var(--muted);border:1px dashed var(--border-light);font-weight:500;font-size:.78rem}
-#sw-auth-msg{font-size:.78rem;margin-bottom:10px;min-height:16px;text-align:center;line-height:1.45}
+/* ===== SimWork — Tela de acesso (split-screen) ===== */
+#sw-auth-overlay{
+  position:fixed;inset:0;z-index:100000;
+  display:grid;grid-template-columns:1.04fr .96fr;
+  background:#16112a;
+  background-image:
+    radial-gradient(ellipse at 84% 6%,  rgba(232,131,90,0.30) 0, transparent 46%),
+    radial-gradient(ellipse at 10% 20%, rgba(130,80,220,0.42) 0, transparent 50%),
+    radial-gradient(ellipse at 94% 34%, rgba(50,75,175,0.30)  0, transparent 50%),
+    radial-gradient(ellipse at 22% 96%, rgba(90,40,170,0.30)  0, transparent 54%);
+  color:#ede8fb;font-family:'Inter','Segoe UI',sans-serif;overflow:auto;
+}
+/* ---- HERO (esquerda) ---- */
+.sw-hero{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:26px;padding:46px 4.2vw 40px 4.6vw;min-height:100vh;overflow:hidden}
+.sw-brand{display:flex;align-items:center;gap:13px}
+.sw-brand-mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#e8835a,#c07aff);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(232,131,90,.32)}
+.sw-brand-mark svg{width:23px;height:23px}
+.sw-brand-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:1.34rem;letter-spacing:-.02em;line-height:1}
+.sw-brand-tag{font-size:.7rem;color:rgba(255,255,255,.42);margin-top:3px;letter-spacing:.02em}
+.sw-hero-main{max-width:530px}
+.sw-hero-h1{font-family:'Outfit',sans-serif;font-weight:800;font-size:clamp(2.1rem,3.4vw,3.15rem);line-height:1.07;letter-spacing:-.025em;margin:0}
+.sw-hero-h1 .ac{color:#e8835a}
+.sw-hero-sub{margin:20px 0 0;font-size:1.02rem;line-height:1.55;color:rgba(255,255,255,.62);max-width:470px}
+.sw-feats{list-style:none;margin:30px 0 0;padding:0;display:flex;flex-direction:column;gap:15px}
+.sw-feats li{display:flex;align-items:center;gap:13px;font-size:.92rem;color:rgba(255,255,255,.82)}
+.sw-feat-ic{width:36px;height:36px;border-radius:11px;background:rgba(232,131,90,.12);border:1px solid rgba(232,131,90,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sw-feat-ic svg{width:18px;height:18px;stroke:#e8835a;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+/* ---- Motivo visual (leque de cards) ---- */
+.sw-motif{position:relative;height:224px;margin-top:4px;max-width:500px}
+.sw-mcard{position:absolute;background:rgba(30,24,52,0.72);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.14);border-radius:18px;box-shadow:0 22px 52px rgba(0,0,0,.42);padding:13px 15px}
+.sw-mcard-1{width:246px;left:2px;bottom:14px;transform:rotate(-6deg);opacity:.94;z-index:1}
+.sw-mcard-2{width:298px;left:146px;bottom:76px;transform:rotate(4deg);z-index:3}
+.sw-mcard-3{width:236px;left:208px;bottom:0;transform:rotate(-3deg);z-index:2}
+.sw-mlbl{font-size:.58rem;letter-spacing:.16em;color:rgba(255,255,255,.34);font-weight:600;margin-bottom:8px}
+.sw-mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.82rem;color:rgba(255,255,255,.62)}
+.sw-badge{font-size:.62rem;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.sw-badge.coral{background:rgba(232,131,90,.18);color:#e8835a}
+.sw-badge.green{background:rgba(66,232,154,.16);color:#42e89a}
+.sw-ry{display:flex;align-items:flex-start;gap:10px}
+.sw-ry-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c07aff,#6b9fff);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:800;font-size:.66rem;color:#fff;flex-shrink:0}
+.sw-ry-txt{font-size:.8rem;line-height:1.4;color:#ede8fb}
+.sw-ry-chips{display:flex;gap:6px;margin-top:9px;padding-left:42px}
+.sw-tx{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sw-tx-nome{font-size:.82rem;color:#ede8fb;font-weight:500}
+.sw-tx-cat{font-size:.66rem;color:rgba(255,255,255,.42);margin-top:2px}
+.sw-check{width:26px;height:26px;border-radius:50%;background:#42e89a;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sw-check svg{width:14px;height:14px;stroke:#16112a;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.sw-hero-foot{font-size:.72rem;color:rgba(255,255,255,.4);line-height:1.5;margin:18px 0 0}
+/* ---- FORM (direita) ---- */
+.sw-formwrap{display:flex;align-items:center;justify-content:center;padding:40px 4vw;min-height:100vh}
+.sw-auth-card{width:min(400px,100%);background:rgba(30,24,52,0.68);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:34px 32px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.sw-auth-card h2{font-family:'Outfit',sans-serif;font-weight:800;font-size:1.5rem;color:#ede8fb;margin:0 0 5px}
+.sw-auth-sub{font-size:.85rem;color:rgba(255,255,255,.5);margin:0 0 22px;line-height:1.5}
+.sw-tabs{display:flex;gap:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:4px;margin-bottom:20px}
+.sw-tab{flex:1;padding:9px;border:none;border-radius:9px;background:transparent;color:rgba(255,255,255,.5);font-weight:600;font-size:.85rem;cursor:pointer;font-family:inherit;transition:all .16s}
+.sw-tab.active{background:rgba(232,131,90,.16);color:#e8835a}
+.sw-field{margin-bottom:14px}
+.sw-field label{display:block;font-size:.74rem;font-weight:600;color:rgba(255,255,255,.55);margin-bottom:6px;letter-spacing:.01em}
+.sw-auth-card input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#ede8fb;font-size:.92rem;outline:none;font-family:inherit;transition:border-color .16s,background .16s}
+.sw-auth-card input:focus{border-color:rgba(232,131,90,.55);background:rgba(255,255,255,.07)}
+.sw-auth-card input::placeholder{color:rgba(255,255,255,.28)}
+#sw-auth-msg{font-size:.78rem;margin:2px 0 12px;min-height:16px;line-height:1.45}
+.sw-auth-btn{width:100%;padding:13px;border:none;border-radius:12px;font-weight:700;font-size:.92rem;cursor:pointer;font-family:inherit;transition:transform .12s,box-shadow .16s,opacity .16s}
+.sw-auth-btn.primary{background:linear-gradient(135deg,#e8835a,#e0674a);color:#fff;box-shadow:0 10px 26px rgba(232,131,90,.32)}
+.sw-auth-btn.primary:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(232,131,90,.4)}
+.sw-forgot{display:block;width:100%;text-align:center;background:none;border:none;color:rgba(255,255,255,.42);font-size:.76rem;cursor:pointer;margin-top:14px;font-family:inherit}
+.sw-forgot:hover{color:#e8835a}
+.sw-divider{display:flex;align-items:center;gap:10px;margin:18px 0 14px;color:rgba(255,255,255,.28);font-size:.7rem}
+.sw-divider::before,.sw-divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.1)}
+.sw-skip{width:100%;padding:11px;border:1px dashed rgba(255,255,255,.16);border-radius:12px;background:transparent;color:rgba(255,255,255,.5);font-weight:500;font-size:.8rem;cursor:pointer;font-family:inherit}
+.sw-skip:hover{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.72)}
 #sw-cloud-chip{position:fixed;left:14px;bottom:14px;z-index:9997;font-size:.72rem;padding:7px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--border-light);color:var(--muted);cursor:pointer;backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+/* ---- responsivo ---- */
+@media(max-width:900px){
+  #sw-auth-overlay{grid-template-columns:1fr}
+  .sw-hero{display:none}
+  .sw-auth-card{background:rgba(30,24,52,0.82)}
+}
 </style>
 
 <div id="sw-auth-overlay" style="display:none">
-  <div class="sw-auth-card">
-    <h2>SimWork ☁️</h2>
-    <p class="sw-auth-sub">Crie sua conta (ou entre) pra ter seus dados salvos na nuvem e acessar de qualquer dispositivo.</p>
-    <input id="sw-auth-email" type="email" placeholder="Seu e-mail" autocomplete="email">
-    <input id="sw-auth-pass" type="password" placeholder="Senha (mínimo 6 caracteres)" autocomplete="current-password">
-    <div id="sw-auth-msg"></div>
-    <button class="sw-auth-btn primary" onclick="swAuthLogin()">Entrar</button>
-    <button class="sw-auth-btn primary" style="opacity:.85" onclick="swAuthSignup()">Criar conta</button>
-    <button class="sw-auth-btn ghost" onclick="swAuthSkip()">Continuar sem conta (só neste dispositivo)</button>
+  <!-- HERO -->
+  <div class="sw-hero">
+    <div class="sw-brand">
+      <div class="sw-brand-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="1.5" opacity=".55"/><polygon points="12,6.5 14,12 12,17.5 10,12" fill="#fff"/></svg></div>
+      <div>
+        <div class="sw-brand-name">SimWork</div>
+        <div class="sw-brand-tag">Suíte SimFlow</div>
+      </div>
+    </div>
+    <div class="sw-hero-main">
+      <h1 class="sw-hero-h1">Você fala.<br>A Ryuki <span class="ac">concilia</span>,<br>organiza e resume.</h1>
+      <p class="sw-hero-sub">A IA lê sua fatura e seu extrato, lança e corrige transações sozinha. A você resta conferir — e decidir.</p>
+      <ul class="sw-feats">
+        <li><span class="sw-feat-ic"><svg viewBox="0 0 24 24"><path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 3.5l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6z"/></svg></span> A Ryuki concilia fatura e extrato e lança tudo por você</li>
+        <li><span class="sw-feat-ic"><svg viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M6 20v-6M11 20V6M16 20v-9"/></svg></span> Relatório semanal do seu progresso, escrito pela IA</li>
+        <li><span class="sw-feat-ic"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M9 14.5l2 2 4-4"/></svg></span> Reuniões viram resumo e tarefas, sem digitar nada</li>
+      </ul>
+    </div>
+    <div>
+      <div class="sw-motif" aria-hidden="true">
+        <div class="sw-mcard sw-mcard-1">
+          <div class="sw-mlbl">FATURA IMPORTADA</div>
+          <div class="sw-mrow"><span>Nubank · R$ 1.240,00</span><span class="sw-badge coral">importada</span></div>
+        </div>
+        <div class="sw-mcard sw-mcard-2">
+          <div class="sw-ry"><div class="sw-ry-av">RY</div><div class="sw-ry-txt">Conciliei 12 lançamentos. 2 pedem sua conferência.</div></div>
+          <div class="sw-ry-chips"><span class="sw-badge green">10 ok</span><span class="sw-badge coral">2 revisar</span></div>
+        </div>
+        <div class="sw-mcard sw-mcard-3">
+          <div class="sw-tx"><div><div class="sw-tx-nome">Mercado · R$ 86,40</div><div class="sw-tx-cat">Alimentação</div></div><div class="sw-check"><svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg></div></div>
+        </div>
+      </div>
+      <p class="sw-hero-foot">Dados criptografados e sincronizados na nuvem. O controle é sempre seu.</p>
+    </div>
+  </div>
+  <!-- FORM -->
+  <div class="sw-formwrap">
+    <div class="sw-auth-card">
+      <h2>Acesse seu SimWork</h2>
+      <p class="sw-auth-sub">Entre para sincronizar seu trabalho em qualquer aparelho.</p>
+      <div class="sw-tabs">
+        <button class="sw-tab active" id="sw-tab-login" onclick="swAuthTab('login')">Entrar</button>
+        <button class="sw-tab" id="sw-tab-signup" onclick="swAuthTab('signup')">Criar conta</button>
+      </div>
+      <div class="sw-field">
+        <label for="sw-auth-email">E-mail</label>
+        <input id="sw-auth-email" type="email" placeholder="voce@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')swAuthSubmit()">
+      </div>
+      <div class="sw-field">
+        <label for="sw-auth-pass">Senha</label>
+        <input id="sw-auth-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="current-password" onkeydown="if(event.key==='Enter')swAuthSubmit()">
+      </div>
+      <div id="sw-auth-msg"></div>
+      <button class="sw-auth-btn primary" id="sw-auth-submit" onclick="swAuthSubmit()">Entrar</button>
+      <button class="sw-forgot" onclick="swAuthForgot()">Esqueci minha senha</button>
+      <div class="sw-divider">ou</div>
+      <button class="sw-skip" onclick="swAuthSkip()">Continuar sem conta neste aparelho</button>
+    </div>
   </div>
 </div>
 <div id="sw-cloud-chip" style="display:none" onclick="swChipClick()"></div>
@@ -15639,7 +15932,29 @@ function swChipClick(){
   if(swUser){ swLogout(); }
   else { try{ localStorage.removeItem("simwork_skip_login"); }catch(_){} swShowOverlay(); }
 }
-function swShowOverlay(){ const o=document.getElementById("sw-auth-overlay"); if(o) o.style.display="flex"; }
+let swAuthMode = "login";
+function swAuthTab(mode){
+  swAuthMode = mode;
+  const tl=document.getElementById("sw-tab-login"), ts=document.getElementById("sw-tab-signup"), sub=document.getElementById("sw-auth-submit"), pass=document.getElementById("sw-auth-pass");
+  if(tl) tl.classList.toggle("active", mode==="login");
+  if(ts) ts.classList.toggle("active", mode==="signup");
+  if(sub) sub.textContent = mode==="signup" ? "Criar conta" : "Entrar";
+  if(pass) pass.setAttribute("autocomplete", mode==="signup" ? "new-password" : "current-password");
+  swAuthMsg("");
+}
+function swAuthSubmit(){ if(swAuthMode==="signup") swAuthSignup(); else swAuthLogin(); }
+async function swAuthForgot(){
+  if(!swClient) return;
+  const email=(document.getElementById("sw-auth-email")?.value||"").trim();
+  if(!email){ swAuthMsg("Digite seu e-mail no campo acima para receber o link de redefinição."); return; }
+  swAuthMsg("Enviando link de redefinição...", true);
+  try{
+    const { error } = await swClient.auth.resetPasswordForEmail(email, { redirectTo: SW_SITE });
+    if(error){ swAuthMsg(swAuthErrPt(error.message)); return; }
+    swAuthMsg("Link enviado. Verifique seu e-mail para redefinir a senha.", true);
+  }catch(e){ swAuthMsg("Não foi possível enviar agora. Tente novamente em instantes."); }
+}
+function swShowOverlay(){ const o=document.getElementById("sw-auth-overlay"); if(o) o.style.display=""; swAuthTab("login"); }
 function swHideOverlay(){ const o=document.getElementById("sw-auth-overlay"); if(o) o.style.display="none"; }
 function swSetChip(txt){ const c=document.getElementById("sw-cloud-chip"); if(c){ c.style.display="block"; c.textContent=txt; } }
 

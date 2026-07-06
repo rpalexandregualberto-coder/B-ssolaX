@@ -20,6 +20,9 @@ skills-lock.json
 .claude/worktrees/
 .wrangler/
 
+# Prévia de dev da tela de login (não vai pro deploy)
+tools/_login-preview.html
+
 # Arquivos de sistema
 Thumbs.db
 .DS_Store
