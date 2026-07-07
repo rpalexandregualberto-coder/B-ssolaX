@@ -9430,26 +9430,34 @@ function renderProjecaoCaixa(totalEntradas, totalDespesas){
   if(saldoEl) saldoEl.textContent = fmtBRL(saldoAtual);
 
   const fixas = getFixas().filter(f=>!f.paga);
-  if(!fixas.length && saldoAtual === 0){
+  const temFatura = CARDS.some(c=>faturaFechada(c.id)>0);
+  if(!fixas.length && !temFatura && saldoAtual === 0){
     barsEl.innerHTML = '<div style="color:var(--muted);font-size:.72rem;padding:16px">Cadastre contas e despesas fixas para ver a projeção.</div>';
     return;
   }
 
-  // Projetar 30 dias
+  // Projetar 30 dias — inclui fixas não pagas E faturas de cartão fechadas
   const today = new Date();
   const todayDay = today.getDate();
-  const daysInMonth = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
+
+  // eventos de saída por offset de dia (0..29). Conta já vencida = vence hoje (offset 0).
+  const eventos = {};
+  const addEvento = (diaDoMes, valor)=>{
+    if(!(valor>0)) return;
+    const off = (diaDoMes<=todayDay) ? 0 : (diaDoMes - todayDay);
+    if(off>=0 && off<30) eventos[off] = (eventos[off]||0) + valor;
+  };
+  fixas.forEach(f=> addEvento(f.dia, f.valor));
+  CARDS.forEach(c=>{ const ff=faturaFechada(c.id); if(ff>0) addEvento(cartaoVencimento(c), ff); });
 
   const dias = [];
   let saldoProj = saldoAtual;
   for(let i=0; i<30; i++){
     const d = new Date(today);
     d.setDate(d.getDate()+i);
-    const dayOfMonth = d.getDate();
-    // Deduzir fixas que vencem neste dia (ainda não pagas)
-    const saidas = fixas.filter(f=>f.dia===dayOfMonth).reduce((s,f)=>s+f.valor,0);
+    const saidas = eventos[i] || 0;
     saldoProj -= saidas;
-    dias.push({d:i+1, dia:dayOfMonth, saldo:saldoProj, saida:saidas});
+    dias.push({d:i+1, dia:d.getDate(), saldo:saldoProj, saida:saidas});
   }
 
   const minSaldo = Math.min(...dias.map(d=>d.saldo), 0);
