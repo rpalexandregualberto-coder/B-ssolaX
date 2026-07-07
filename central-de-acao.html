@@ -10085,8 +10085,8 @@ JSON SOMENTE:`;
       const existingNubankIds=new Set(FIN_TRANSACTIONS.filter(t=>t.nubank_id).map(t=>t.nubank_id));
       // Fallback: mapa nome+valor+data para tx sem nubank_id
       const existingMap={};
-      FIN_TRANSACTIONS.filter(t=>!t.nubank_id).forEach(e=>{
-        const k=`${e.nome}|${e.valor}|${e.data}`; existingMap[k]=(existingMap[k]||0)+1;
+      FIN_TRANSACTIONS.forEach(e=>{
+        const k=`${e.nome}|${Math.abs(e.valor)}|${e.data}`; existingMap[k]=(existingMap[k]||0)+1;
       });
       const batchMap={};
 
@@ -10192,10 +10192,15 @@ JSON SOMENTE:
     const importBatchIdAI = "imp_" + Date.now();
     const importedIds = [];
     let totalSaidasAI=0, totalEstornosAI=0;
+    const duplicadosAI=[], existingMapAI={}, batchMapAI={};
+    FIN_TRANSACTIONS.forEach(e=>{ const k=`${e.nome}|${Math.abs(e.valor)}|${e.data}`; existingMapAI[k]=(existingMapAI[k]||0)+1; });
     (result.transacoes||[]).forEach(tx=>{
       if(!tx.nome||tx.valor==null) return;
-      const newId = nextFinId++;
       const v = parseAIValor(tx.valor);
+      const _kAI=`${tx.nome}|${Math.abs(v)}|${tx.data||dataDefault}`;
+      batchMapAI[_kAI]=(batchMapAI[_kAI]||0)+1;
+      if(batchMapAI[_kAI] <= (existingMapAI[_kAI]||0)){ duplicadosAI.push(tx.nome); return; }
+      const newId = nextFinId++;
       const newTx = {
         id: newId,
         nome: tx.nome,
@@ -10247,12 +10252,12 @@ JSON SOMENTE:
       fonte: "IA (PDF/TXT/OFX)",
       mes: mesLabel,
       count,
-      countDup: 0,
+      countDup: duplicadosAI.length,
       totalSaidas: totalSaidasAI,
       totalEstornos: totalEstornosAI,
       futuro: !!(typeof isFuturo!=="undefined" ? isFuturo : window._finImportFuturo)
     });
-    if(statusText) statusText.textContent=`✅ ${count} transações importadas com inteligência financeira!`;
+    if(statusText) statusText.textContent=`✅ ${count} transações importadas${duplicadosAI.length?` (${duplicadosAI.length} duplicata${duplicadosAI.length!==1?"s":""} ignorada${duplicadosAI.length!==1?"s":""})`:""}!`;
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; }, 2500);
     renderFinanceiro();
     try{ saveData(); }catch(e){}
