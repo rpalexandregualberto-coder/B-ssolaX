@@ -8036,8 +8036,8 @@ function getFaturaVencimento(dataStr, cartao){
   if(!dataStr || !cartao) return null;
   const d = new Date(dataStr + "T12:00:00");
   if(isNaN(d)) return null;
-  const diaFech = cartao.dia_fechamento || 5;
-  const diaVenc = cartao.dia_vencimento || 12;
+  const diaFech = cartaoFechamento(cartao);
+  const diaVenc = cartaoVencimento(cartao);
   let invMes = d.getMonth();   // 0-indexed
   let invAno = d.getFullYear();
   if(d.getDate() > diaFech){
@@ -8060,7 +8060,7 @@ function getFaturaMesLabel(dataStr, cartao){
   if(!dataStr || !cartao) return "";
   const d = new Date(dataStr + "T12:00:00");
   if(isNaN(d)) return "";
-  const diaFech = cartao.dia_fechamento || 5;
+  const diaFech = cartaoFechamento(cartao);
   let invMes = d.getMonth();
   let invAno = d.getFullYear();
   if(d.getDate() > diaFech){ invMes++; if(invMes>11){invMes=0;invAno++;} }
@@ -8210,7 +8210,7 @@ function getFixas(){
     const previous = allKeys.filter(k=>k<key).pop();
     if(previous){
       FIN_FIXAS_BY_MONTH[key] = FIN_FIXAS_BY_MONTH[previous].map(f=>({
-        id: nextFixaId++, nome: f.nome, valor: f.valor, dia: f.dia, paga: false
+        id: nextFixaId++, nome: f.nome, valor: f.valor, dia: f.dia, paga: false, cat: f.cat||"outros"
       }));
     } else {
       FIN_FIXAS_BY_MONTH[key] = [];
@@ -8680,7 +8680,7 @@ function copiarFixasDoMes(sourceKey){
   const destKey = monthKey();
   if(!confirm(`Copiar ${fonte.length} contas fixas de ${sourceKey} pra ${destKey}?`)) return;
   FIN_FIXAS_BY_MONTH[destKey] = fonte.map(f=>({
-    id: nextFixaId++, nome: f.nome, valor: f.valor, dia: f.dia, paga: false
+    id: nextFixaId++, nome: f.nome, valor: f.valor, dia: f.dia, paga: false, cat: f.cat||"outros"
   }));
   renderFinanceiro();
   try{ saveData(); }catch(e){}
@@ -8801,8 +8801,10 @@ function renderFinanceiro(){
 
   const totalEntradas  = entradas.reduce((s,t)=>s+t.valor,0);
   const totalExtras    = despExtras.reduce((s,t)=>s+t.valor,0);
-  const totalFixasTx   = despFixasTx.reduce((s,t)=>s+t.valor,0);
   const fixasMes       = getFixas();
+  const fixasNomesKPI  = new Set(fixasMes.map(f=>(f.nome||"").toLowerCase()));
+  const despFixasTxUnica = despFixasTx.filter(t=>!fixasNomesKPI.has((t.nome||"").toLowerCase())); // evita contar 2x fixa cadastrada + tx da mesma fixa
+  const totalFixasTx   = despFixasTxUnica.reduce((s,t)=>s+t.valor,0);
   const totalFixasCad  = fixasMes.reduce((s,f)=>s+f.valor,0);
   const totalCartaoPago= cartaoPago.reduce((s,t)=>s+t.valor,0);
   const totalDespesas  = totalExtras + totalFixasCad + totalFixasTx + totalCartaoPago;
@@ -8833,7 +8835,7 @@ function renderFinanceiro(){
   setEl("fin-fixas-total",fmtBRL(totalFixasAll));
   setEl("fin-fixas-pct",totalDespesas>0?Math.round(totalFixasAll/totalDespesas*100)+"% das despesas":"—");
   setEl("fin-vars-total",fmtBRL(totalExtras));
-  setEl("fin-fixas-pagas",(fixasPagas+despFixasTx.length)+"/"+(fixasMes.length+despFixasTx.length));
+  setEl("fin-fixas-pagas",(fixasPagas+despFixasTxUnica.length)+"/"+(fixasMes.length+despFixasTxUnica.length));
 
   const saldoEl=document.getElementById("fin-saldo");
   if(saldoEl) saldoEl.style.color=saldo>=0?"var(--green)":"var(--red)";
@@ -9590,10 +9592,11 @@ function renderAlertasVencimento(){
 
   // Também verifica cartões cadastrados
   const cartaoAlertas = CARDS.map(c=>{
-    const diff = c.dia_vencimento - diaHoje;
+    const diaVenc = cartaoVencimento(c);
+    const diff = diaVenc - diaHoje;
     const fat = faturaAberta(c.id);
     if(diff >= 0 && diff <= 7 && fat > 0){
-      return {nome:`Fatura ${c.nome}`, valor:fat, dia:c.dia_vencimento, diff, tipo:"cartao"};
+      return {nome:`Fatura ${c.nome}`, valor:fat, dia:diaVenc, diff, tipo:"cartao"};
     }
     return null;
   }).filter(Boolean);
@@ -11667,10 +11670,12 @@ function markFaturaPaga(cardId, mesAno){
 }
 
 function deleteCard(id){
-  if(!confirm("Excluir este cartão? As transações associadas serão mantidas.")) return;
+  if(!confirm("Excluir este cartão? As transações associadas serão desvinculadas (não apagadas).")) return;
+  FIN_TRANSACTIONS.forEach(t=>{ if(t.cartao_id===id) delete t.cartao_id; });
   const idx=CARDS.findIndex(c=>c.id===id);
   if(idx>-1) CARDS.splice(idx,1);
   if(_selectedCardId===id) _selectedCardId=CARDS.length>0?CARDS[0].id:null;
+  try{ renderFinanceiro(); }catch(e){}
   saveData();
   renderCartoes();
 }
@@ -11739,7 +11744,7 @@ function saveNewCard(){
   const card={
     id:"card_"+(nextCardId++),
     nome, banco:_ccmBanco, ultimos4, cor:b.cor, cor2:b.cor2, corTexto:b.corTexto,
-    limite, fechamento, vencimento, ativo:true, faturas:{}, criadoEm:new Date().toISOString()
+    limite, fechamento, vencimento, dia_fechamento:fechamento, dia_vencimento:vencimento, ativo:true, faturas:{}, criadoEm:new Date().toISOString()
   };
   CARDS.push(card);
   _selectedCardId=card.id;
@@ -12010,7 +12015,7 @@ function loadData(){
     if(FIN_CONTAS_FIXAS.length > 0 && Object.keys(FIN_FIXAS_BY_MONTH).length === 0){
       const cKey = monthKey();
       FIN_FIXAS_BY_MONTH[cKey] = FIN_CONTAS_FIXAS.map(f=>({
-        id: f.id, nome: f.nome, valor: f.valor, dia: f.dia, paga: !!f.paga
+        id: f.id, nome: f.nome, valor: f.valor, dia: f.dia, paga: !!f.paga, cat: f.cat||"outros"
       }));
       console.log("Migrado contas fixas pro formato mensal:", cKey);
     }
