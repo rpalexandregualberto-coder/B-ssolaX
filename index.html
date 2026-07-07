@@ -8023,7 +8023,7 @@ function saldoConta(contaId){
   FIN_TRANSACTIONS.forEach(t=>{
     if(t.conta_id !== contaId) return;
     if(t.tipo === 'receita') saldo += t.valor;
-    else if(t.tipo === 'despesa_extra' || t.tipo === 'despesa_fixa' || t.tipo === 'pagamento_fixa') saldo -= t.valor;
+    else if(t.tipo === 'despesa_extra' || t.tipo === 'despesa_fixa' || t.tipo === 'pagamento_fixa' || t.tipo === 'pagamento_fatura') saldo -= t.valor;
     else if(t.tipo === 'investimento') saldo -= t.valor; // sai da conta
   });
   return saldo;
@@ -8731,26 +8731,58 @@ function deleteContaFixa(id){
 
 // ── QUANTO PRECISO TER EM CAIXA — contas a pagar do periodo menos saldo ──
 // Fatura FECHADA de um cartao = ciclo que ja fechou e esta pendente de pagamento
-function faturaFechada(cardId){
-  const card=getCartaoAny(cardId); if(!card) return 0;
+function faturaFechadaInfo(cardId){
+  const card=getCartaoAny(cardId); if(!card) return {valor:0,cicloKey:null,paga:false,nome:''};
   const diaFech=cartaoFechamento(card);
   const today=new Date();
   let fAno=today.getFullYear(), fMes=today.getMonth();
   if(today.getDate()<=diaFech){ fMes--; if(fMes<0){fMes=11;fAno--;} }
   const fim=new Date(fAno, fMes, diaFech, 23,59,59);
   const inicio=new Date(fAno, fMes-1, diaFech+1, 0,0,0);
-  return FIN_TRANSACTIONS
+  const cicloKey=fAno+"-"+String(fMes+1).padStart(2,"0");
+  const paga=!!(card.ciclosPagos && card.ciclosPagos[cicloKey]);
+  const valor=FIN_TRANSACTIONS
     .filter(t=>t.cartao_id===cardId && t.tipo==='cartao')
     .filter(t=>{ const d=new Date((t.data||'')+'T12:00:00'); return d>=inicio && d<=fim; })
     .reduce((s,t)=>s+(t.valor||0), 0);
+  return {valor, cicloKey, paga, nome:card.nome};
+}
+function faturaFechada(cardId){ const i=faturaFechadaInfo(cardId); return i.paga?0:i.valor; }
+function pagarFaturaFechada(cardId){
+  const info=faturaFechadaInfo(cardId);
+  if(info.paga){ alert("Essa fatura fechada já está marcada como paga."); return; }
+  if(info.valor<=0){ alert("Não há fatura fechada pendente neste cartão."); return; }
+  const card=getCartaoAny(cardId);
+  const conta=FIN_CONTAS.find(c=>c.id===card.conta_pagamento_id) || FIN_CONTAS.find(c=>c.ativa!==false) || FIN_CONTAS[0];
+  if(!conta){ alert("Cadastre uma conta bancária primeiro para registrar o pagamento da fatura."); return; }
+  if(!confirm(`Pagar a fatura fechada de ${card.nome} (${fmtBRL(info.valor)})?\n\nVai lançar uma saída de ${fmtBRL(info.valor)} na conta "${conta.nome}" e sair do "a pagar".`)) return;
+  const tx={ id:nextFinId++, nome:"Pagamento fatura "+card.nome, valor:info.valor, tipo:"pagamento_fatura", categoria:"Cartão de Crédito", data:new Date().toISOString().split("T")[0], conta_id:conta.id, origem:"pagamento_fatura", cartao_ref:cardId, ciclo_ref:info.cicloKey };
+  FIN_TRANSACTIONS.push(tx);
+  card.ciclosPagos=card.ciclosPagos||{};
+  card.ciclosPagos[info.cicloKey]={ valor:info.valor, txId:tx.id, pagoEm:tx.data };
+  renderFinanceiro(); try{ if(typeof renderCartoes==='function') renderCartoes(); }catch(e){}
+  saveData();
+}
+function estornarFaturaFechada(cardId){
+  const card=getCartaoAny(cardId); if(!card||!card.ciclosPagos) return;
+  const info=faturaFechadaInfo(cardId);
+  const pago=card.ciclosPagos[info.cicloKey]; if(!pago) return;
+  if(!confirm(`Desfazer o pagamento da fatura de ${card.nome}? A saída na conta será removida.`)) return;
+  if(pago.txId!=null){ const i=FIN_TRANSACTIONS.findIndex(t=>t.id===pago.txId); if(i>-1) FIN_TRANSACTIONS.splice(i,1); }
+  delete card.ciclosPagos[info.cicloKey];
+  renderFinanceiro(); try{ if(typeof renderCartoes==='function') renderCartoes(); }catch(e){}
+  saveData();
 }
 function renderCaixaNecessario(){
   const box=document.getElementById("fin-caixa-box"); if(!box) return;
   let aPagarFixas=0; getFixas().forEach(f=>{ if(!f.paga) aPagarFixas+=(f.valor||0); });
   let aPagarFaturas=0, previsaoParcial=0;
+  const faturasFechadasList=[], faturasPagasList=[];
   CARDS.forEach(c=>{
-    const fechada=faturaFechada(c.id); if(fechada>0) aPagarFaturas+=fechada;
-    const aberta=faturaAberta(c.id);   if(aberta>0)  previsaoParcial+=aberta;
+    const info=faturaFechadaInfo(c.id);
+    if(info.paga && info.valor>0){ faturasPagasList.push({id:c.id,nome:c.nome,valor:info.valor}); }
+    else if(info.valor>0){ aPagarFaturas+=info.valor; faturasFechadasList.push({id:c.id,nome:c.nome,valor:info.valor}); }
+    const aberta=faturaAberta(c.id); if(aberta>0) previsaoParcial+=aberta;
   });
   const totalAPagar=aPagarFixas+aPagarFaturas;
   const saldoAtual=FIN_CONTAS.reduce((s,c)=>s+saldoConta(c.id),0);
@@ -8777,6 +8809,18 @@ function renderCaixaNecessario(){
           ${mini('Faturas fechadas', fmtBRL(aPagarFaturas))}
           ${mini('Já tenho em conta', fmtBRL(saldoAtual), 'var(--green)')}
         </div>
+        ${faturasFechadasList.length?`<div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+          ${faturasFechadasList.map(f=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);border-radius:9px;padding:7px 10px">
+            <span style="font-size:.74rem">Fatura ${escHtml(f.nome)} · <strong>${fmtBRL(f.valor)}</strong></span>
+            <button onclick="pagarFaturaFechada('${f.id}')" style="border:none;border-radius:8px;padding:5px 12px;background:var(--green);color:#fff;font-weight:700;font-size:.7rem;cursor:pointer">Pagar</button>
+          </div>`).join('')}
+        </div>`:''}
+        ${faturasPagasList.length?`<div style="margin-top:8px;display:flex;flex-direction:column;gap:5px">
+          ${faturasPagasList.map(f=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.7rem;color:var(--muted)">
+            <span>Fatura ${escHtml(f.nome)} paga · ${fmtBRL(f.valor)}</span>
+            <button onclick="estornarFaturaFechada('${f.id}')" style="border:1px solid var(--border-light);border-radius:8px;padding:4px 10px;background:transparent;color:var(--muted);font-size:.66rem;cursor:pointer">Desfazer</button>
+          </div>`).join('')}
+        </div>`:''}
         ${previsaoParcial>0?`<div style="font-size:.68rem;color:var(--muted);margin-top:10px">+ ${fmtBRL(previsaoParcial)} em faturas ainda abertas — previsão do próximo ciclo, fora do valor acima.</div>`:''}
       </div>
     </div>`;
