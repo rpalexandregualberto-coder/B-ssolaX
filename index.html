@@ -8640,6 +8640,8 @@ function addTransaction(){
       const idx = parseInt(escolhaStr) - 1;
       if(FIN_CONTAS[idx]) tx.conta_id = FIN_CONTAS[idx].id;
     }
+    // fallback: nunca deixar transacao de conta orfa (senao some do saldo/"ja tenho em conta")
+    if(tx.conta_id==null && FIN_CONTAS.length) tx.conta_id = (FIN_CONTAS.find(c=>c.ativa!==false)||FIN_CONTAS[0]).id;
   }
   FIN_TRANSACTIONS.push(tx);
   document.getElementById("fin-tx-nome").value="";
@@ -11411,7 +11413,12 @@ function renderCartoes(){
 
 function getFaturaTotal(card, mesAno){
   const f=(card.faturas||{})[mesAno];
-  return f ? (f.valorTotal||0) : 0;
+  if(f && f.valorTotal>0) return f.valorTotal; // snapshot do upload (meses historicos)
+  // sem snapshot: no mes atual usa o valor AO VIVO das transacoes (evita divergir da aba Financeiro)
+  const now=new Date();
+  const curMes=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
+  if(mesAno===curMes) return faturaAberta(card.id);
+  return 0;
 }
 
 function calcComprometimentoFuturo(){
