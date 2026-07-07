@@ -6026,7 +6026,7 @@ function saveMeetingNotes(id){
   saveData();
   // feedback visual
   const btn=ta.nextElementSibling;
-  if(btn){ btn.textContent="✅ Salvo!"; btn.style.color="var(--green)"; setTimeout(()=>{ btn.textContent="💾 Salvar notas"; btn.style.color=""; },1800); }
+  if(btn){ btn.textContent="Salvo!"; btn.style.color="var(--green)"; setTimeout(()=>{ btn.textContent="Salvar notas"; btn.style.color=""; },1800); }
 }
 
 function renderMeetings(){
@@ -6244,7 +6244,7 @@ function toggleMeetingCard(id){
 async function analyzeMeeting(id){
   const m=meetings.find(x=>x.id===id); if(!m)return;
   const btn=document.getElementById(`btn-ai-${id}`);
-  if(btn){ btn.classList.add("loading"); btn.textContent="✨ Analisando..."; }
+  if(btn){ btn.classList.add("loading"); btn.textContent="Analisando..."; }
   const resultEl=document.getElementById(`ai-result-${id}`);
   if(resultEl) resultEl.innerHTML=`<div class="ai-box"><div class="ai-box-head"><div class="ai-box-title">IA Analisando</div></div><div class="ai-box-body"><div class="ai-loading"><div class="ai-spinner"></div> Processando transcrição e gerando análise...</div></div></div>`;
 
@@ -6346,7 +6346,7 @@ Responda APENAS com o JSON. Seja brutalmente honesto, estratégico e profundamen
           <button class="btn btn-ai" onclick="analyzeMeeting(${id})" style="margin-top:4px">🔄 Tentar novamente</button>
         </div>
       </div>`;
-    if(btn){ btn.classList.remove("loading"); btn.textContent="✨ Analisar com IA"; }
+    if(btn){ btn.classList.remove("loading"); btn.textContent="Analisar com IA"; }
   }
   updateMetrics();
 }
@@ -6862,7 +6862,7 @@ function saveApiKey(){
   try{ localStorage.setItem("central_acao_apikey", val); }catch(e){}
   updateApiKeyUI();
   const status = document.getElementById("apikey-status");
-  if(status){ status.textContent = "✅ Chave salva!"; status.style.color = "var(--green)"; }
+  if(status){ status.textContent = "Chave salva!"; status.style.color = "var(--green)"; }
 }
 
 function updateApiKeyUI(){
@@ -6919,7 +6919,7 @@ function apikeyRemove(){
 
 function showKeyError(msg){
   const status = document.getElementById("apikey-status");
-  if(status){ status.textContent = "⚠️ " + msg; status.style.color = "var(--red)"; }
+  if(status){ status.textContent = "" + msg; status.style.color = "var(--red)"; }
   // highlight the input
   const inp = document.getElementById("apikey-input");
   if(inp){ inp.style.borderColor = "var(--red)"; inp.focus(); setTimeout(()=>inp.style.borderColor="", 2000); }
@@ -6963,7 +6963,7 @@ function showToastConvite(msg){
     background:var(--green);color:#fff;font-family:'Outfit',sans-serif;font-weight:700;
     font-size:.85rem;padding:12px 24px;border-radius:14px;z-index:99999;
     box-shadow:0 8px 32px rgba(0,0,0,.3);animation:toastIn .4s ease;white-space:nowrap`;
-  t.textContent = "✅ " + msg;
+  t.textContent = "" + msg;
   document.body.appendChild(t);
   setTimeout(()=>t.remove(), 5000);
 }
@@ -7245,10 +7245,10 @@ function setRecEngineBadge(engine) {
   const badge = document.getElementById("rec-engine-badge");
   if (!badge) return;
   if (engine === "assemblyai") {
-    badge.textContent = "⚡ AssemblyAI";
+    badge.textContent = "AssemblyAI";
     badge.style.cssText = "display:inline-block;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-border);margin-left:8px";
   } else if (engine === "webspeech") {
-    badge.textContent = "🎙 Web Speech";
+    badge.textContent = "Web Speech";
     badge.style.cssText = "display:inline-block;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(91,159,255,.1);color:#5b9fff;border:1px solid rgba(91,159,255,.25);margin-left:8px";
   } else {
     badge.style.display = "none";
@@ -7347,19 +7347,19 @@ function setRecUI(state) {
   status.className = `rec-status ${state}`;
 
   if (state === "idle") {
-    btn.textContent = "🎙";
+    btn.textContent = "";
     status.textContent = "Pronto para gravar";
     pauseBtn.style.display = "none";
     resumeBtn.style.display = "none";
     stopBtn.style.display = "none";
   } else if (state === "recording") {
-    btn.textContent = "⏹";
+    btn.textContent = "";
     status.innerHTML = '<span class="rec-dot"></span>Gravando...';
     pauseBtn.style.display = "";
     resumeBtn.style.display = "none";
     stopBtn.style.display = "";
   } else if (state === "paused") {
-    btn.textContent = "▶";
+    btn.textContent = "";
     status.textContent = "Pausado";
     pauseBtn.style.display = "none";
     resumeBtn.style.display = "";
@@ -7409,7 +7409,7 @@ async function gerarRelatorio(){
   if(!btn||!content) return;
 
   btn.classList.add("loading");
-  btn.textContent="⏳ Gerando inteligência...";
+  btn.textContent="Gerando inteligência...";
   content.innerHTML=`<div class="relatorio-loading">
     <div class="ai-spinner"></div>
     IA analisando toda a sua semana com profundidade estratégica...
@@ -7792,7 +7792,7 @@ Responda APENAS com o JSON.`;
     </div>`;
   } finally {
     btn.classList.remove("loading");
-    btn.textContent="✨ Gerar Relatório da Semana";
+    btn.textContent="Gerar Relatório da Semana";
   }
 }
 
@@ -7956,7 +7956,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   // Floating shortcut hint button
   const btn = document.createElement("button");
   btn.title="Atalhos de teclado (?)";
-  btn.textContent="⌨️";
+  btn.textContent="";
   btn.style.cssText="position:fixed;bottom:20px;left:20px;z-index:8300;width:32px;height:32px;background:var(--card);border:1px solid var(--border);border-radius:50%;cursor:pointer;font-size:.78rem;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.2);opacity:.55";
   btn.onmouseover = ()=>btn.style.background="var(--accent-dim)";
   btn.onmouseout  = ()=>btn.style.background="var(--card)";
@@ -8584,7 +8584,7 @@ function renderFinDashboard(){
     const range=maxS-minS||1;
     const neg=dias.filter(d=>d.saldo<0).length;
     if(projMsgEl){
-      projMsgEl.textContent=neg>0?`⚠️ ${neg} dia${neg>1?"s":""} negativo${neg>1?"s":""}`:"✓ Saldo positivo";
+      projMsgEl.textContent=neg>0?`${neg} dia${neg>1?"s":""} negativo${neg>1?"s":""}`:"Saldo positivo";
       projMsgEl.style.color=neg>0?"var(--red)":"var(--green)";
     }
     const shown=dias.filter((_,i)=>i%2===0||dias[i].saida>0);
@@ -8871,7 +8871,7 @@ function renderFinanceiro(){
   setEl("fin-total-cartao", fmtBRL(totalFuturo)); // só fatura em aberto/pendente
   setEl("fin-cartao-total-label",fmtBRL(totalCartaoPago)); // cartão pago (na seção cartão)
   setEl("fin-saldo",fmtBRL(saldo));
-  setEl("fin-saldo-status",saldo>=0?"✅ Positivo":"⚠️ Déficit");
+  setEl("fin-saldo-status",saldo>=0?"Positivo":"Déficit");
   setEl("fin-month-label",FIN_MONTHS[finMonth]+" "+finYear);
   setEl("fin-receitas-count",entradas.length+" lançamento"+(entradas.length!==1?"s":""));
   setEl("fin-burn",burnRate>0?fmtBRL(burnRate)+"/dia":"—");
@@ -9470,10 +9470,10 @@ function renderProjecaoCaixa(totalEntradas, totalDespesas){
   const diasNegativos = dias.filter(d=>d.saldo<0).length;
   if(criticoEl){
     if(diasNegativos > 0){
-      criticoEl.textContent = `⚠️ ${diasNegativos} dia${diasNegativos>1?"s":""} com saldo negativo projetado`;
+      criticoEl.textContent = `${diasNegativos} dia${diasNegativos>1?"s":""} com saldo negativo projetado`;
       criticoEl.style.color = "var(--red)";
     } else {
-      criticoEl.textContent = "✓ Saldo positivo em todos os dias";
+      criticoEl.textContent = "Saldo positivo em todos os dias";
       criticoEl.style.color = "var(--green)";
     }
   }
@@ -9876,7 +9876,7 @@ async function processFinFile(event, tipo){
   });
 
   if(!text||text.trim().length<20){
-    if(statusText) statusText.textContent="❌ Arquivo sem conteúdo legível. Use .txt, .csv ou .ofx";
+    if(statusText) statusText.textContent="Arquivo sem conteúdo legível. Use .txt, .csv ou .ofx";
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },4000);
     event.target.value=""; return;
   }
@@ -9887,7 +9887,7 @@ async function processFinFile(event, tipo){
   // ── Detecta CSV Nubank (date,title,amount) e faz parse direto ──
   const nubankTxsRaw = _parseNubankCSV(text, tipo, dataDefault);
   if(nubankTxsRaw){
-    if(statusText) statusText.textContent=`🧠 Categorizando ${nubankTxsRaw.length} transações com IA...`;
+    if(statusText) statusText.textContent=`Categorizando ${nubankTxsRaw.length} transações com IA...`;
     // Histórico para contextualizar
     const histCats={};
     FIN_TRANSACTIONS.slice(-200).forEach(t=>{ const k=(t.nome||"").toLowerCase().slice(0,20); if(k) histCats[k]=t.categoria; });
@@ -9988,7 +9988,7 @@ JSON SOMENTE:
     matchFixasFromTransactions();
     const _fut2=isFuturo||!!window._finImportFuturo;
     const msgExtra = duplicados.length>0 ? ` (${duplicados.length} duplicata${duplicados.length>1?"s":""} ignorada${duplicados.length>1?"s":""})` : "";
-    if(statusText) statusText.textContent=`✅ ${importedIds.length}/${nubankTxsRaw.length} transações importadas${_fut2?" · pendentes":""}${msgExtra}`;
+    if(statusText) statusText.textContent=`${importedIds.length}/${nubankTxsRaw.length} transações importadas${_fut2?" · pendentes":""}${msgExtra}`;
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },3500);
     const totalLiq=nubankTxsRaw.reduce((s,t)=>s+t.valor,0);
     const totalSaidas=nubankTxsRaw.filter(t=>t.valor>0).reduce((s,t)=>s+t.valor,0);
@@ -10028,7 +10028,7 @@ JSON SOMENTE:
   if(tipo==="extrato"){
     const extratoRows = _parseNubankExtratoConta(text, dataDefault);
     if(extratoRows){
-      if(statusText) statusText.textContent=`🧠 Categorizando ${extratoRows.length} transações do extrato...`;
+      if(statusText) statusText.textContent=`Categorizando ${extratoRows.length} transações do extrato...`;
 
       // Histórico de categorias para contextualizar
       const histCats={};
@@ -10122,7 +10122,7 @@ JSON SOMENTE:`;
       const totalSaidasEx=extratoRows.filter(t=>!t.isReceita).reduce((s,t)=>s+Math.abs(t.valor),0);
       const totalEntradasEx=extratoRows.filter(t=>t.isReceita).reduce((s,t)=>s+t.valor,0);
       const msgDup=duplicados.length>0?` (${duplicados.length} duplicata${duplicados.length!==1?"s":""} ignorada${duplicados.length!==1?"s":""})` :"";
-      if(statusText) statusText.textContent=`✅ ${importedIds.length}/${extratoRows.length} transações importadas${msgDup}`;
+      if(statusText) statusText.textContent=`${importedIds.length}/${extratoRows.length} transações importadas${msgDup}`;
       setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; },3500);
 
       FIN_IMPORT_HISTORY.unshift({
@@ -10158,7 +10158,7 @@ JSON SOMENTE:`;
 
   // ── Fallback: IA extrai as transações (PDF/OFX/TXT) ──
   const textClean = text.replace(/\0/g,"").replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g," ").replace(/ {4,}/g,"   ").slice(0,15000);
-  if(statusText) statusText.textContent=`🧠 Analisando ${tipo==="fatura"?"fatura":"extrato"} completo...`;
+  if(statusText) statusText.textContent=`Analisando ${tipo==="fatura"?"fatura":"extrato"} completo...`;
 
   const catsFatura = FIN_CATS.cartao.join(", ");
   const catsExtrato = [...FIN_CATS.receita,...FIN_CATS.despesa_extra,...(FIN_CATS.despesa_fixa||[]),...FIN_CATS.investimento].join(", ");
@@ -10186,7 +10186,7 @@ JSON SOMENTE:
 {"transacoes":[{"nome":"nome","valor":0.00,"tipo":"cartao","categoria":"cat","data":"YYYY-MM-DD"}]}`;
 
   try{
-    if(statusText) statusText.textContent="🔍 Classificando todas as transações...";
+    if(statusText) statusText.textContent="Classificando todas as transações...";
     const result = await aiProxyCallStream(aiPrompt, 8192);
     let count=0;
     const importBatchIdAI = "imp_" + Date.now();
@@ -10257,7 +10257,7 @@ JSON SOMENTE:
       totalEstornos: totalEstornosAI,
       futuro: !!(typeof isFuturo!=="undefined" ? isFuturo : window._finImportFuturo)
     });
-    if(statusText) statusText.textContent=`✅ ${count} transações importadas${duplicadosAI.length?` (${duplicadosAI.length} duplicata${duplicadosAI.length!==1?"s":""} ignorada${duplicadosAI.length!==1?"s":""})`:""}!`;
+    if(statusText) statusText.textContent=`${count} transações importadas${duplicadosAI.length?` (${duplicadosAI.length} duplicata${duplicadosAI.length!==1?"s":""} ignorada${duplicadosAI.length!==1?"s":""})`:""}!`;
     setTimeout(()=>{ if(statusEl) statusEl.style.display="none"; }, 2500);
     renderFinanceiro();
     try{ saveData(); }catch(e){}
@@ -10270,7 +10270,7 @@ JSON SOMENTE:
   }catch(e){
     console.error("processFinFile error:", e);
     const msg = e.message||"Erro desconhecido";
-    if(statusText) statusText.innerHTML=`❌ <span title="${msg.replace(/"/g,"'")}">${msg.length>80?msg.slice(0,80)+"…":msg}</span>`;
+    if(statusText) statusText.innerHTML=`<span title="${msg.replace(/"/g,"'")}">${msg.length>80?msg.slice(0,80)+"…":msg}</span>`;
     if(statusEl) statusEl.style.background="rgba(255,77,109,.08)";
     setTimeout(()=>{ if(statusEl){ statusEl.style.display="none"; statusEl.style.background=""; } },6000);
   }
@@ -10638,7 +10638,7 @@ function revertImport(batchId){
   try{ saveData(); }catch(e){}
   const toast = document.createElement("div");
   toast.style.cssText="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 20px;font-size:.8rem;font-weight:700;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:9999;backdrop-filter:blur(12px)";
-  toast.textContent=`✅ Importação excluída — ${count} transação${count!==1?"ões":""} removida${count!==1?"s":""}`;
+  toast.textContent=`Importação excluída — ${count} transação${count!==1?"ões":""} removida${count!==1?"s":""}`;
   document.body.appendChild(toast);
   setTimeout(()=>toast.remove(),3500);
 }
@@ -10990,7 +10990,7 @@ function _resolvePixDup(extraId, cartaoId, acao, btn){
     if(tc) tc._pixIgnorado=true;
     try{saveData();}catch(e){}
     renderFinanceiro();
-    if(card){ card.style.opacity=".4"; card.style.pointerEvents="none"; card.querySelectorAll("button").forEach(b=>{b.disabled=true;}); const p=card.querySelector("button"); if(p) p.textContent="✅ Extrato removido — cartão mantido"; }
+    if(card){ card.style.opacity=".4"; card.style.pointerEvents="none"; card.querySelectorAll("button").forEach(b=>{b.disabled=true;}); const p=card.querySelector("button"); if(p) p.textContent="Extrato removido — cartão mantido"; }
   } else {
     // Mantém os dois mas marca como revisados pra não aparecer de novo
     const te=FIN_TRANSACTIONS.find(t=>t.id===extraId);
@@ -11823,7 +11823,7 @@ async function uploadCardFatura(cardId, input){
   if(!file) return;
   const statusEl=document.getElementById(`cc-upload-status-${cardId}`);
   const mesAno=_selectedCardMes||monthKey();
-  if(statusEl) statusEl.textContent="📄 Lendo arquivo...";
+  if(statusEl) statusEl.textContent="Lendo arquivo...";
 
   const text = await new Promise((res,rej)=>{
     const r=new FileReader();
@@ -11832,7 +11832,7 @@ async function uploadCardFatura(cardId, input){
     r.readAsText(file,"UTF-8");
   });
 
-  if(statusEl) statusEl.textContent="🧠 Analisando fatura com IA...";
+  if(statusEl) statusEl.textContent="Analisando fatura com IA...";
 
   const card=CARDS.find(c=>c.id===cardId);
   const cardNome=card?card.nome:"Cartão";
@@ -11902,7 +11902,7 @@ RESPONDA APENAS COM JSON VÁLIDO (sem markdown, sem texto fora do JSON):
 {"transacoes":[{"nome":"nome limpo","valor":0.00,"categoria":"categoria","data":"YYYY-MM-DD","parcela_atual":1,"parcela_total":1}]}`;
 
   try{
-    if(statusEl) statusEl.textContent="🔍 Classificando todas as transações...";
+    if(statusEl) statusEl.textContent="Classificando todas as transações...";
     const result = await aiProxyCallStream(prompt, 8192);
 
     // Import transactions
@@ -11931,12 +11931,12 @@ RESPONDA APENAS COM JSON VÁLIDO (sem markdown, sem texto fora do JSON):
       }
     };
 
-    if(statusEl) statusEl.textContent=`✅ ${txIds.length} transações importadas!`;
+    if(statusEl) statusEl.textContent=`${txIds.length} transações importadas!`;
     setTimeout(()=>{ if(statusEl) statusEl.textContent=""; },3000);
     saveData();
     renderCartoes();
   }catch(e){
-    if(statusEl) statusEl.textContent="❌ "+e.message;
+    if(statusEl) statusEl.textContent=""+e.message;
     setTimeout(()=>{ if(statusEl) statusEl.textContent=""; },5000);
   }
   input.value="";
@@ -14354,7 +14354,7 @@ function renderNotasMirror(){
   // ─── ARQUIVADAS (concluídas) ───
   const concluidas = TASKS.filter(t=>doneSet.has(t.id)).filter(t=>matchSearch((t.name||"")+(t.cat||""))).sort((a,b)=>b.id-a.id);
   if(archiveCnt) archiveCnt.textContent = concluidas.length;
-  if(archiveBtn) archiveBtn.textContent = `📦 Arquivadas (${concluidas.length}) ${_notasArchiveVisible?'▲':'▼'}`;
+  if(archiveBtn) archiveBtn.textContent = `Arquivadas (${concluidas.length}) ${_notasArchiveVisible?'▲':'▼'}`;
   if(archiveSec) archiveSec.style.display = _notasArchiveVisible ? "block" : "none";
   if(archiveEl && _notasArchiveVisible){
     if(!concluidas.length){
@@ -14549,7 +14549,7 @@ function pomoStart(){
   // Request notification permission silently
   if(Notification&&Notification.permission==="default") Notification.requestPermission();
   pomoRunning = true;
-  document.getElementById("pomo-start-btn").textContent = "⏸ Pausar";
+  document.getElementById("pomo-start-btn").textContent = "Pausar";
   document.getElementById("pomo-start-btn").className = "foco-pomo-btn pause";
   pomoInterval = setInterval(()=>{
     pomoSecondsLeft--;
@@ -14562,7 +14562,7 @@ function pomoStart(){
 function pomoPause(){
   pomoRunning = false;
   clearInterval(pomoInterval);
-  document.getElementById("pomo-start-btn").textContent = "▶ Retomar";
+  document.getElementById("pomo-start-btn").textContent = "Retomar";
   document.getElementById("pomo-start-btn").className = "foco-pomo-btn start";
 }
 
@@ -14571,7 +14571,7 @@ function pomoReset(){
   pomoRunning = false;
   pomoIsBreak = false;
   pomoSecondsLeft = POMO_WORK;
-  document.getElementById("pomo-start-btn").textContent = "▶ Iniciar";
+  document.getElementById("pomo-start-btn").textContent = "Iniciar";
   document.getElementById("pomo-start-btn").className = "foco-pomo-btn start";
   document.getElementById("pomo-mode").textContent = "Foco";
   document.getElementById("pomo-mode").style.color = "";
@@ -14594,14 +14594,14 @@ function pomoFinish(){
     else alert(msg);
     document.getElementById("pomo-mode").textContent = pomoSession===0?"Pausa Longa":"Pausa";
     document.getElementById("pomo-mode").style.color = "var(--green)";
-    document.getElementById("pomo-start-btn").textContent = "▶ Iniciar pausa";
+    document.getElementById("pomo-start-btn").textContent = "Iniciar pausa";
   } else {
     // Break done
     pomoIsBreak = false;
     pomoSecondsLeft = POMO_WORK;
     document.getElementById("pomo-mode").textContent = "Foco";
     document.getElementById("pomo-mode").style.color = "";
-    document.getElementById("pomo-start-btn").textContent = "▶ Iniciar foco";
+    document.getElementById("pomo-start-btn").textContent = "Iniciar foco";
     playPomoAlarm();
     alert("🔔 Pausa encerrada! Hora de focar.");
   }
@@ -14813,7 +14813,7 @@ function updateRyukiFilesBadge(){
   if(!badge) return;
   if(RYUKI_FILES.length === 0){ badge.style.display="none"; return; }
   badge.style.display="inline";
-  badge.textContent = `📎 ${RYUKI_FILES.length} arquivo${RYUKI_FILES.length!==1?"s":""}`;
+  badge.textContent = `${RYUKI_FILES.length} arquivo${RYUKI_FILES.length!==1?"s":""}`;
 }
 
 function showRyukiFilesList(){
@@ -15894,10 +15894,10 @@ async function swCloudSaveNow(){
   try{
     const { error } = await swClient.from("user_data").upsert({ user_id: swUser.id, data: swCollectState(), updated_at: new Date().toISOString() });
     if(error) throw error;
-    swSetChip("☁️ Sincronizado · " + (swUser.email||""));
+    swSetChip("Sincronizado · " + (swUser.email||""));
   }catch(e){
     console.warn("SimWork cloud save:", e);
-    swSetChip("⚠️ Erro ao sincronizar — suas alterações estão salvas neste dispositivo");
+    swSetChip("Erro ao sincronizar — suas alterações estão salvas neste dispositivo");
   }
 }
 async function swCloudPull(){
@@ -15937,7 +15937,7 @@ async function swAfterLogin(){
     await swCloudSaveNow();
   }catch(e){
     console.warn("SimWork sync:", e);
-    swSetChip("⚠️ Erro de sincronização — dados locais preservados");
+    swSetChip("Erro de sincronização — dados locais preservados");
   }
 }
 function swAuthMsg(txt, ok){
@@ -15965,7 +15965,7 @@ async function swAuthLogin(){
   swUser = data.user;
   try{ localStorage.removeItem("simwork_skip_login"); }catch(_){}
   swHideOverlay();
-  swSetChip("☁️ Sincronizando...");
+  swSetChip("Sincronizando...");
   await swAfterLogin();
 }
 async function swAuthSignup(){
@@ -15980,7 +15980,7 @@ async function swAuthSignup(){
     swUser = data.user;
     try{ localStorage.removeItem("simwork_skip_login"); }catch(_){}
     swHideOverlay();
-    swSetChip("☁️ Sincronizando...");
+    swSetChip("Sincronizando...");
     await swAfterLogin();
   } else {
     swAuthMsg("✉️ Conta criada! Abra o link de confirmação que enviamos pro seu e-mail e depois volte aqui e clique em Entrar.", true);
@@ -15989,7 +15989,7 @@ async function swAuthSignup(){
 function swAuthSkip(){
   try{ localStorage.setItem("simwork_skip_login","1"); }catch(_){}
   swHideOverlay();
-  swSetChip("📴 Modo local — clique pra usar a nuvem");
+  swSetChip("Modo local — clique pra usar a nuvem");
 }
 async function swLogout(){
   if(!confirm("Sair da conta? Seus dados continuam salvos na nuvem e neste dispositivo.")) return;
@@ -16033,13 +16033,13 @@ function swSetChip(txt){ const c=document.getElementById("sw-cloud-chip"); if(c)
     const { data:{ session } } = await swClient.auth.getSession();
     if(session){
       swUser = session.user;
-      swSetChip("☁️ Sincronizando...");
+      swSetChip("Sincronizando...");
       await swAfterLogin();
     } else if(!localStorage.getItem("simwork_skip_login")){
       swShowOverlay();
-      swSetChip("📴 Modo local");
+      swSetChip("Modo local");
     } else {
-      swSetChip("📴 Modo local — clique pra usar a nuvem");
+      swSetChip("Modo local — clique pra usar a nuvem");
     }
   }catch(e){ console.warn("SimWork init:", e); }
 })();
